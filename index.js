@@ -1,3 +1,15 @@
-// run `node index.js` in the terminal
+import express from "express";
 
-console.log(`Hello Node.js v${process.versions.node}!`);
+const app = express();
+
+app.get("/", (req, res) => {
+  res.json({
+    status: "Lumina Simulation Engine running",
+    time: new Date().toISOString()
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
