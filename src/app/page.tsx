@@ -767,15 +767,18 @@ export default function LandingPage() {
               Powered by Ambidexters Inc. &copy; {new Date().getFullYear()}. All rights reserved.
             </p>
             <div className="flex gap-8">
-              {['Simulation', 'Facilitator', 'Debrief', 'Support'].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-sm text-silver-500 hover:text-primary-600 transition-colors"
-                >
-                  {item}
-                </Link>
-              ))}
+              <Link href="/simulation" className="text-sm text-silver-500 hover:text-primary-600 transition-colors">
+                Simulation
+              </Link>
+              <Link href="/facilitator" className="text-sm text-silver-500 hover:text-primary-600 transition-colors">
+                Facilitator
+              </Link>
+              <span className="text-sm text-silver-500 hover:text-primary-600 transition-colors cursor-pointer">
+                Debrief
+              </span>
+              <span className="text-sm text-silver-500 hover:text-primary-600 transition-colors cursor-pointer">
+                Support
+              </span>
             </div>
           </div>
         </div>
