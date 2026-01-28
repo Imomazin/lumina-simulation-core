@@ -14,7 +14,7 @@ interface SimulationStore {
   gameState: GameState | null;
   isLoading: boolean;
   error: string | null;
-  selectedRole: Role;
+  selectedRole: Role | null;
   pendingDecisions: RoundDecisions;
   demoMode: boolean;
 
@@ -22,7 +22,7 @@ interface SimulationStore {
   setGameState: (state: GameState) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setSelectedRole: (role: Role) => void;
+  setSelectedRole: (role: Role | null) => void;
   setDecision: (role: Role, decision: unknown) => void;
   clearDecisions: () => void;
   setDemoMode: (demo: boolean) => void;

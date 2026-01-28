@@ -377,30 +377,31 @@ function StockTicker({ price, change }: { price: number; change: number }) {
 
 // Dashboard View Component
 function DashboardView({ gameState, sharePrice }: { gameState: GameState; sharePrice: number }) {
-  const metrics = gameState.metrics;
+  const company = gameState.company;
+  const scorecard = gameState.scorecard;
 
   const kpis = [
     {
       label: 'Revenue',
-      value: formatCurrency(metrics.revenue),
+      value: formatCurrency(company.revenue),
       change: '+12.5%',
       trend: 'up' as const,
       icon: DollarSign,
       gradient: 'from-success-400 to-success-500',
     },
     {
-      label: 'Market Share',
-      value: formatPercent(metrics.marketShare / 100),
+      label: 'Market Growth',
+      value: formatPercent(scorecard.growth / 100),
       change: '+3.2%',
       trend: 'up' as const,
       icon: PieChart,
       gradient: 'from-primary-400 to-primary-500',
     },
     {
-      label: 'Customer Trust',
-      value: formatPercent(metrics.trust / 100),
-      change: '-1.5%',
-      trend: 'down' as const,
+      label: 'Brand Trust',
+      value: formatPercent(company.brandTrust / 100),
+      change: company.brandTrust >= 70 ? '+2.5%' : '-1.5%',
+      trend: company.brandTrust >= 70 ? 'up' as const : 'down' as const,
       icon: Heart,
       gradient: 'from-accent-400 to-accent-500',
     },
@@ -809,14 +810,20 @@ function ReportsView({ gameState }: { gameState: GameState }) {
                   <AlertCircle className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold text-silver-900">{event.title}</div>
+                  <div className="font-semibold text-silver-900">{event.name}</div>
                   <div className="text-sm text-silver-600 mt-1">{event.description}</div>
                   <div className="flex gap-2 mt-3">
-                    {Object.entries(event.impact || {}).map(([key, value]) => (
-                      <span key={key} className="px-2 py-1 rounded-lg bg-white text-xs font-medium text-silver-600 border border-silver-200">
-                        {key}: {typeof value === 'number' ? (value > 0 ? '+' : '') + value + '%' : value}
-                      </span>
-                    ))}
+                    <span className={cn(
+                      "px-2 py-1 rounded-lg text-xs font-medium border",
+                      event.severity === 'high' ? 'bg-danger-50 text-danger-600 border-danger-200' :
+                      event.severity === 'medium' ? 'bg-warning-50 text-warning-600 border-warning-200' :
+                      'bg-info-50 text-info-600 border-info-200'
+                    )}>
+                      {event.severity} severity
+                    </span>
+                    <span className="px-2 py-1 rounded-lg bg-white text-xs font-medium text-silver-600 border border-silver-200">
+                      Round {event.round}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -858,18 +865,19 @@ function ReportsView({ gameState }: { gameState: GameState }) {
 
 // Helper function to calculate share price
 function calculateSharePrice(gameState: GameState): number {
-  const metrics = gameState.metrics;
+  const company = gameState.company;
+  const scorecard = gameState.scorecard;
   const basePrice = 100;
-  const revenueMultiplier = metrics.revenue / 1000000 * 0.5;
-  const marketShareBonus = metrics.marketShare * 0.8;
-  const trustBonus = metrics.trust * 0.3;
-  const profitFactor = Math.max(0, metrics.profitMargin) * 2;
+  const revenueMultiplier = company.revenue / 100 * 0.5;
+  const growthBonus = scorecard.growth * 0.8;
+  const trustBonus = company.brandTrust * 0.3;
+  const profitFactor = Math.max(0, company.profit / company.revenue) * 20;
 
-  return basePrice + revenueMultiplier + marketShareBonus + trustBonus + profitFactor;
+  return basePrice + revenueMultiplier + growthBonus + trustBonus + profitFactor;
 }
 
 // Helper function to get decision fields for each role
-function getDecisionFields(role: Role): Array<{
+type DecisionField = {
   id: string;
   label: string;
   type: 'slider' | 'select';
@@ -878,8 +886,10 @@ function getDecisionFields(role: Role): Array<{
   default: number | string;
   description: string;
   options?: Array<{ value: string; label: string }>;
-}> {
-  const fields: Record<Role, typeof fields[Role]> = {
+};
+
+function getDecisionFields(role: Role): DecisionField[] {
+  const fields: Record<Role, DecisionField[]> = {
     strategy: [
       { id: 'riskAppetite', label: 'Risk Appetite', type: 'slider', min: 0, max: 100, default: 50, description: 'Higher risk can lead to higher rewards but also bigger losses' },
       { id: 'growthFocus', label: 'Growth Focus', type: 'select', default: 'balanced', description: 'Choose your strategic growth direction', options: [
