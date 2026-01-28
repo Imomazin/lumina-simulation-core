@@ -1,7 +1,16 @@
 {
-  "name": "node-starter",
+  "name": "lumina-simulation-core",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
