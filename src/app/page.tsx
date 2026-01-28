@@ -1,1153 +1,904 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight,
-  BarChart3,
-  Users,
-  Zap,
-  Target,
+  Crown,
   TrendingUp,
-  Building2,
-  Scale,
-  Lightbulb,
-  Settings,
-  Trophy,
-  Globe,
-  LineChart,
-  Shield,
-  Briefcase,
-  GraduationCap,
-  Play,
-  ChevronRight,
-  Star,
-  Award,
-  Layers,
-  Sparkles,
-  Rocket,
-  Brain,
-  PieChart,
   DollarSign,
-  Factory,
-  ShoppingCart,
-  Megaphone,
-  Cpu,
-  Heart,
-  CheckCircle,
-  ArrowUpRight,
-  Circle,
+  Cog,
+  Target,
+  Lightbulb,
+  ChevronRight,
+  Users,
+  Clock,
+  BarChart3,
+  Shield,
+  Zap,
+  Globe,
+  Award,
+  BookOpen,
+  Play,
+  Briefcase,
+  Building2,
+  GraduationCap,
+  Star,
+  AlertTriangle,
+  Activity,
+  X,
 } from 'lucide-react';
 
-// Floating Particle Component
-function FloatingParticle({ delay, duration, x, y, size, color }: {
-  delay: number;
-  duration: number;
-  x: number;
-  y: number;
-  size: number;
-  color: string;
-}) {
-  return (
-    <motion.div
-      className={`absolute rounded-full ${color}`}
-      style={{ width: size, height: size, left: `${x}%`, top: `${y}%` }}
-      animate={{
-        y: [0, -30, 0],
-        x: [0, 15, 0],
-        opacity: [0.3, 0.7, 0.3],
-        scale: [1, 1.2, 1],
-      }}
-      transition={{
-        duration,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
+// =============================================================================
+// SIMULATION CATALOG DATA
+// =============================================================================
 
-// Animated Orb Component
-function AnimatedOrb({ className, delay = 0 }: { className: string; delay?: number }) {
-  return (
-    <motion.div
-      className={`absolute rounded-full blur-3xl ${className}`}
-      animate={{
-        scale: [1, 1.2, 1],
-        opacity: [0.3, 0.5, 0.3],
-      }}
-      transition={{
-        duration: 8,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
+const SIMULATIONS = [
+  {
+    id: 'strategic-leadership',
+    title: 'Strategic Leadership',
+    subtitle: 'Governing Under Uncertainty',
+    icon: Crown,
+    color: 'from-violet-600 to-purple-700',
+    accentColor: 'violet',
+    difficulty: 'Expert',
+    duration: '3-4 hours',
+    players: '3-5 players',
+    rounds: 8,
+    coreFantasy: 'You are the executive leadership team of a complex enterprise operating under extreme uncertainty, conflicting stakeholder demands, and incomplete information.',
+    narrativeWorld: [
+      'Publicly listed multinational corporation',
+      'Board pressure and investor activism',
+      'Media scrutiny and public perception',
+      'Internal politics and talent dynamics',
+    ],
+    roles: [
+      { name: 'CEO / Strategy Lead', desc: 'Sets corporate direction, manages board relations' },
+      { name: 'Chief Financial Officer', desc: 'Controls capital allocation and investor relations' },
+      { name: 'Chief Operating Officer', desc: 'Oversees execution and cross-functional alignment' },
+      { name: 'Chief Legal & Compliance', desc: 'Manages regulatory risk and governance' },
+      { name: 'Chief People Officer', desc: 'Owns talent strategy and organizational health' },
+    ],
+    dilemmas: [
+      'The board demands 20% cost cuts, but your top talent is already at flight risk',
+      'A competitor\'s PR crisis presents an opportunity, but aggressive moves may backfire',
+      'Activist investors push for a strategic pivot that contradicts your 5-year plan',
+    ],
+    learningOutcomes: [
+      'Strategic coherence under ambiguity',
+      'Leadership and governance tradeoffs',
+      'Stakeholder management at executive level',
+      'Crisis decision-making',
+    ],
+    uniqueMechanics: [
+      'Board confidence score (can fire the CEO)',
+      'Internal alignment index (political friction)',
+      'Reputation memory (early mistakes haunt later)',
+      'Long-term vs short-term tension scoring',
+    ],
+    targetAudience: ['Senior executives', 'MBA capstone', 'Board development', 'High-potential programs'],
+    tags: ['Leadership', 'Strategy', 'Governance', 'Crisis'],
+  },
+  {
+    id: 'market-dynamics',
+    title: 'Market Dynamics',
+    subtitle: 'Competing in Motion',
+    icon: TrendingUp,
+    color: 'from-blue-600 to-cyan-600',
+    accentColor: 'blue',
+    difficulty: 'Advanced',
+    duration: '2-3 hours',
+    players: '2-6 teams',
+    rounds: 10,
+    coreFantasy: 'You are competing firms in a volatile market where customer behavior, pricing, brand perception, and competitor moves constantly shift.',
+    narrativeWorld: [
+      'Fast-moving competitive market',
+      'Aggressive competitors with varying strategies',
+      'Shifting consumer preferences',
+      'Platform and ecosystem effects',
+    ],
+    roles: [
+      { name: 'Marketing Lead', desc: 'Owns brand positioning and campaigns' },
+      { name: 'Sales Lead', desc: 'Drives revenue and manages channels' },
+      { name: 'Strategy Lead', desc: 'Sets competitive direction and market entry' },
+      { name: 'Product Lead', desc: 'Manages roadmap and market fit' },
+    ],
+    dilemmas: [
+      'A competitor slashes prices 30% — match them and destroy margins or hold and lose share?',
+      'Your brand equity is eroding but marketing wants to cut spend to hit profit targets',
+      'A new segment is emerging but entering cannibalizes your core business',
+    ],
+    learningOutcomes: [
+      'Competitive strategy formulation',
+      'Market sensing and response',
+      'Pricing discipline and dynamics',
+      'Cross-functional go-to-market coordination',
+    ],
+    uniqueMechanics: [
+      'Live competitor dashboards (multi-team)',
+      'Demand elasticity that evolves over time',
+      'Brand equity as slow-moving stock',
+      'Price war dynamics with destructive spirals',
+    ],
+    targetAudience: ['Marketing executives', 'Strategy professionals', 'MBA students', 'Competitive intelligence'],
+    tags: ['Competition', 'Marketing', 'Pricing', 'Strategy'],
+  },
+  {
+    id: 'financial-acumen',
+    title: 'Financial Acumen',
+    subtitle: 'Capital, Risk, and Survival',
+    icon: DollarSign,
+    color: 'from-emerald-600 to-teal-600',
+    accentColor: 'emerald',
+    difficulty: 'Expert',
+    duration: '3-4 hours',
+    players: '3-4 players',
+    rounds: 12,
+    coreFantasy: 'You are running the financial backbone of a company where liquidity, investment timing, and risk decisions determine survival.',
+    narrativeWorld: [
+      'Capital-intensive business environment',
+      'External financing pressures',
+      'Economic shocks and market volatility',
+      'Investor scrutiny and rating pressure',
+    ],
+    roles: [
+      { name: 'Chief Financial Officer', desc: 'Owns financial strategy and capital structure' },
+      { name: 'Finance Director', desc: 'Manages working capital and treasury' },
+      { name: 'Strategy Lead', desc: 'Drives investment decisions and M&A' },
+      { name: 'Chief Risk Officer', desc: 'Manages financial risk and hedging' },
+    ],
+    dilemmas: [
+      'Cash runway is 6 months, but raising equity dilutes 40% — when do you pull the trigger?',
+      'Two projects compete for limited capital: high-risk/high-return vs safe/incremental',
+      'Credit rating is slipping — aggressive cost cuts hurt growth, inaction risks downgrade',
+    ],
+    learningOutcomes: [
+      'Financial decision-making under uncertainty',
+      'Capital structure optimization',
+      'Risk-return tradeoff management',
+      'Cash flow management and timing',
+    ],
+    uniqueMechanics: [
+      'Cash flow timing (not just totals)',
+      'Probability-weighted scenario trees',
+      'Credit rating dynamics with real consequences',
+      'Bankruptcy risk if mismanaged',
+    ],
+    targetAudience: ['Finance professionals', 'CFO development', 'Investment analysts', 'MBA finance'],
+    tags: ['Finance', 'Risk', 'Capital Markets', 'Treasury'],
+  },
+  {
+    id: 'operations-excellence',
+    title: 'Operations Excellence',
+    subtitle: 'Flow, Capacity, and Fragility',
+    icon: Cog,
+    color: 'from-orange-500 to-amber-600',
+    accentColor: 'orange',
+    difficulty: 'Advanced',
+    duration: '2-3 hours',
+    players: '3-4 players',
+    rounds: 8,
+    coreFantasy: 'You are running an operational system where small inefficiencies cascade into major failures.',
+    narrativeWorld: [
+      'Multi-node supply chain network',
+      'Capacity constraints and bottlenecks',
+      'Quality risk and defect propagation',
+      'Supplier dependency and concentration',
+    ],
+    roles: [
+      { name: 'Operations Lead', desc: 'Owns production capacity and efficiency' },
+      { name: 'Supply Chain Manager', desc: 'Manages suppliers, logistics, inventory' },
+      { name: 'Quality Director', desc: 'Ensures product quality and compliance' },
+      { name: 'Finance Liaison', desc: 'Manages operational budgets and costs' },
+    ],
+    dilemmas: [
+      'A key supplier is financially distressed — sole-source risk vs switching costs',
+      'Quality defects are rising but fixing them slows delivery by 2 weeks',
+      'Demand surge incoming — invest in capacity now or risk bottlenecks?',
+    ],
+    learningOutcomes: [
+      'Systems thinking in operations',
+      'Bottleneck identification and management',
+      'Quality-cost-speed tradeoffs',
+      'Supply chain resilience building',
+    ],
+    uniqueMechanics: [
+      'Bottleneck dynamics with cascade effects',
+      'Bullwhip effect amplification',
+      'Quality incidents with delayed detection',
+      'Failure propagation visualization',
+    ],
+    targetAudience: ['Operations executives', 'Supply chain pros', 'Manufacturing leaders', 'MBA operations'],
+    tags: ['Operations', 'Supply Chain', 'Quality', 'Systems'],
+  },
+  {
+    id: 'sales-mastery',
+    title: 'Sales Mastery',
+    subtitle: 'Growth Without Erosion',
+    icon: Target,
+    color: 'from-rose-500 to-pink-600',
+    accentColor: 'rose',
+    difficulty: 'Advanced',
+    duration: '2-3 hours',
+    players: '3-5 players',
+    rounds: 8,
+    coreFantasy: 'You are scaling revenue while trying not to destroy margin, culture, or customer trust.',
+    narrativeWorld: [
+      'High-growth sales organization',
+      'Territory battles and competition',
+      'Channel conflict dynamics',
+      'Customer churn and retention pressure',
+    ],
+    roles: [
+      { name: 'Head of Sales', desc: 'Owns revenue targets and sales strategy' },
+      { name: 'Regional Manager - North', desc: 'Drives performance in northern territories' },
+      { name: 'Regional Manager - South', desc: 'Drives performance in southern territories' },
+      { name: 'Marketing Liaison', desc: 'Aligns sales and marketing, manages leads' },
+      { name: 'Finance Liaison', desc: 'Manages pricing authority and deal desk' },
+    ],
+    dilemmas: [
+      'Hit quarterly number with aggressive discounts or miss and preserve margin?',
+      'Top performer is toxic to the team — fire them and risk the pipeline?',
+      'Channel partners complain about direct competition — who do you favor?',
+    ],
+    learningOutcomes: [
+      'Sustainable revenue growth strategy',
+      'Incentive design and unintended consequences',
+      'Territory and channel optimization',
+      'Customer lifetime value management',
+    ],
+    uniqueMechanics: [
+      'Incentive gaming detection',
+      'Customer LTV decay from bad practices',
+      'Sales burnout and attrition risk',
+      'Short-term wins vs long-term erosion',
+    ],
+    targetAudience: ['Sales leaders', 'Revenue operations', 'Go-to-market executives', 'MBA sales'],
+    tags: ['Sales', 'Revenue', 'Incentives', 'Customer Success'],
+  },
+  {
+    id: 'innovation-lab',
+    title: 'Innovation Lab',
+    subtitle: 'Betting on the Future',
+    icon: Lightbulb,
+    color: 'from-yellow-500 to-orange-500',
+    accentColor: 'yellow',
+    difficulty: 'Advanced',
+    duration: '2-3 hours',
+    players: '3-4 players',
+    rounds: 10,
+    coreFantasy: 'You are managing innovation under uncertainty, balancing exploration and exploitation.',
+    narrativeWorld: [
+      'Technology uncertainty and disruption',
+      'Market adoption and timing risk',
+      'Internal resistance and politics',
+      'Portfolio allocation tradeoffs',
+    ],
+    roles: [
+      { name: 'Head of R&D', desc: 'Owns innovation portfolio and technology roadmap' },
+      { name: 'Product Strategy Lead', desc: 'Bridges innovation and market fit' },
+      { name: 'Finance Liaison', desc: 'Manages R&D budget and ROI tracking' },
+      { name: 'Operations Liaison', desc: 'Ensures manufacturability and readiness' },
+    ],
+    dilemmas: [
+      'Promising project is 2 years from market — kill it for cash or double down?',
+      'Breakthrough tech cannibalizes your cash cow — accelerate or delay?',
+      'Technical debt is crushing velocity but cleaning it delays all launches',
+    ],
+    learningOutcomes: [
+      'Innovation portfolio management',
+      'Stage-gate and kill decisions',
+      'Option value thinking',
+      'Exploration vs exploitation balance',
+    ],
+    uniqueMechanics: [
+      'Innovation option value calculations',
+      'Failure learning curves',
+      'Cannibalization effects',
+      'Technical debt accumulation',
+    ],
+    targetAudience: ['R&D executives', 'Innovation leaders', 'Product strategy', 'MBA innovation'],
+    tags: ['Innovation', 'R&D', 'Product', 'Portfolio'],
+  },
+];
 
-// Sparkle Component
-function Sparkle({ className }: { className: string }) {
+const TESTIMONIALS = [
+  {
+    quote: "The most realistic strategic simulation I've experienced in 20 years of executive education.",
+    author: "VP Strategy, Fortune 500 Tech Company",
+    context: "Strategic Leadership simulation",
+  },
+  {
+    quote: "Our entire leadership team finally understood the consequences of short-term thinking.",
+    author: "CEO, Healthcare Services",
+    context: "Financial Acumen simulation",
+  },
+  {
+    quote: "Better than any case study. The pressure felt real.",
+    author: "MBA Student, Top-10 Business School",
+    context: "Market Dynamics simulation",
+  },
+];
+
+// =============================================================================
+// COMPONENTS
+// =============================================================================
+
+function SimulationCard({ sim, index, onSelect }: { sim: typeof SIMULATIONS[0]; index: number; onSelect: () => void }) {
+  const Icon = sim.icon;
+
   return (
     <motion.div
-      className={`absolute ${className}`}
-      animate={{
-        scale: [0, 1, 0],
-        opacity: [0, 1, 0],
-        rotate: [0, 180, 360],
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.6 }}
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+      className="group relative"
     >
-      <Star className="w-3 h-3 text-gold-400 fill-gold-400" />
+      {/* Card */}
+      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden transition-all duration-500 group-hover:shadow-2xl group-hover:border-slate-300">
+        {/* Gradient header */}
+        <div className={`h-32 bg-gradient-to-br ${sim.color} relative overflow-hidden`}>
+          {/* Animated background pattern */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-32 h-32 bg-black/10 rounded-full blur-2xl transform translate-x-1/2 translate-y-1/2" />
+          </div>
+
+          {/* Icon */}
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="absolute top-6 left-6 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30"
+          >
+            <Icon className="w-7 h-7 text-white" />
+          </motion.div>
+
+          {/* Difficulty badge */}
+          <div className="absolute top-6 right-6">
+            <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+              sim.difficulty === 'Expert'
+                ? 'bg-red-500/90 text-white'
+                : 'bg-amber-500/90 text-white'
+            }`}>
+              {sim.difficulty}
+            </span>
+          </div>
+
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+            <h3 className="text-xl font-bold text-white">{sim.title}</h3>
+            <p className="text-sm text-white/80">{sim.subtitle}</p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Meta info */}
+          <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {sim.duration}
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              {sim.players}
+            </span>
+            <span className="flex items-center gap-1">
+              <BarChart3 className="w-4 h-4" />
+              {sim.rounds} rounds
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
+            {sim.coreFantasy}
+          </p>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            {sim.tags.map((tag) => (
+              <span key={tag} className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-lg">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Action */}
+          <button
+            onClick={onSelect}
+            className={`w-full py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r ${sim.color} flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
+          >
+            View Simulation
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </motion.div>
   );
 }
 
-// Animated Counter
-function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
+function SimulationModal({ sim, onClose }: { sim: typeof SIMULATIONS[0]; onClose: () => void }) {
+  const Icon = sim.icon;
+
   return (
-    <motion.span
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
     >
-      <motion.span
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 25 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
       >
-        {value.toLocaleString()}{suffix}
-      </motion.span>
-    </motion.span>
+        {/* Header */}
+        <div className={`relative h-48 bg-gradient-to-br ${sim.color} overflow-hidden`}>
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-black/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
+          </div>
+
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/70 to-transparent">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                <Icon className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">{sim.title}</h2>
+                <p className="text-lg text-white/80">{sim.subtitle}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-8 overflow-y-auto max-h-[calc(90vh-12rem)]">
+          {/* Meta badges */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <span className={`px-3 py-1.5 text-sm font-bold rounded-full ${
+              sim.difficulty === 'Expert'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-amber-100 text-amber-700'
+            }`}>
+              {sim.difficulty} Level
+            </span>
+            <span className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full flex items-center gap-1.5">
+              <Clock className="w-4 h-4" />
+              {sim.duration}
+            </span>
+            <span className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full flex items-center gap-1.5">
+              <Users className="w-4 h-4" />
+              {sim.players}
+            </span>
+            <span className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full flex items-center gap-1.5">
+              <BarChart3 className="w-4 h-4" />
+              {sim.rounds} Rounds
+            </span>
+          </div>
+
+          {/* Core Fantasy */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-slate-900 mb-3">The Challenge</h3>
+            <p className="text-slate-600 leading-relaxed text-lg">{sim.coreFantasy}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Narrative World */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-slate-400" />
+                Narrative World
+              </h3>
+              <ul className="space-y-2">
+                {sim.narrativeWorld.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600">
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-2 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Roles */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <Users className="w-5 h-5 text-slate-400" />
+                Player Roles
+              </h3>
+              <ul className="space-y-2">
+                {sim.roles.map((role, i) => (
+                  <li key={i} className="text-sm">
+                    <span className="font-semibold text-slate-800">{role.name}</span>
+                    <span className="text-slate-500"> — {role.desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Dilemmas */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Example Dilemmas
+            </h3>
+            <div className="space-y-3">
+              {sim.dilemmas.map((dilemma, i) => (
+                <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
+                  &ldquo;{dilemma}&rdquo;
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Learning Outcomes */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-slate-400" />
+                Learning Outcomes
+              </h3>
+              <ul className="space-y-2">
+                {sim.learningOutcomes.map((outcome, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600">
+                    <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                    {outcome}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Unique Mechanics */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <Zap className="w-5 h-5 text-slate-400" />
+                Unique Mechanics
+              </h3>
+              <ul className="space-y-2">
+                {sim.uniqueMechanics.map((mechanic, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600">
+                    <Activity className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    {mechanic}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Target Audience */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-slate-400" />
+              Designed For
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {sim.targetAudience.map((audience, i) => (
+                <span key={i} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full">
+                  {audience}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="flex gap-4">
+            <Link
+              href="/simulation"
+              className={`flex-1 py-4 px-6 rounded-xl font-bold text-white bg-gradient-to-r ${sim.color} flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
+            >
+              <Play className="w-5 h-5" />
+              Launch Simulation
+            </Link>
+            <button
+              onClick={onClose}
+              className="px-6 py-4 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-export default function LandingPage() {
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+// =============================================================================
+// MAIN PAGE
+// =============================================================================
+
+export default function CatalogPage() {
+  const [selectedSim, setSelectedSim] = useState<typeof SIMULATIONS[0] | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 mesh-gradient pointer-events-none" />
-      <div className="fixed inset-0 grid-pattern pointer-events-none opacity-50" />
-
-      {/* Floating Orbs */}
-      <AnimatedOrb className="w-96 h-96 bg-primary-200 -top-48 -right-48" />
-      <AnimatedOrb className="w-80 h-80 bg-accent-200 top-1/3 -left-40" delay={2} />
-      <AnimatedOrb className="w-64 h-64 bg-gold-200 bottom-20 right-20" delay={4} />
-      <AnimatedOrb className="w-72 h-72 bg-success-200 bottom-1/4 left-1/4" delay={3} />
-
-      {/* Floating Particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <FloatingParticle delay={0} duration={6} x={10} y={20} size={8} color="bg-primary-300" />
-        <FloatingParticle delay={1} duration={8} x={80} y={10} size={6} color="bg-accent-300" />
-        <FloatingParticle delay={2} duration={7} x={30} y={70} size={10} color="bg-gold-300" />
-        <FloatingParticle delay={3} duration={9} x={70} y={60} size={8} color="bg-success-300" />
-        <FloatingParticle delay={4} duration={6} x={50} y={30} size={6} color="bg-primary-400" />
-        <FloatingParticle delay={5} duration={8} x={20} y={80} size={12} color="bg-accent-200" />
-        <FloatingParticle delay={1.5} duration={7} x={90} y={40} size={8} color="bg-gold-400" />
-        <FloatingParticle delay={2.5} duration={9} x={40} y={50} size={6} color="bg-info-300" />
-      </div>
-
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="fixed top-0 left-0 right-0 z-50 glass"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <Link href="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-glow-purple"
-              >
-                <Layers className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <span className="font-bold text-silver-800 text-xl tracking-tight">Lumina</span>
-                <span className="gradient-text text-xl font-bold">Sim</span>
-              </div>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-10">
-              {['Features', 'Simulations', 'How It Works', 'Pricing'].map((item) => (
-                <Link
-                  key={item}
-                  href={`#${item.toLowerCase().replace(' ', '-')}`}
-                  className="text-silver-600 hover:text-primary-600 text-sm font-medium transition-colors relative group"
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Link href="/facilitator" className="text-silver-600 hover:text-primary-600 text-sm font-medium transition-colors hidden md:block">
-                Facilitators
-              </Link>
-              <Link href="/simulation" className="btn-primary gap-2 group">
-                <span>Launch Demo</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative pt-32 pb-24 px-4 min-h-screen flex items-center">
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              {/* Award Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass mb-8 group cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <div className="flex -space-x-1">
-                  {[1, 2, 3].map((i) => (
-                    <motion.div
-                      key={i}
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ delay: i * 0.2, duration: 2, repeat: Infinity }}
-                    >
-                      <Star className="w-4 h-4 text-gold-500 fill-gold-500" />
-                    </motion.div>
-                  ))}
-                </div>
-                <span className="text-sm font-medium text-silver-700">Award-Winning Business Simulation Platform</span>
-                <ArrowUpRight className="w-4 h-4 text-primary-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </motion.div>
+      <section className="relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-200/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
+        </div>
 
-              <h1 className="text-5xl lg:text-7xl font-bold text-silver-900 leading-[1.1] tracking-tight mb-8">
-                Transform Your
-                <br />
-                <span className="gradient-text-multi">Business Acumen</span>
-              </h1>
+        <div className="relative max-w-7xl mx-auto px-6 pt-20 pb-16">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center mb-8"
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full text-sm font-medium text-slate-600 shadow-sm">
+              <Building2 className="w-4 h-4" />
+              Enterprise Simulation Suite
+            </span>
+          </motion.div>
 
-              <p className="text-xl text-silver-600 leading-relaxed mb-10 max-w-xl">
-                Immersive business simulations where teams compete in dynamic markets.
-                Make real decisions, face real consequences, and develop <span className="text-primary-600 font-semibold">real skills</span>.
-              </p>
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-center text-slate-900 mb-6"
+          >
+            Business Simulation
+            <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
+              Catalog
+            </span>
+          </motion.h1>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-16">
-                <Link href="/simulation" className="btn-primary text-lg px-8 py-4 gap-3 group">
-                  <Play className="w-5 h-5" />
-                  <span>Start Free Demo</span>
-                  <motion.span
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </motion.span>
-                </Link>
-                <Link href="/facilitator" className="btn-secondary text-lg px-8 py-4 gap-2">
-                  <GraduationCap className="w-5 h-5" />
-                  Facilitator Console
-                </Link>
-              </div>
-
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-8">
-                {[
-                  { value: 15000, suffix: '+', label: 'Students Trained' },
-                  { value: 120, suffix: '+', label: 'Universities' },
-                  { value: 98, suffix: '%', label: 'Satisfaction' },
-                ].map((stat, index) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                    className="text-center"
-                  >
-                    <div className="text-4xl font-bold gradient-text mb-1">
-                      <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                    </div>
-                    <div className="text-sm text-silver-500">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Hero Visualization */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, x: 50 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.3 }}
-              className="relative"
-            >
-              <HeroVisualization />
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-silver-400"
-        >
-          <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
-          <div className="w-6 h-10 rounded-full border-2 border-silver-300 flex justify-center pt-2">
-            <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-primary-500"
-            />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Trusted By Strip */}
-      <section className="py-16 border-y border-silver-200 bg-white/50">
-        <div className="max-w-7xl mx-auto px-4">
+          {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center text-xs text-silver-400 mb-10 uppercase tracking-[0.2em] font-medium"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl text-slate-600 text-center max-w-3xl mx-auto mb-8"
           >
-            Trusted by Leading Institutions Worldwide
+            Six flagship simulations for executive education, MBA programs, and leadership development.
+            <span className="block mt-2 text-lg font-medium text-slate-500">
+              This is not training. This is rehearsal for real leadership.
+            </span>
           </motion.p>
-          <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
-            {['Harvard Business School', 'Stanford GSB', 'MIT Sloan', 'Wharton', 'INSEAD', 'London Business School'].map((name, index) => (
-              <motion.div
-                key={name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-silver-400 font-semibold text-lg hover:text-primary-500 transition-colors cursor-pointer"
-              >
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-8 mb-12"
+          >
+            {[
+              { label: 'Simulations', value: '6' },
+              { label: 'Unique Roles', value: '27' },
+              { label: 'Decision Points', value: '500+' },
+              { label: 'Learning Hours', value: '20+' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
+                <div className="text-sm text-slate-500">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Benchmark logos placeholder */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-center text-sm text-slate-400 mb-4"
+          >
+            Benchmarked against industry standards
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-wrap justify-center items-center gap-6 text-slate-300 text-xs"
+          >
+            {['Capsim', 'Harvard Business Publishing', 'Marketplace', 'McKinsey War-Gaming'].map((name) => (
+              <span key={name} className="px-3 py-1.5 bg-slate-100 rounded-lg text-slate-500 font-medium">
                 {name}
-              </motion.div>
+              </span>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Simulation Catalog */}
-      <section id="simulations" className="py-32 px-4">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-600 text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              6 Complete Simulations
-            </div>
-            <h2 className="text-5xl font-bold text-silver-900 mb-6">Business Simulation Catalog</h2>
-            <p className="text-xl text-silver-600 max-w-2xl mx-auto">
-              Each simulation is a complete, immersive experience with unique scenarios,
-              decisions, and learning outcomes
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {simulations.map((sim, index) => (
-              <motion.div
-                key={sim.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link href="/simulation">
-                  <div className="card-luxury-hover group h-full">
-                    {/* Icon with animated background */}
-                    <div className="relative mb-6">
-                      <motion.div
-                        className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${sim.gradient} flex items-center justify-center shadow-lg`}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 400 }}
-                      >
-                        <sim.icon className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <motion.div
-                        className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${sim.gradient} opacity-20 blur-xl`}
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-silver-900 group-hover:text-primary-600 transition-colors">
-                        {sim.name}
-                      </h3>
-                      {sim.featured && (
-                        <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 text-white text-xs font-bold shadow-glow-gold">
-                          FEATURED
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-silver-600 mb-6 leading-relaxed">{sim.description}</p>
-
-                    {/* Stats */}
-                    <div className="flex items-center gap-4 mb-6 text-sm text-silver-500">
-                      <div className="flex items-center gap-1.5">
-                        <Users className="w-4 h-4" />
-                        <span>{sim.teamSize} players</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Target className="w-4 h-4" />
-                        <span>{sim.rounds} rounds</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />
-                        <span>{sim.duration}</span>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2">
-                      {sim.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1.5 rounded-full bg-silver-100 text-silver-600 text-xs font-medium hover:bg-primary-50 hover:text-primary-600 transition-colors"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Hover Arrow */}
-                    <motion.div
-                      className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                      initial={{ x: -10 }}
-                      whileHover={{ x: 0 }}
-                    >
-                      <ArrowRight className="w-5 h-5 text-primary-500" />
-                    </motion.div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+      {/* Catalog Grid */}
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {SIMULATIONS.map((sim, index) => (
+            <SimulationCard
+              key={sim.id}
+              sim={sim}
+              index={index}
+              onSelect={() => setSelectedSim(sim)}
+            />
+          ))}
+        </motion.div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-32 px-4 bg-gradient-to-b from-white to-silver-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Features Section */}
+      <section className="bg-slate-900 py-20">
+        <div className="max-w-7xl mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-50 text-accent-600 text-sm font-medium mb-6">
-              <Zap className="w-4 h-4" />
-              Powerful Features
-            </div>
-            <h2 className="text-5xl font-bold text-silver-900 mb-6">Enterprise-Grade Platform</h2>
-            <p className="text-xl text-silver-600 max-w-2xl mx-auto">
-              Built for serious business education with sophisticated algorithms and real-world dynamics
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              What Sets Us Apart
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Built for serious learning, not gamification theater
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Shield,
+                title: 'Consequence Realism',
+                desc: 'Every decision has cascading effects. Early mistakes haunt later rounds.',
+              },
+              {
+                icon: Users,
+                title: 'Role-Based Tension',
+                desc: 'Players face conflicting objectives. Coordination is earned, not given.',
+              },
+              {
+                icon: BarChart3,
+                title: 'Financial Rigor',
+                desc: 'Real numbers, real models. No simplified math or fake metrics.',
+              },
+              {
+                icon: BookOpen,
+                title: 'Narrative Depth',
+                desc: 'Story-led scenarios that mirror real corporate challenges.',
+              },
+            ].map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
-                className="card-silver group hover:shadow-luxury transition-all duration-300"
+                transition={{ delay: index * 0.1 }}
+                className="p-6 bg-slate-800/50 rounded-2xl border border-slate-700"
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-silver-900 mb-2">{feature.title}</h3>
-                <p className="text-silver-600 text-sm leading-relaxed">{feature.description}</p>
+                <feature.icon className="w-10 h-10 text-violet-400 mb-4" />
+                <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-slate-400 text-sm">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Team Roles Section */}
-      <section className="py-32 px-4">
-        <div className="max-w-7xl mx-auto">
+      {/* Testimonials */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success-50 text-success-600 text-sm font-medium mb-6">
-              <Users className="w-4 h-4" />
-              Team-Based Learning
-            </div>
-            <h2 className="text-5xl font-bold text-silver-900 mb-6">Executive Team Roles</h2>
-            <p className="text-xl text-silver-600 max-w-2xl mx-auto">
-              Each team member assumes a C-suite role with distinct responsibilities and decision authority
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              From the Field
+            </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {roles.map((role, index) => (
+          <div className="grid md:grid-cols-3 gap-8">
+            {TESTIMONIALS.map((testimonial, index) => (
               <motion.div
-                key={role.title}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className="stat-card group hover:shadow-luxury-lg transition-all duration-300"
-              >
-                <motion.div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center mb-4 shadow-lg`}
-                  whileHover={{ rotate: [0, -10, 10, 0] }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <role.icon className="w-6 h-6 text-white" />
-                </motion.div>
-                <h3 className="font-bold text-silver-900 mb-1">{role.title}</h3>
-                <p className="text-xs text-silver-400 mb-4 uppercase tracking-wider">{role.subtitle}</p>
-                <ul className="space-y-2">
-                  {role.decisions.map((d) => (
-                    <li key={d} className="text-xs text-silver-600 flex items-center gap-2">
-                      <Circle className="w-1.5 h-1.5 fill-primary-500 text-primary-500" />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-32 px-4 bg-gradient-to-b from-silver-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-50 text-gold-600 text-sm font-medium mb-6">
-              <Rocket className="w-4 h-4" />
-              Simple Process
-            </div>
-            <h2 className="text-5xl font-bold text-silver-900 mb-6">How The Simulation Works</h2>
-            <p className="text-xl text-silver-600 max-w-2xl mx-auto">
-              Each round represents one year of business operations. Compete over 8 rounds.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-4 gap-6 relative">
-            {/* Connection Line */}
-            <div className="hidden md:block absolute top-20 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-200 via-accent-200 to-gold-200" />
-
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 30 }}
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-                className="relative"
+                transition={{ delay: index * 0.1 }}
+                className="p-8 bg-white rounded-2xl border border-slate-200 shadow-lg"
               >
-                <div className="card-luxury text-center">
-                  <motion.div
-                    className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${step.gradient} flex items-center justify-center font-bold text-white text-2xl mb-6 shadow-lg relative z-10`}
-                    whileHover={{ scale: 1.1 }}
-                    whileInView={{
-                      boxShadow: ["0 0 0 0 rgba(139, 92, 246, 0)", "0 0 0 20px rgba(139, 92, 246, 0)"]
-                    }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    {index + 1}
-                  </motion.div>
-                  <h3 className="text-lg font-bold text-silver-900 mb-3">{step.title}</h3>
-                  <p className="text-sm text-silver-600 leading-relaxed">{step.description}</p>
+                <div className="text-violet-500 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 inline-block fill-current" />
+                  ))}
+                </div>
+                <p className="text-slate-700 text-lg mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
+                <div>
+                  <div className="font-semibold text-slate-900">{testimonial.author}</div>
+                  <div className="text-sm text-slate-500">{testimonial.context}</div>
                 </div>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Balanced Scorecard Preview */}
-      <section className="py-32 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-600 text-sm font-medium mb-6">
-                <PieChart className="w-4 h-4" />
-                Multi-Dimensional Scoring
-              </div>
-              <h2 className="text-5xl font-bold text-silver-900 mb-6">Balanced Scorecard Ranking</h2>
-              <p className="text-xl text-silver-600 mb-10">
-                Teams are ranked on a comprehensive Balanced Scorecard that measures performance across five key dimensions:
-              </p>
-              <div className="space-y-5">
-                {scorecard.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-4"
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${item.gradient} shadow-lg`} />
-                    <div className="flex-1">
-                      <div className="flex justify-between mb-2">
-                        <span className="font-semibold text-silver-800">{item.name}</span>
-                        <span className="text-silver-500 font-medium">{item.weight}%</span>
-                      </div>
-                      <div className="h-2.5 bg-silver-100 rounded-full overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full bg-gradient-to-r ${item.gradient}`}
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${item.weight}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1, delay: index * 0.1 }}
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="card-luxury">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-bold text-silver-900">Live Leaderboard</h3>
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Trophy className="w-6 h-6 text-gold-500" />
-                  </motion.div>
-                </div>
-                <div className="space-y-4">
-                  {leaderboard.map((team, index) => (
-                    <motion.div
-                      key={team.name}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
-                        index === 0
-                          ? 'bg-gradient-to-r from-gold-50 to-gold-100 border-2 border-gold-200 shadow-glow-gold'
-                          : 'bg-silver-50 hover:bg-silver-100'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold shadow-lg ${
-                        index === 0 ? 'bg-gradient-to-br from-gold-400 to-gold-500 text-white' :
-                        index === 1 ? 'bg-gradient-to-br from-silver-300 to-silver-400 text-white' :
-                        index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white' :
-                        'bg-silver-200 text-silver-600'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-silver-900">{team.name}</div>
-                        <div className="text-xs text-silver-500">Share Price: ${team.sharePrice}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-xl text-silver-900">{team.score}</div>
-                        <div className={`text-xs font-semibold ${team.change >= 0 ? 'text-success-500' : 'text-danger-500'}`}>
-                          {team.change >= 0 ? '+' : ''}{team.change} pts
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-20 bg-gradient-to-br from-violet-600 via-blue-600 to-emerald-600">
+        <div className="max-w-4xl mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="card-luxury relative overflow-hidden"
           >
-            {/* Animated background */}
-            <div className="absolute inset-0 mesh-gradient opacity-50" />
-            <motion.div
-              className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary-200 blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 5, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-accent-200 blur-3xl"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 6, repeat: Infinity, delay: 1 }}
-            />
-
-            <div className="relative z-10 text-center py-12">
-              <motion.div
-                animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Ready to Run the Company?
+            </h2>
+            <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+              Experience decision-making at the highest level. Feel the weight of leadership.
+              Learn what it takes to govern under uncertainty.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/facilitator"
+                className="px-8 py-4 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
               >
-                <Trophy className="w-20 h-20 text-gold-500 mx-auto mb-8" />
-              </motion.div>
-              <h2 className="text-5xl font-bold text-silver-900 mb-6">
-                Ready to Lead Your Company?
-              </h2>
-              <p className="text-xl text-silver-600 mb-10 max-w-2xl mx-auto">
-                Experience the most sophisticated business simulation platform.
-                Make decisions that matter. Compete to win.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/simulation" className="btn-primary text-lg px-10 py-5 gap-3">
-                  <Play className="w-6 h-6" />
-                  <span>Launch Free Demo</span>
-                </Link>
-                <Link href="/facilitator" className="btn-secondary text-lg px-10 py-5 gap-3">
-                  <GraduationCap className="w-6 h-6" />
-                  <span>Facilitator Access</span>
-                </Link>
-              </div>
+                <Award className="w-5 h-5" />
+                Facilitator Console
+              </Link>
+              <Link
+                href="/simulation"
+                className="px-8 py-4 bg-white/10 text-white font-bold rounded-xl border border-white/30 hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Play className="w-5 h-5" />
+                Try Demo
+              </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-4 border-t border-silver-200 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg">
-                <Layers className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-silver-800 text-lg">LuminaSim</span>
+      <footer className="bg-slate-900 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-center md:text-left">
+              <div className="text-xl font-bold text-white mb-1">Lumina Simulation</div>
+              <div className="text-slate-400 text-sm">Run the company. Feel the consequences.</div>
             </div>
-            <p className="text-sm text-silver-500">
-              Powered by Ambidexters Inc. &copy; {new Date().getFullYear()}. All rights reserved.
-            </p>
-            <div className="flex gap-8">
-              <Link href="/simulation" className="text-sm text-silver-500 hover:text-primary-600 transition-colors">
-                Simulation
-              </Link>
-              <Link href="/facilitator" className="text-sm text-silver-500 hover:text-primary-600 transition-colors">
-                Facilitator
-              </Link>
-              <span className="text-sm text-silver-500 hover:text-primary-600 transition-colors cursor-pointer">
-                Debrief
-              </span>
-              <span className="text-sm text-silver-500 hover:text-primary-600 transition-colors cursor-pointer">
-                Support
-              </span>
+            <div className="flex gap-6 text-sm text-slate-400">
+              <Link href="/simulation" className="hover:text-white transition-colors">Simulations</Link>
+              <Link href="/facilitator" className="hover:text-white transition-colors">Facilitator</Link>
+              <Link href="/debrief" className="hover:text-white transition-colors">Debrief</Link>
             </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+            &copy; {new Date().getFullYear()} Lumina Simulation Suite. Enterprise Learning Platform.
           </div>
         </div>
       </footer>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {selectedSim && (
+          <SimulationModal sim={selectedSim} onClose={() => setSelectedSim(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
-// Hero Visualization Component with Animations
-function HeroVisualization() {
-  return (
-    <div className="relative">
-      {/* Glow Effects */}
-      <motion.div
-        className="absolute -inset-8 bg-gradient-to-r from-primary-200 via-accent-200 to-gold-200 rounded-3xl blur-3xl opacity-40"
-        animate={{ opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 4, repeat: Infinity }}
-      />
-
-      {/* Floating Elements */}
-      <motion.div
-        animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
-        transition={{ duration: 6, repeat: Infinity }}
-        className="absolute -top-8 -left-8 w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-500 shadow-glow-purple flex items-center justify-center"
-      >
-        <TrendingUp className="w-10 h-10 text-white" />
-      </motion.div>
-
-      <motion.div
-        animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
-        transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-        className="absolute -top-4 -right-12 w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-500 shadow-glow-rose flex items-center justify-center"
-      >
-        <BarChart3 className="w-8 h-8 text-white" />
-      </motion.div>
-
-      <motion.div
-        animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
-        transition={{ duration: 7, repeat: Infinity, delay: 2 }}
-        className="absolute -bottom-8 -right-8 w-14 h-14 rounded-xl bg-gradient-to-br from-gold-400 to-gold-500 shadow-glow-gold flex items-center justify-center"
-      >
-        <DollarSign className="w-7 h-7 text-white" />
-      </motion.div>
-
-      <motion.div
-        animate={{ y: [0, 10, 0], x: [0, -10, 0] }}
-        transition={{ duration: 6, repeat: Infinity, delay: 1.5 }}
-        className="absolute bottom-20 -left-12 w-12 h-12 rounded-xl bg-gradient-to-br from-success-400 to-success-500 shadow-glow-emerald flex items-center justify-center"
-      >
-        <CheckCircle className="w-6 h-6 text-white" />
-      </motion.div>
-
-      {/* Main Card */}
-      <div className="relative card-luxury overflow-hidden shadow-luxury-xl">
-        {/* Shimmer effect */}
-        <div className="absolute inset-0 shimmer opacity-30" />
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-danger-400" />
-            <div className="w-3 h-3 rounded-full bg-warning-400" />
-            <div className="w-3 h-3 rounded-full bg-success-400" />
-          </div>
-          <div className="flex items-center gap-2 text-xs text-silver-400">
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 rounded-full bg-success-400"
-            />
-            Live Demo
-          </div>
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="space-y-5 relative z-10">
-          {/* KPI Row */}
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { label: 'Revenue', value: '$24.5M', change: '+12%', color: 'text-success-500', gradient: 'from-success-400 to-success-500' },
-              { label: 'Market Share', value: '34%', change: '+5%', color: 'text-success-500', gradient: 'from-primary-400 to-primary-500' },
-              { label: 'Stock Price', value: '$127.50', change: '+8.3%', color: 'text-success-500', gradient: 'from-gold-400 to-gold-500' },
-              { label: 'Score', value: '428', change: 'Rank #2', color: 'text-gold-500', gradient: 'from-accent-400 to-accent-500' },
-            ].map((kpi, i) => (
-              <motion.div
-                key={kpi.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="stat-card p-3"
-              >
-                <div className="text-xs text-silver-500 mb-1">{kpi.label}</div>
-                <div className="text-lg font-bold text-silver-900">{kpi.value}</div>
-                <div className={`text-xs font-semibold ${kpi.color}`}>{kpi.change}</div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Chart Placeholder */}
-          <div className="h-36 bg-gradient-to-b from-silver-50 to-white rounded-xl flex items-end justify-center gap-2 p-4 border border-silver-100">
-            {[40, 55, 45, 60, 52, 68, 75, 70, 85, 82, 90, 95].map((h, i) => (
-              <motion.div
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
-                className="w-6 bg-gradient-to-t from-primary-500 to-primary-400 rounded-t shadow-sm"
-              />
-            ))}
-          </div>
-
-          {/* Team Status */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="stat-card p-3">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="w-4 h-4 text-primary-500" />
-                <span className="text-sm font-medium text-silver-800">Team Alpha</span>
-              </div>
-              <div className="flex gap-2">
-                {['CEO', 'CFO', 'CMO', 'COO'].map((role) => (
-                  <motion.div
-                    key={role}
-                    whileHover={{ scale: 1.05 }}
-                    className="px-2 py-1 bg-success-50 text-success-600 text-xs rounded-lg font-medium border border-success-100"
-                  >
-                    {role}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-            <div className="stat-card p-3">
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-4 h-4 text-accent-500" />
-                <span className="text-sm font-medium text-silver-800">Round 5 of 8</span>
-              </div>
-              <div className="h-3 bg-silver-100 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: '62.5%' }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Clock icon component (since it's not in lucide)
-function Clock({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 6v6l4 2" />
-    </svg>
-  );
-}
-
-// Data
-const simulations = [
-  {
-    id: 'strategic-leadership',
-    name: 'Strategic Leadership',
-    description: 'Lead a Fortune 500 company through digital transformation, market disruption, and competitive pressures. Master CEO-level decision making.',
-    icon: Briefcase,
-    gradient: 'from-primary-500 to-primary-600',
-    featured: true,
-    teamSize: '4-6',
-    rounds: 8,
-    duration: '4-6 hrs',
-    tags: ['Strategy', 'Leadership', 'Digital Transformation'],
-  },
-  {
-    id: 'market-dynamics',
-    name: 'Market Dynamics',
-    description: 'Navigate complex market forces, competitive positioning, and consumer behavior in a dynamic multi-player marketplace simulation.',
-    icon: TrendingUp,
-    gradient: 'from-accent-500 to-accent-600',
-    featured: false,
-    teamSize: '3-5',
-    rounds: 10,
-    duration: '3-4 hrs',
-    tags: ['Marketing', 'Competition', 'Market Analysis'],
-  },
-  {
-    id: 'financial-acumen',
-    name: 'Financial Acumen',
-    description: 'Master corporate finance, investment decisions, and risk management. Build financial models and optimize capital allocation.',
-    icon: DollarSign,
-    gradient: 'from-success-500 to-success-600',
-    featured: false,
-    teamSize: '3-5',
-    rounds: 8,
-    duration: '4-5 hrs',
-    tags: ['Finance', 'Investment', 'Risk Management'],
-  },
-  {
-    id: 'operations-excellence',
-    name: 'Operations Excellence',
-    description: 'Optimize supply chains, manage production capacity, and implement lean operations. Balance quality, cost, and delivery.',
-    icon: Factory,
-    gradient: 'from-warning-500 to-warning-600',
-    featured: false,
-    teamSize: '4-6',
-    rounds: 8,
-    duration: '4-5 hrs',
-    tags: ['Operations', 'Supply Chain', 'Quality'],
-  },
-  {
-    id: 'sales-mastery',
-    name: 'Sales Mastery',
-    description: 'Build and lead a high-performing sales organization. Manage territories, compensation, and customer relationships.',
-    icon: Megaphone,
-    gradient: 'from-info-500 to-info-600',
-    featured: false,
-    teamSize: '3-5',
-    rounds: 6,
-    duration: '3-4 hrs',
-    tags: ['Sales', 'CRM', 'Team Management'],
-  },
-  {
-    id: 'innovation-lab',
-    name: 'Innovation Lab',
-    description: 'Drive R&D strategy, manage product portfolios, and bring innovations to market. Balance exploration and exploitation.',
-    icon: Lightbulb,
-    gradient: 'from-purple-500 to-purple-600',
-    featured: false,
-    teamSize: '4-6',
-    rounds: 8,
-    duration: '4-5 hrs',
-    tags: ['Innovation', 'R&D', 'Product Development'],
-  },
-];
-
-const features = [
-  {
-    icon: Zap,
-    title: 'Real-Time Competition',
-    description: 'Teams compete simultaneously in the same market. Your decisions impact others and vice versa.',
-    gradient: 'from-primary-400 to-primary-500',
-  },
-  {
-    icon: LineChart,
-    title: 'Dynamic Market Events',
-    description: 'Respond to market shocks, regulatory changes, competitor moves, and economic shifts.',
-    gradient: 'from-accent-400 to-accent-500',
-  },
-  {
-    icon: Trophy,
-    title: 'Balanced Scorecard',
-    description: 'Multi-dimensional scoring on financial performance, growth, trust, resilience, and execution.',
-    gradient: 'from-gold-400 to-gold-500',
-  },
-  {
-    icon: Users,
-    title: 'C-Suite Role Assignment',
-    description: 'Each team member takes a specific executive role with unique decision authority.',
-    gradient: 'from-success-400 to-success-500',
-  },
-  {
-    icon: Settings,
-    title: 'Facilitator Control Panel',
-    description: 'Instructors can inject events, pause rounds, compare teams, and export analytics.',
-    gradient: 'from-warning-400 to-warning-500',
-  },
-  {
-    icon: Brain,
-    title: 'AI-Powered Analytics',
-    description: 'Machine learning insights on decision patterns, team dynamics, and learning outcomes.',
-    gradient: 'from-info-400 to-info-500',
-  },
-];
-
-const roles = [
-  {
-    title: 'Chief Executive Officer',
-    subtitle: 'CEO',
-    icon: Briefcase,
-    color: 'from-primary-500 to-primary-600',
-    decisions: ['Strategic Direction', 'Risk Appetite', 'Capital Allocation', 'Crisis Response'],
-  },
-  {
-    title: 'Chief Financial Officer',
-    subtitle: 'CFO',
-    icon: LineChart,
-    color: 'from-success-500 to-success-600',
-    decisions: ['Budget Planning', 'Investment Strategy', 'Cost Management', 'Financial Reporting'],
-  },
-  {
-    title: 'Chief Marketing Officer',
-    subtitle: 'CMO',
-    icon: TrendingUp,
-    color: 'from-accent-500 to-accent-600',
-    decisions: ['Campaign Spend', 'Pricing Strategy', 'Brand Positioning', 'Channel Mix'],
-  },
-  {
-    title: 'Chief Operating Officer',
-    subtitle: 'COO',
-    icon: Settings,
-    color: 'from-warning-500 to-warning-600',
-    decisions: ['Capacity Planning', 'Supply Chain', 'Quality Control', 'Process Optimization'],
-  },
-  {
-    title: 'Chief Technology Officer',
-    subtitle: 'CTO',
-    icon: Cpu,
-    color: 'from-purple-500 to-purple-600',
-    decisions: ['R&D Roadmap', 'Tech Stack', 'Innovation Budget', 'Security & Privacy'],
-  },
-  {
-    title: 'Chief People Officer',
-    subtitle: 'CPO',
-    icon: Heart,
-    color: 'from-pink-500 to-pink-600',
-    decisions: ['Hiring Strategy', 'Compensation', 'Culture Investment', 'Talent Development'],
-  },
-  {
-    title: 'Chief Legal Officer',
-    subtitle: 'CLO',
-    icon: Scale,
-    color: 'from-slate-500 to-slate-600',
-    decisions: ['Compliance Spend', 'Policy Framework', 'Audit Readiness', 'Data Governance'],
-  },
-  {
-    title: 'VP of Sales',
-    subtitle: 'VP Sales',
-    icon: BarChart3,
-    color: 'from-orange-500 to-orange-600',
-    decisions: ['Sales Targets', 'Territory Strategy', 'Discount Policy', 'Partner Programs'],
-  },
-];
-
-const steps = [
-  {
-    title: 'Analyze Situation',
-    description: 'Review market conditions, financial position, competitive landscape, and team performance.',
-    gradient: 'from-primary-400 to-primary-500',
-  },
-  {
-    title: 'Strategic Planning',
-    description: 'Coordinate with your team. Each role makes decisions within their domain.',
-    gradient: 'from-accent-400 to-accent-500',
-  },
-  {
-    title: 'Submit Decisions',
-    description: 'Lock in your choices before the deadline. Decisions are final once submitted.',
-    gradient: 'from-gold-400 to-gold-500',
-  },
-  {
-    title: 'Review Outcomes',
-    description: 'Watch the simulation resolve. See how your decisions played out against competitors.',
-    gradient: 'from-success-400 to-success-500',
-  },
-];
-
-const scorecard = [
-  { name: 'Financial Health', weight: 25, gradient: 'from-success-400 to-success-500' },
-  { name: 'Market Growth', weight: 25, gradient: 'from-primary-400 to-primary-500' },
-  { name: 'Brand Trust', weight: 20, gradient: 'from-accent-400 to-accent-500' },
-  { name: 'Operational Resilience', weight: 15, gradient: 'from-warning-400 to-warning-500' },
-  { name: 'Execution Quality', weight: 15, gradient: 'from-purple-400 to-purple-500' },
-];
-
-const leaderboard = [
-  { name: 'Team Alpha', score: 428, sharePrice: 127.50, change: 15 },
-  { name: 'Team Omega', score: 412, sharePrice: 118.25, change: 8 },
-  { name: 'Team Delta', score: 395, sharePrice: 105.75, change: -3 },
-  { name: 'Team Sigma', score: 378, sharePrice: 98.50, change: 12 },
-];

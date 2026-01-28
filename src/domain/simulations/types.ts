@@ -933,7 +933,7 @@ export interface InnovationLabDecision {
   licensingStrategy?: 'in' | 'out' | 'both' | 'none';
 
   // Risk management
-  optionValue Focus?: boolean;
+  optionValueFocus?: boolean;
   hedgingBets?: number; // number of parallel bets
   experimentationBudget?: number;
 }
