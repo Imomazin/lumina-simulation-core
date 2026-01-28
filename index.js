@@ -1,19 +1,16 @@
 import express from "express";
-import { createInitialState, advanceTime } from "./engine/state.js";
+import { createInitialState, advanceTime } from "../engine/state.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
 let simState = structuredClone(createInitialState());
 
-app.use(express.json());
-
-app.get("/state", (req, res) => {
-  res.json(simState);
+app.get("/", (req, res) => {
+  res.json({ status: "Lumina Simulation API live" });
 });
 
-app.post("/advance", (req, res) => {
-  advanceTime(simState);
+app.get("/state", (req, res) => {
   res.json(simState);
 });
 
@@ -27,8 +24,9 @@ app.get("/summary", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Simulation server running on port ${PORT}`);
+app.post("/advance", (req, res) => {
+  advanceTime(simState);
+  res.json(simState);
 });
 
 export default app;
