@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateBoardMemo, generateLessonsLearned } from '@/domain/engine';
 import { loadGameState } from '@/lib/store';
+import type { GameState } from '@/domain/engine/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function generateCSVExport(state: typeof import('@/domain/engine/types').GameState extends infer T ? T : never): string {
+function generateCSVExport(state: GameState): string {
   const rows: string[] = [];
 
   // Header
