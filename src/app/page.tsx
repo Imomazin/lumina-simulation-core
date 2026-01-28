@@ -378,7 +378,7 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Link href={`/simulation/${sim.id}`}>
+                <Link href="/simulation">
                   <div className="card-luxury-hover group h-full">
                     {/* Icon with animated background */}
                     <div className="relative mb-6">
