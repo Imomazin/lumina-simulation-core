@@ -18,6 +18,17 @@ app.get('/state', (req, res) => {
   res.json(simState);
 });
 
+// GET /summary - Returns a snapshot of key metrics
+app.get('/summary', (req, res) => {
+  res.json({
+    round: simState.round,
+    time: simState.time,
+    finance: simState.finance,
+    market: simState.market,
+    operations: simState.operations
+  });
+});
+
 // POST /advance - Advances time and returns updated state
 app.post('/advance', (req, res) => {
   advanceTime(simState);

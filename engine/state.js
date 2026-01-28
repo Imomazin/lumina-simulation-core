@@ -3,7 +3,8 @@
 export function createInitialState() {
     return {
       time: 0,
-  
+      round: 1,
+
       finance: {
         cash: 100_000_000,
         revenue: 0,
@@ -41,6 +42,7 @@ export function createInitialState() {
   
   export function advanceTime(state) {
     state.time += 1;
+    state.round += 1;
     return state;
   }
   
