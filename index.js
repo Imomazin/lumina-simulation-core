@@ -1,6 +1,10 @@
 import express from "express";
+import { createInitialState, advanceTime } from "./engine/state.js";
 
 const app = express();
+app.use(express.json());
+
+let simState = structuredClone(createInitialState());
 
 app.get("/", (req, res) => {
   res.json({
@@ -9,7 +13,14 @@ app.get("/", (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get("/state", (req, res) => {
+  res.json(simState);
 });
+
+app.post("/advance", (req, res) => {
+  advanceTime(simState);
+  res.json(simState);
+});
+
+// IMPORTANT: export the app, DO NOT listen()
+export default app;
