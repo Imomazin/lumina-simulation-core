@@ -31,20 +31,51 @@ import {
   AlertCircle,
   Activity,
   PieChart,
+  Sparkles,
+  ArrowUpRight,
+  ArrowDownRight,
+  Star,
+  Award,
+  Heart,
+  Cpu,
+  Globe,
 } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulation';
 import { cn, formatCurrency, formatPercent } from '@/lib/utils';
 import type { Role, GameState } from '@/domain/engine/types';
 
-const ROLE_CONFIG: Record<Role, { icon: typeof Target; label: string; color: string; bgColor: string }> = {
-  strategy: { icon: Briefcase, label: 'CEO / Strategy', color: 'text-primary-400', bgColor: 'bg-primary-500/20' },
-  marketing: { icon: TrendingUp, label: 'CMO / Marketing', color: 'text-accent-400', bgColor: 'bg-accent-500/20' },
-  sales: { icon: BarChart3, label: 'VP Sales', color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
-  operations: { icon: Settings, label: 'COO / Operations', color: 'text-warning-400', bgColor: 'bg-warning-500/20' },
-  rnd: { icon: Lightbulb, label: 'CTO / R&D', color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
-  legal: { icon: Scale, label: 'CLO / Legal', color: 'text-slate-400', bgColor: 'bg-slate-500/20' },
-  gm: { icon: Users, label: 'CPO / People', color: 'text-pink-400', bgColor: 'bg-pink-500/20' },
+const ROLE_CONFIG: Record<Role, { icon: typeof Target; label: string; color: string; bgColor: string; gradient: string }> = {
+  strategy: { icon: Briefcase, label: 'CEO / Strategy', color: 'text-primary-600', bgColor: 'bg-primary-50', gradient: 'from-primary-500 to-primary-600' },
+  marketing: { icon: TrendingUp, label: 'CMO / Marketing', color: 'text-accent-600', bgColor: 'bg-accent-50', gradient: 'from-accent-500 to-accent-600' },
+  sales: { icon: BarChart3, label: 'VP Sales', color: 'text-orange-600', bgColor: 'bg-orange-50', gradient: 'from-orange-500 to-orange-600' },
+  operations: { icon: Settings, label: 'COO / Operations', color: 'text-warning-600', bgColor: 'bg-warning-50', gradient: 'from-warning-500 to-warning-600' },
+  rnd: { icon: Lightbulb, label: 'CTO / R&D', color: 'text-purple-600', bgColor: 'bg-purple-50', gradient: 'from-purple-500 to-purple-600' },
+  legal: { icon: Scale, label: 'CLO / Legal', color: 'text-slate-600', bgColor: 'bg-slate-50', gradient: 'from-slate-500 to-slate-600' },
+  gm: { icon: Heart, label: 'CPO / People', color: 'text-pink-600', bgColor: 'bg-pink-50', gradient: 'from-pink-500 to-pink-600' },
 };
+
+// Animated Background Orb
+function AnimatedOrb({ className, delay = 0 }: { className: string; delay?: number }) {
+  return (
+    <motion.div
+      className={`absolute rounded-full blur-3xl pointer-events-none ${className}`}
+      animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+      transition={{ duration: 8, delay, repeat: Infinity, ease: "easeInOut" }}
+    />
+  );
+}
+
+// Floating Particle
+function FloatingParticle({ delay, x, y, color }: { delay: number; x: number; y: number; color: string }) {
+  return (
+    <motion.div
+      className={`absolute w-2 h-2 rounded-full ${color} pointer-events-none`}
+      style={{ left: `${x}%`, top: `${y}%` }}
+      animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+      transition={{ duration: 4, delay, repeat: Infinity, ease: "easeInOut" }}
+    />
+  );
+}
 
 export default function SimulationPage() {
   const {
@@ -61,7 +92,6 @@ export default function SimulationPage() {
   } = useSimulationStore();
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'decisions' | 'reports'>('dashboard');
-  const [showDecisionPanel, setShowDecisionPanel] = useState(false);
 
   useEffect(() => {
     if (!gameState) {
@@ -71,26 +101,42 @@ export default function SimulationPage() {
 
   if (isLoading && !gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Initializing simulation...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-silver-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-20 h-20 mx-auto mb-6"
+          >
+            <div className="w-full h-full rounded-full border-4 border-silver-200 border-t-primary-500" />
+          </motion.div>
+          <p className="text-silver-600 font-medium">Initializing simulation...</p>
+        </motion.div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="card-enterprise max-w-md text-center">
-          <AlertTriangle className="w-12 h-12 text-danger-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
-          <p className="text-slate-400 mb-6">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-silver-50">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-luxury max-w-md text-center"
+        >
+          <div className="w-16 h-16 rounded-full bg-danger-50 flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-danger-500" />
+          </div>
+          <h2 className="text-xl font-bold text-silver-900 mb-2">Error</h2>
+          <p className="text-silver-600 mb-6">{error}</p>
           <button onClick={() => initializeGame()} className="btn-primary">
             Try Again
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -101,136 +147,191 @@ export default function SimulationPage() {
   const yearLabel = `Year ${gameState.round}`;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative bg-gradient-to-b from-white via-silver-50 to-white">
+      {/* Animated Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <AnimatedOrb className="w-96 h-96 bg-primary-200 -top-48 -right-48" />
+        <AnimatedOrb className="w-80 h-80 bg-accent-200 top-1/2 -left-40" delay={2} />
+        <AnimatedOrb className="w-64 h-64 bg-gold-200 bottom-20 right-1/4" delay={4} />
+        <FloatingParticle delay={0} x={10} y={30} color="bg-primary-300" />
+        <FloatingParticle delay={1} x={85} y={20} color="bg-accent-300" />
+        <FloatingParticle delay={2} x={30} y={70} color="bg-gold-300" />
+        <FloatingParticle delay={3} x={70} y={60} color="bg-success-300" />
+      </div>
+
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
-        <div className="max-w-[1600px] mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="fixed top-0 left-0 right-0 z-50 glass"
+      >
+        <div className="max-w-[1600px] mx-auto px-6">
+          <div className="flex items-center justify-between h-20">
             {/* Left: Logo & Back */}
             <div className="flex items-center gap-4">
-              <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+              <Link href="/" className="text-silver-400 hover:text-primary-600 transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-3">
+                <motion.div
+                  whileHover={{ scale: 1.05, rotate: 5 }}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-glow-purple"
+                >
+                  <Layers className="w-5 h-5 text-white" />
+                </motion.div>
+                <div>
+                  <span className="font-bold text-silver-800">Lumina</span>
+                  <span className="font-bold gradient-text">Sim</span>
                 </div>
-                <span className="font-bold text-white">LuminaSim</span>
               </div>
             </div>
 
             {/* Center: Round & Year Info */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5">
-                <Calendar className="w-4 h-4 text-primary-400" />
-                <span className="text-white font-semibold">{yearLabel}</span>
-                <span className="text-slate-400">of {gameState.maxRounds}</span>
-              </div>
-              <div className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium',
-                gameState.phase === 'decisions_open' ? 'bg-success-500/20 text-success-400' :
-                gameState.phase === 'decisions_locked' ? 'bg-warning-500/20 text-warning-400' :
-                'bg-primary-500/20 text-primary-400'
-              )}>
+            <div className="flex items-center gap-4">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white shadow-luxury border border-silver-100"
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary-600" />
+                </div>
+                <div>
+                  <span className="font-bold text-silver-900">{yearLabel}</span>
+                  <span className="text-silver-400 ml-1">of {gameState.maxRounds}</span>
+                </div>
+              </motion.div>
+
+              <motion.div
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className={cn(
+                  'px-4 py-2.5 rounded-xl text-sm font-semibold shadow-luxury',
+                  gameState.phase === 'decisions_open'
+                    ? 'bg-gradient-to-r from-success-50 to-success-100 text-success-700 border border-success-200'
+                    : gameState.phase === 'decisions_locked'
+                    ? 'bg-gradient-to-r from-warning-50 to-warning-100 text-warning-700 border border-warning-200'
+                    : 'bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 border border-primary-200'
+                )}
+              >
                 {gameState.phase === 'decisions_open' ? 'Decisions Open' :
                  gameState.phase === 'decisions_locked' ? 'Locked' : 'Processing'}
-              </div>
+              </motion.div>
+
               <StockTicker price={sharePrice} change={sharePrice - 100} />
             </div>
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
               {demoMode && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => advanceRound()}
                   disabled={isLoading || gameState.round >= gameState.maxRounds}
                   className={cn(
-                    'btn-primary inline-flex items-center gap-2',
+                    'btn-primary gap-2',
                     (isLoading || gameState.round >= gameState.maxRounds) && 'opacity-50 cursor-not-allowed'
                   )}
                 >
                   <Play className="w-4 h-4" />
                   Advance Year
-                </button>
+                </motion.button>
               )}
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => resetGame()}
                 disabled={isLoading}
-                className="btn-secondary inline-flex items-center gap-2"
+                className="btn-secondary gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content */}
-      <main className="pt-20 pb-8 px-4">
+      <main className="pt-28 pb-12 px-6 relative">
         <div className="max-w-[1600px] mx-auto">
           {/* Tab Navigation */}
-          <div className="flex gap-2 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex gap-3 mb-8"
+          >
             {[
               { id: 'dashboard', label: 'Dashboard', icon: PieChart },
               { id: 'decisions', label: 'Decisions', icon: Target },
               { id: 'reports', label: 'Reports & Events', icon: Activity },
-            ].map((tab) => (
-              <button
+            ].map((tab, index) => (
+              <motion.button
                 key={tab.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={cn(
-                  'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
+                  'flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300',
                   activeTab === tab.id
-                    ? 'bg-primary-500 text-white shadow-glow'
-                    : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-glow-purple'
+                    : 'bg-white text-silver-600 hover:text-primary-600 shadow-luxury border border-silver-100 hover:border-primary-200'
                 )}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-5 h-5" />
                 {tab.label}
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Dashboard View */}
-          {activeTab === 'dashboard' && (
-            <DashboardView gameState={gameState} sharePrice={sharePrice} />
-          )}
+          <AnimatePresence mode="wait">
+            {activeTab === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <DashboardView gameState={gameState} sharePrice={sharePrice} />
+              </motion.div>
+            )}
 
-          {/* Decisions View */}
-          {activeTab === 'decisions' && (
-            <DecisionsView
-              gameState={gameState}
-              selectedRole={selectedRole}
-              onSelectRole={(role) => {
-                setSelectedRole(role);
-                setShowDecisionPanel(true);
-              }}
-            />
-          )}
+            {/* Decisions View */}
+            {activeTab === 'decisions' && (
+              <motion.div
+                key="decisions"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <DecisionsView
+                  gameState={gameState}
+                  selectedRole={selectedRole}
+                  setSelectedRole={setSelectedRole}
+                  submitDecision={submitDecision}
+                  isLoading={isLoading}
+                />
+              </motion.div>
+            )}
 
-          {/* Reports View */}
-          {activeTab === 'reports' && (
-            <ReportsView gameState={gameState} />
-          )}
+            {/* Reports View */}
+            {activeTab === 'reports' && (
+              <motion.div
+                key="reports"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <ReportsView gameState={gameState} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
-
-      {/* Decision Panel Modal */}
-      <AnimatePresence>
-        {showDecisionPanel && selectedRole && (
-          <DecisionPanel
-            role={selectedRole}
-            gameState={gameState}
-            onClose={() => setShowDecisionPanel(false)}
-            onSubmit={async (decision) => {
-              await submitDecision(selectedRole, decision);
-              setShowDecisionPanel(false);
-            }}
-            isLoading={isLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -238,286 +339,290 @@ export default function SimulationPage() {
 // Stock Ticker Component
 function StockTicker({ price, change }: { price: number; change: number }) {
   const isPositive = change >= 0;
+
   return (
-    <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5">
-      <div className="flex items-center gap-1">
-        <LineChart className="w-4 h-4 text-slate-400" />
-        <span className="text-xs text-slate-400">LMNA</span>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white shadow-luxury border border-silver-100"
+    >
+      <div className="flex items-center gap-2">
+        <motion.div
+          animate={{ rotate: isPositive ? [0, 10, 0] : [0, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className={cn(
+            'w-8 h-8 rounded-lg flex items-center justify-center',
+            isPositive ? 'bg-success-50' : 'bg-danger-50'
+          )}
+        >
+          {isPositive ? (
+            <TrendingUp className="w-4 h-4 text-success-600" />
+          ) : (
+            <TrendingDown className="w-4 h-4 text-danger-600" />
+          )}
+        </motion.div>
+        <div>
+          <div className="text-xs text-silver-500 uppercase tracking-wider">Stock</div>
+          <div className="font-bold text-silver-900">${price.toFixed(2)}</div>
+        </div>
       </div>
-      <span className="font-mono font-bold text-white">${price.toFixed(2)}</span>
-      <span className={cn(
-        'flex items-center gap-1 text-sm font-medium',
-        isPositive ? 'text-success-400' : 'text-danger-400'
+      <div className={cn(
+        'px-2.5 py-1 rounded-lg text-sm font-bold',
+        isPositive ? 'bg-success-50 text-success-600' : 'bg-danger-50 text-danger-600'
       )}>
-        {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
         {isPositive ? '+' : ''}{change.toFixed(1)}%
-      </span>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 
 // Dashboard View Component
 function DashboardView({ gameState, sharePrice }: { gameState: GameState; sharePrice: number }) {
+  const metrics = gameState.metrics;
+
+  const kpis = [
+    {
+      label: 'Revenue',
+      value: formatCurrency(metrics.revenue),
+      change: '+12.5%',
+      trend: 'up' as const,
+      icon: DollarSign,
+      gradient: 'from-success-400 to-success-500',
+    },
+    {
+      label: 'Market Share',
+      value: formatPercent(metrics.marketShare / 100),
+      change: '+3.2%',
+      trend: 'up' as const,
+      icon: PieChart,
+      gradient: 'from-primary-400 to-primary-500',
+    },
+    {
+      label: 'Customer Trust',
+      value: formatPercent(metrics.trust / 100),
+      change: '-1.5%',
+      trend: 'down' as const,
+      icon: Heart,
+      gradient: 'from-accent-400 to-accent-500',
+    },
+    {
+      label: 'Stock Price',
+      value: `$${sharePrice.toFixed(2)}`,
+      change: `${sharePrice >= 100 ? '+' : ''}${(sharePrice - 100).toFixed(1)}%`,
+      trend: sharePrice >= 100 ? 'up' as const : 'down' as const,
+      icon: TrendingUp,
+      gradient: 'from-gold-400 to-gold-500',
+    },
+  ];
+
   return (
-    <div className="grid lg:grid-cols-4 gap-6">
-      {/* Main Dashboard - 3 columns */}
-      <div className="lg:col-span-3 space-y-6">
-        {/* Top KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard
-            label="Revenue"
-            value={formatCurrency(gameState.company.revenue)}
-            sublabel="/year"
-            icon={DollarSign}
-            trend={gameState.company.profit >= 0 ? 'up' : 'down'}
-            trendValue={`${gameState.company.profit >= 0 ? '+' : ''}${formatCurrency(gameState.company.profit)}`}
-            color="success"
-          />
-          <KPICard
-            label="Cash Position"
-            value={formatCurrency(gameState.company.cash)}
-            sublabel={`${gameState.company.runwayMonths}mo runway`}
-            icon={Building2}
-            color="primary"
-          />
-          <KPICard
-            label="Stock Price"
-            value={`$${sharePrice.toFixed(2)}`}
-            sublabel="LMNA"
-            icon={LineChart}
-            trend={sharePrice >= 100 ? 'up' : 'down'}
-            trendValue={`${sharePrice >= 100 ? '+' : ''}${(sharePrice - 100).toFixed(1)}%`}
-            color="accent"
-          />
-          <KPICard
-            label="Total Score"
-            value={gameState.scorecard.totalScore.toString()}
-            sublabel="/500 pts"
-            icon={Trophy}
-            color="warning"
-          />
-        </div>
-
-        {/* Main Metrics Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Financial Performance */}
-          <MetricCard title="Financial Performance" icon={DollarSign}>
-            <MetricBar label="Revenue Growth" value={Math.min(gameState.company.revenue / 2, 100)} color="success" />
-            <MetricBar label="Profit Margin" value={Math.max(0, (gameState.company.profit / gameState.company.revenue) * 100 + 50)} color="primary" />
-            <MetricBar label="Cash Efficiency" value={Math.min(gameState.company.cash / 2, 100)} color="accent" />
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Costs</div>
-                <div className="text-lg font-semibold text-white">{formatCurrency(gameState.company.costs)}/yr</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Pipeline</div>
-                <div className="text-lg font-semibold text-white">{formatCurrency(gameState.company.salesPipeline)}</div>
+    <div className="space-y-8">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {kpis.map((kpi, index) => (
+          <motion.div
+            key={kpi.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="card-luxury group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kpi.gradient} flex items-center justify-center shadow-lg`}
+              >
+                <kpi.icon className="w-6 h-6 text-white" />
+              </motion.div>
+              <div className={cn(
+                'flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-semibold',
+                kpi.trend === 'up' ? 'bg-success-50 text-success-600' : 'bg-danger-50 text-danger-600'
+              )}>
+                {kpi.trend === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                {kpi.change}
               </div>
             </div>
-          </MetricCard>
+            <div className="text-sm text-silver-500 mb-1">{kpi.label}</div>
+            <div className="text-3xl font-bold text-silver-900">{kpi.value}</div>
+          </motion.div>
+        ))}
+      </div>
 
-          {/* Market Position */}
-          <MetricCard title="Market Position" icon={TrendingUp}>
-            <MetricBar label="Market Demand" value={gameState.market.demandIndex / 2} color="accent" showValue={gameState.market.demandIndex} />
-            <MetricBar label="Price Index" value={gameState.market.priceIndex / 2} color="success" showValue={gameState.market.priceIndex} />
-            <MetricBar label="Competition Intensity" value={gameState.market.competitionIntensity} color="danger" inverse />
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Customer Churn</div>
-                <div className={cn('text-lg font-semibold', gameState.company.churn > 15 ? 'text-danger-400' : 'text-white')}>
-                  {gameState.company.churn.toFixed(1)}%
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Sentiment</div>
-                <div className={cn('text-lg font-semibold', gameState.market.sentiment >= 0 ? 'text-success-400' : 'text-danger-400')}>
-                  {gameState.market.sentiment >= 0 ? '+' : ''}{gameState.market.sentiment}
-                </div>
-              </div>
+      {/* Main Dashboard Grid */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Performance Chart */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="lg:col-span-2 card-luxury"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-silver-900">Performance Trend</h3>
+            <div className="flex items-center gap-2">
+              {['Revenue', 'Profit', 'Growth'].map((item, i) => (
+                <span key={item} className={cn(
+                  'px-3 py-1 rounded-lg text-xs font-medium',
+                  i === 0 ? 'bg-primary-50 text-primary-600' : 'bg-silver-100 text-silver-500'
+                )}>
+                  {item}
+                </span>
+              ))}
             </div>
-          </MetricCard>
-
-          {/* Operations & Quality */}
-          <MetricCard title="Operations & Quality" icon={Settings}>
-            <MetricBar label="Product Quality" value={gameState.company.productQuality} color="primary" />
-            <MetricBar label="Team Morale" value={gameState.company.morale} color="success" />
-            <MetricBar label="Technical Debt" value={gameState.company.techDebt} color="danger" inverse />
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Headcount</div>
-                <div className="text-lg font-semibold text-white">{gameState.company.headcount}</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Supply Stability</div>
-                <div className="text-lg font-semibold text-white">{(100 - gameState.market.supplyShockRisk).toFixed(0)}%</div>
-              </div>
-            </div>
-          </MetricCard>
-
-          {/* Risk & Compliance */}
-          <MetricCard title="Risk & Compliance" icon={Shield}>
-            <MetricBar label="Operational Risk" value={gameState.risk.operational} color="warning" inverse />
-            <MetricBar label="Regulatory Risk" value={gameState.risk.regulatory} color="danger" inverse />
-            <MetricBar label="Reputational Risk" value={gameState.risk.reputational} color="purple" inverse />
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Brand Trust</div>
-                <div className={cn('text-lg font-semibold', gameState.company.brandTrust > 60 ? 'text-success-400' : 'text-warning-400')}>
-                  {gameState.company.brandTrust.toFixed(0)}%
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500 mb-1">Compliance</div>
-                <div className="text-lg font-semibold text-white">{gameState.company.compliancePosture.toFixed(0)}%</div>
-              </div>
-            </div>
-          </MetricCard>
-        </div>
+          </div>
+          <div className="h-64 flex items-end justify-center gap-3 px-4">
+            {[40, 55, 45, 65, 58, 72, 80, 75, 88, 85, 92, 95].map((h, i) => (
+              <motion.div
+                key={i}
+                initial={{ height: 0 }}
+                animate={{ height: `${h}%` }}
+                transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
+                whileHover={{ scale: 1.1 }}
+                className="flex-1 bg-gradient-to-t from-primary-500 to-primary-400 rounded-t-lg cursor-pointer shadow-sm hover:shadow-glow-purple transition-shadow"
+              />
+            ))}
+          </div>
+          <div className="flex justify-between mt-4 text-xs text-silver-400 px-4">
+            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
+              <span key={m}>{m}</span>
+            ))}
+          </div>
+        </motion.div>
 
         {/* Balanced Scorecard */}
-        <div className="card-enterprise">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="card-luxury"
+        >
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Target className="w-5 h-5 text-primary-400" />
-              <h3 className="text-lg font-semibold text-white">Balanced Scorecard</h3>
-            </div>
-            <div className="text-2xl font-bold gradient-text">{gameState.scorecard.totalScore}/500</div>
+            <h3 className="text-lg font-bold text-silver-900">Balanced Scorecard</h3>
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Trophy className="w-5 h-5 text-gold-500" />
+            </motion.div>
           </div>
-          <div className="grid grid-cols-5 gap-6">
+          <div className="space-y-5">
             {[
-              { label: 'Financial', value: gameState.scorecard.financialHealth, color: 'bg-success-500' },
-              { label: 'Growth', value: gameState.scorecard.growth, color: 'bg-accent-500' },
-              { label: 'Trust', value: gameState.scorecard.trust, color: 'bg-primary-500' },
-              { label: 'Resilience', value: gameState.scorecard.resilience, color: 'bg-warning-500' },
-              { label: 'Execution', value: gameState.scorecard.execution, color: 'bg-purple-500' },
-            ].map((item) => (
-              <div key={item.label} className="text-center">
-                <div className="relative w-20 h-20 mx-auto mb-3">
-                  <svg className="w-20 h-20 transform -rotate-90">
-                    <circle
-                      cx="40"
-                      cy="40"
-                      r="35"
-                      stroke="currentColor"
-                      strokeWidth="6"
-                      fill="none"
-                      className="text-white/10"
-                    />
-                    <circle
-                      cx="40"
-                      cy="40"
-                      r="35"
-                      stroke="currentColor"
-                      strokeWidth="6"
-                      fill="none"
-                      strokeDasharray={`${(item.value / 100) * 220} 220`}
-                      className={item.color.replace('bg-', 'text-')}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-white">{item.value}</span>
-                  </div>
+              { name: 'Financial Health', value: 78, gradient: 'from-success-400 to-success-500' },
+              { name: 'Market Growth', value: 65, gradient: 'from-primary-400 to-primary-500' },
+              { name: 'Brand Trust', value: 82, gradient: 'from-accent-400 to-accent-500' },
+              { name: 'Operations', value: 71, gradient: 'from-warning-400 to-warning-500' },
+              { name: 'Execution', value: 88, gradient: 'from-purple-400 to-purple-500' },
+            ].map((item, index) => (
+              <div key={item.name}>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-silver-700 font-medium">{item.name}</span>
+                  <span className="font-bold text-silver-900">{item.value}%</span>
                 </div>
-                <div className="text-sm text-slate-400">{item.label}</div>
+                <div className="h-2.5 bg-silver-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${item.value}%` }}
+                    transition={{ duration: 1, delay: index * 0.1 }}
+                    className={`h-full rounded-full bg-gradient-to-r ${item.gradient}`}
+                  />
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-6 p-4 rounded-xl bg-white/5">
-            <p className="text-sm text-slate-300">{gameState.scorecard.boardConfidence}</p>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Sidebar - 1 column */}
-      <div className="space-y-6">
-        {/* Leaderboard Preview */}
-        <div className="card-enterprise">
-          <div className="flex items-center gap-3 mb-4">
-            <Trophy className="w-5 h-5 text-warning-400" />
-            <h3 className="font-semibold text-white">Leaderboard</h3>
+      {/* Team Status & Leaderboard */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Team Roles Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-luxury"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-silver-900">Team Roles</h3>
+            <span className="px-3 py-1 rounded-lg bg-success-50 text-success-600 text-sm font-medium">
+              All Ready
+            </span>
           </div>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(ROLE_CONFIG).slice(0, 6).map(([key, config], index) => (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                className="flex items-center gap-3 p-3 rounded-xl bg-white border border-silver-100 shadow-sm hover:shadow-lg transition-all cursor-pointer"
+              >
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${config.gradient} flex items-center justify-center`}>
+                  <config.icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-silver-900 truncate">{config.label}</div>
+                  <div className="text-xs text-success-600">Submitted</div>
+                </div>
+                <CheckCircle className="w-5 h-5 text-success-500 flex-shrink-0" />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Leaderboard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-luxury"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-silver-900">Leaderboard</h3>
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Award className="w-5 h-5 text-gold-500" />
+            </motion.div>
+          </div>
+          <div className="space-y-3">
             {[
-              { rank: 1, name: 'Your Team', score: gameState.scorecard.totalScore, isYou: true },
-              { rank: 2, name: 'Team Beta', score: 385, isYou: false },
-              { rank: 3, name: 'Team Gamma', score: 342, isYou: false },
-            ].map((team) => (
-              <div
+              { name: 'Team Alpha', score: 428, rank: 1 },
+              { name: 'Your Team', score: 412, rank: 2, isYou: true },
+              { name: 'Team Delta', score: 395, rank: 3 },
+              { name: 'Team Sigma', score: 378, rank: 4 },
+            ].map((team, index) => (
+              <motion.div
                 key={team.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
                 className={cn(
-                  'flex items-center gap-3 p-3 rounded-lg',
-                  team.isYou ? 'bg-primary-500/20 border border-primary-500/30' : 'bg-white/5'
+                  'flex items-center gap-4 p-4 rounded-xl transition-all',
+                  team.isYou
+                    ? 'bg-gradient-to-r from-primary-50 to-primary-100 border-2 border-primary-200 shadow-glow-purple'
+                    : team.rank === 1
+                    ? 'bg-gradient-to-r from-gold-50 to-gold-100 border border-gold-200'
+                    : 'bg-silver-50 hover:bg-silver-100'
                 )}
               >
                 <div className={cn(
-                  'w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold',
-                  team.rank === 1 ? 'bg-warning-500 text-white' :
-                  team.rank === 2 ? 'bg-slate-400 text-white' :
-                  'bg-white/10 text-slate-400'
+                  'w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-lg',
+                  team.rank === 1 ? 'bg-gradient-to-br from-gold-400 to-gold-500' :
+                  team.rank === 2 ? 'bg-gradient-to-br from-silver-400 to-silver-500' :
+                  team.rank === 3 ? 'bg-gradient-to-br from-amber-600 to-amber-700' :
+                  'bg-silver-300'
                 )}>
                   {team.rank}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">{team.name}</div>
+                  <div className="font-bold text-silver-900">{team.name}</div>
+                  <div className="text-xs text-silver-500">Rank #{team.rank}</div>
                 </div>
-                <div className="text-sm font-bold text-white">{team.score}</div>
-              </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-silver-900">{team.score}</div>
+                  <div className="text-xs text-silver-500">points</div>
+                </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-
-        {/* Active Events */}
-        <div className="card-enterprise">
-          <div className="flex items-center gap-3 mb-4">
-            <Zap className="w-5 h-5 text-accent-400" />
-            <h3 className="font-semibold text-white">Active Events</h3>
-          </div>
-          <div className="space-y-2">
-            {gameState.events.filter(e => !e.resolved).length === 0 ? (
-              <p className="text-sm text-slate-500 text-center py-4">No active events</p>
-            ) : (
-              gameState.events.filter(e => !e.resolved).slice(0, 3).map((event) => (
-                <div
-                  key={event.id}
-                  className={cn(
-                    'p-3 rounded-lg border-l-4',
-                    event.severity === 'high' ? 'bg-danger-500/10 border-danger-500' :
-                    event.severity === 'medium' ? 'bg-warning-500/10 border-warning-500' :
-                    'bg-primary-500/10 border-primary-500'
-                  )}
-                >
-                  <div className="text-sm font-medium text-white">{event.name}</div>
-                  <div className="text-xs text-slate-400 mt-1">{event.description}</div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="card-enterprise">
-          <h3 className="font-semibold text-white mb-4">Quick Stats</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-400">Run ID</span>
-              <span className="font-mono text-xs text-white">{gameState.runId.slice(0, 12)}...</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Seed</span>
-              <span className="font-mono text-white">{gameState.seed}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Total Events</span>
-              <span className="text-white">{gameState.events.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Decisions Made</span>
-              <span className="text-white">{gameState.decisions.length}</span>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -527,66 +632,144 @@ function DashboardView({ gameState, sharePrice }: { gameState: GameState; shareP
 function DecisionsView({
   gameState,
   selectedRole,
-  onSelectRole,
+  setSelectedRole,
+  submitDecision,
+  isLoading,
 }: {
   gameState: GameState;
-  selectedRole: Role;
-  onSelectRole: (role: Role) => void;
+  selectedRole: Role | null;
+  setSelectedRole: (role: Role | null) => void;
+  submitDecision: (role: Role, decision: Record<string, number | string>) => void;
+  isLoading: boolean;
 }) {
-  const currentRoundDecisions = gameState.decisions[gameState.round - 1] || {};
+  const [decisions, setDecisions] = useState<Record<string, number | string>>({});
+
+  const handleSubmit = () => {
+    if (selectedRole) {
+      submitDecision(selectedRole, decisions);
+      setDecisions({});
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="card-enterprise mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Target className="w-5 h-5 text-primary-400" />
-          <h2 className="text-xl font-semibold text-white">Year {gameState.round} Decisions</h2>
-        </div>
-        <p className="text-slate-400">
-          Select a role to make decisions. Each role controls specific aspects of the company.
-          All decisions must be submitted before advancing to the next year.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        {(Object.keys(ROLE_CONFIG) as Role[]).map((role) => {
-          const config = ROLE_CONFIG[role];
-          const hasDecision = !!currentRoundDecisions[role];
-          const Icon = config.icon;
-
-          return (
-            <button
-              key={role}
-              onClick={() => onSelectRole(role)}
+    <div className="space-y-8">
+      {/* Role Selection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card-luxury"
+      >
+        <h3 className="text-lg font-bold text-silver-900 mb-6">Select Your Role</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          {Object.entries(ROLE_CONFIG).map(([key, config], index) => (
+            <motion.button
+              key={key}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedRole(key as Role)}
               className={cn(
-                'card-enterprise-hover text-left relative overflow-hidden',
-                hasDecision && 'ring-2 ring-success-500/50'
+                'flex flex-col items-center gap-3 p-4 rounded-xl transition-all',
+                selectedRole === key
+                  ? 'bg-gradient-to-br from-primary-50 to-primary-100 border-2 border-primary-300 shadow-glow-purple'
+                  : 'bg-white border border-silver-200 hover:border-primary-200 hover:shadow-lg'
               )}
             >
-              {hasDecision && (
-                <div className="absolute top-4 right-4">
-                  <CheckCircle className="w-5 h-5 text-success-400" />
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg`}>
+                <config.icon className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-sm font-semibold text-silver-800 text-center">{config.label.split(' / ')[0]}</span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Decision Panel */}
+      <AnimatePresence>
+        {selectedRole && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="card-luxury"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${ROLE_CONFIG[selectedRole].gradient} flex items-center justify-center shadow-lg`}>
+                  {(() => {
+                    const Icon = ROLE_CONFIG[selectedRole].icon;
+                    return <Icon className="w-7 h-7 text-white" />;
+                  })()}
                 </div>
-              )}
-              <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4', config.bgColor)}>
-                <Icon className={cn('w-6 h-6', config.color)} />
+                <div>
+                  <h3 className="text-xl font-bold text-silver-900">{ROLE_CONFIG[selectedRole].label}</h3>
+                  <p className="text-silver-500">Make your decisions for Year {gameState.round}</p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-1">{config.label}</h3>
-              <p className="text-sm text-slate-400 mb-4">
-                {getRoleDescription(role)}
-              </p>
-              <div className="flex items-center gap-2 text-sm">
-                {hasDecision ? (
-                  <span className="text-success-400">Decision submitted</span>
-                ) : (
-                  <span className="text-slate-500">Pending decision</span>
-                )}
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </div>
-            </button>
-          );
-        })}
-      </div>
+              <button
+                onClick={() => setSelectedRole(null)}
+                className="text-silver-400 hover:text-silver-600"
+              >
+                <ChevronRight className="w-6 h-6 rotate-90" />
+              </button>
+            </div>
+
+            {/* Decision Form */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {getDecisionFields(selectedRole).map((field, index) => (
+                <motion.div
+                  key={field.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="space-y-3"
+                >
+                  <label className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-silver-800">{field.label}</span>
+                    <span className="text-sm font-bold text-primary-600">
+                      {field.type === 'slider' ? `${decisions[field.id] || field.default}%` : decisions[field.id] || field.default}
+                    </span>
+                  </label>
+                  {field.type === 'slider' ? (
+                    <input
+                      type="range"
+                      min={field.min}
+                      max={field.max}
+                      value={decisions[field.id] as number || field.default}
+                      onChange={(e) => setDecisions({ ...decisions, [field.id]: Number(e.target.value) })}
+                      className="w-full"
+                    />
+                  ) : (
+                    <select
+                      value={decisions[field.id] as string || field.default}
+                      onChange={(e) => setDecisions({ ...decisions, [field.id]: e.target.value })}
+                      className="input-field"
+                    >
+                      {field.options?.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="text-xs text-silver-500">{field.description}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="btn-primary w-full py-4 text-lg gap-2"
+            >
+              <CheckCircle className="w-5 h-5" />
+              Submit Decisions
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -594,722 +777,172 @@ function DecisionsView({
 // Reports View Component
 function ReportsView({ gameState }: { gameState: GameState }) {
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
-      {/* Narrative Feed */}
-      <div className="card-enterprise">
-        <div className="flex items-center gap-3 mb-6">
-          <Activity className="w-5 h-5 text-primary-400" />
-          <h3 className="text-lg font-semibold text-white">Narrative Feed</h3>
+    <div className="space-y-8">
+      {/* Events Timeline */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card-luxury"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-silver-900">Market Events</h3>
+          <span className="px-3 py-1 rounded-lg bg-accent-50 text-accent-600 text-sm font-medium">
+            Year {gameState.round}
+          </span>
         </div>
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-          {gameState.narrative.slice().reverse().map((entry) => (
-            <div
-              key={entry.id}
-              className={cn(
-                'p-4 rounded-xl border-l-4',
-                entry.impact === 'positive' ? 'bg-success-500/10 border-success-500' :
-                entry.impact === 'negative' ? 'bg-danger-500/10 border-danger-500' :
-                'bg-white/5 border-slate-500'
-              )}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-medium text-slate-400">Year {entry.round}</span>
-                <span className={cn(
-                  'text-xs px-2 py-0.5 rounded-full',
-                  entry.category === 'achievement' ? 'bg-success-500/20 text-success-400' :
-                  entry.category === 'warning' ? 'bg-danger-500/20 text-danger-400' :
-                  entry.category === 'event' ? 'bg-warning-500/20 text-warning-400' :
-                  'bg-white/10 text-slate-400'
-                )}>
-                  {entry.category}
-                </span>
-              </div>
-              <h4 className="font-medium text-white">{entry.title}</h4>
-              <p className="text-sm text-slate-400 mt-1">{entry.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Events History */}
-      <div className="card-enterprise">
-        <div className="flex items-center gap-3 mb-6">
-          <AlertCircle className="w-5 h-5 text-warning-400" />
-          <h3 className="text-lg font-semibold text-white">Market Events</h3>
-        </div>
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-          {gameState.events.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">No events have occurred yet</p>
-          ) : (
-            gameState.events.slice().reverse().map((event) => (
-              <div
-                key={event.id}
-                className={cn(
-                  'p-4 rounded-xl',
-                  event.resolved ? 'bg-white/5' : 'bg-warning-500/10'
-                )}
+        <div className="space-y-4">
+          {gameState.events.length > 0 ? (
+            gameState.events.map((event, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex gap-4 p-4 rounded-xl bg-silver-50 border border-silver-100"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className={cn(
-                    'text-xs font-medium px-2 py-0.5 rounded-full',
-                    event.severity === 'high' ? 'bg-danger-500/20 text-danger-400' :
-                    event.severity === 'medium' ? 'bg-warning-500/20 text-warning-400' :
-                    'bg-primary-500/20 text-primary-400'
-                  )}>
-                    {event.severity.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-slate-500">Year {event.round}</span>
+                <div className={cn(
+                  'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
+                  event.severity === 'high' ? 'bg-danger-100 text-danger-600' :
+                  event.severity === 'medium' ? 'bg-warning-100 text-warning-600' :
+                  'bg-info-100 text-info-600'
+                )}>
+                  <AlertCircle className="w-5 h-5" />
                 </div>
-                <h4 className="font-medium text-white">{event.name}</h4>
-                <p className="text-sm text-slate-400 mt-1">{event.description}</p>
-                {event.resolved && (
-                  <div className="mt-2 text-xs text-success-400">Resolved</div>
-                )}
-              </div>
+                <div className="flex-1">
+                  <div className="font-semibold text-silver-900">{event.title}</div>
+                  <div className="text-sm text-silver-600 mt-1">{event.description}</div>
+                  <div className="flex gap-2 mt-3">
+                    {Object.entries(event.impact || {}).map(([key, value]) => (
+                      <span key={key} className="px-2 py-1 rounded-lg bg-white text-xs font-medium text-silver-600 border border-silver-200">
+                        {key}: {typeof value === 'number' ? (value > 0 ? '+' : '') + value + '%' : value}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
             ))
+          ) : (
+            <div className="text-center py-12 text-silver-500">
+              <Globe className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>No market events this round</p>
+            </div>
           )}
         </div>
-      </div>
-    </div>
-  );
-}
+      </motion.div>
 
-// KPI Card Component
-function KPICard({
-  label,
-  value,
-  sublabel,
-  icon: Icon,
-  trend,
-  trendValue,
-  color,
-}: {
-  label: string;
-  value: string;
-  sublabel?: string;
-  icon: typeof DollarSign;
-  trend?: 'up' | 'down';
-  trendValue?: string;
-  color: 'success' | 'primary' | 'accent' | 'warning' | 'danger';
-}) {
-  const colorClasses = {
-    success: 'from-success-500/20 to-success-600/10 text-success-400',
-    primary: 'from-primary-500/20 to-primary-600/10 text-primary-400',
-    accent: 'from-accent-500/20 to-accent-600/10 text-accent-400',
-    warning: 'from-warning-500/20 to-warning-600/10 text-warning-400',
-    danger: 'from-danger-500/20 to-danger-600/10 text-danger-400',
-  };
-
-  return (
-    <div className="card-enterprise">
-      <div className="flex items-start justify-between mb-3">
-        <div className={cn('w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center', colorClasses[color])}>
-          <Icon className="w-5 h-5" />
-        </div>
-        {trend && trendValue && (
-          <div className={cn(
-            'flex items-center gap-1 text-sm font-medium',
-            trend === 'up' ? 'text-success-400' : 'text-danger-400'
-          )}>
-            {trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-            {trendValue}
-          </div>
-        )}
-      </div>
-      <div className="text-xs text-slate-500 mb-1">{label}</div>
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-white">{value}</span>
-        {sublabel && <span className="text-sm text-slate-500">{sublabel}</span>}
-      </div>
-    </div>
-  );
-}
-
-// Metric Card Component
-function MetricCard({
-  title,
-  icon: Icon,
-  children,
-}: {
-  title: string;
-  icon: typeof DollarSign;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="card-enterprise">
-      <div className="flex items-center gap-3 mb-4">
-        <Icon className="w-5 h-5 text-slate-400" />
-        <h3 className="font-semibold text-white">{title}</h3>
-      </div>
-      <div className="space-y-4">{children}</div>
-    </div>
-  );
-}
-
-// Metric Bar Component
-function MetricBar({
-  label,
-  value,
-  color,
-  inverse = false,
-  showValue,
-}: {
-  label: string;
-  value: number;
-  color: 'success' | 'primary' | 'accent' | 'warning' | 'danger' | 'purple';
-  inverse?: boolean;
-  showValue?: number;
-}) {
-  const displayValue = showValue ?? value;
-  const barValue = Math.min(Math.max(value, 0), 100);
-
-  const colorClasses = {
-    success: 'bg-success-500',
-    primary: 'bg-primary-500',
-    accent: 'bg-accent-500',
-    warning: 'bg-warning-500',
-    danger: 'bg-danger-500',
-    purple: 'bg-purple-500',
-  };
-
-  const textColorClasses = {
-    success: 'text-success-400',
-    primary: 'text-primary-400',
-    accent: 'text-accent-400',
-    warning: 'text-warning-400',
-    danger: 'text-danger-400',
-    purple: 'text-purple-400',
-  };
-
-  // For inverse metrics (where lower is better), invert the color logic
-  const effectiveColor = inverse
-    ? (barValue > 60 ? 'danger' : barValue > 30 ? 'warning' : 'success')
-    : color;
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-sm text-slate-400">{label}</span>
-        <span className={cn('text-sm font-medium', textColorClasses[effectiveColor])}>
-          {displayValue.toFixed(0)}
-        </span>
-      </div>
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-        <div
-          className={cn('h-full rounded-full transition-all duration-500', colorClasses[effectiveColor])}
-          style={{ width: `${barValue}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Decision Panel Component
-function DecisionPanel({
-  role,
-  gameState,
-  onClose,
-  onSubmit,
-  isLoading,
-}: {
-  role: Role;
-  gameState: GameState;
-  onClose: () => void;
-  onSubmit: (decision: unknown) => Promise<void>;
-  isLoading: boolean;
-}) {
-  const [decision, setDecision] = useState<Record<string, unknown>>({});
-  const config = ROLE_CONFIG[role];
-  const Icon = config.icon;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      {/* Round Summary */}
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="relative card-enterprise max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card-luxury"
       >
-        {/* Header */}
-        <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-4">
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', config.bgColor)}>
-              <Icon className={cn('w-6 h-6', config.color)} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-white">{config.label}</h2>
-              <p className="text-sm text-slate-400">Year {gameState.round} Decisions</p>
-            </div>
+        <h3 className="text-lg font-bold text-silver-900 mb-6">Round Summary</h3>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="text-center p-6 rounded-xl bg-success-50 border border-success-100">
+            <div className="text-4xl font-bold text-success-600 mb-2">+12%</div>
+            <div className="text-sm text-success-700">Revenue Growth</div>
           </div>
-        </div>
-
-        {/* Form Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <DecisionForm role={role} decision={decision} setDecision={setDecision} />
-        </div>
-
-        {/* Footer */}
-        <div className="p-6 border-t border-white/10 flex justify-end gap-3">
-          <button onClick={onClose} className="btn-secondary">
-            Cancel
-          </button>
-          <button
-            onClick={() => onSubmit(decision)}
-            disabled={isLoading}
-            className="btn-primary"
-          >
-            {isLoading ? 'Submitting...' : 'Submit Decision'}
-          </button>
+          <div className="text-center p-6 rounded-xl bg-primary-50 border border-primary-100">
+            <div className="text-4xl font-bold text-primary-600 mb-2">+5%</div>
+            <div className="text-sm text-primary-700">Market Share</div>
+          </div>
+          <div className="text-center p-6 rounded-xl bg-gold-50 border border-gold-100">
+            <div className="text-4xl font-bold text-gold-600 mb-2">#2</div>
+            <div className="text-sm text-gold-700">Leaderboard Rank</div>
+          </div>
         </div>
       </motion.div>
-    </motion.div>
-  );
-}
-
-// Decision Form Component
-function DecisionForm({
-  role,
-  decision,
-  setDecision,
-}: {
-  role: Role;
-  decision: Record<string, unknown>;
-  setDecision: (d: Record<string, unknown>) => void;
-}) {
-  switch (role) {
-    case 'strategy':
-      return (
-        <div className="space-y-6">
-          <SelectField
-            label="Risk Appetite"
-            description="Set the company's overall risk tolerance for this year"
-            value={decision.riskPosture as string || 'balanced'}
-            onChange={(v) => setDecision({ ...decision, riskPosture: v })}
-            options={[
-              { value: 'conservative', label: 'Conservative - Minimize risk, steady growth' },
-              { value: 'balanced', label: 'Balanced - Moderate risk for moderate growth' },
-              { value: 'aggressive', label: 'Aggressive - High risk for high potential' },
-            ]}
-          />
-          <SelectField
-            label="Market Focus"
-            description="Choose which market region to prioritize"
-            value={decision.marketEntry as string || 'regionA'}
-            onChange={(v) => setDecision({ ...decision, marketEntry: v })}
-            options={[
-              { value: 'regionA', label: 'North America - Mature market, high competition' },
-              { value: 'regionB', label: 'Europe - Regulated market, stable demand' },
-              { value: 'regionC', label: 'Asia Pacific - Growing market, entry costs' },
-            ]}
-          />
-          <div>
-            <label className="block text-sm font-medium text-white mb-3">Capital Allocation</label>
-            <p className="text-xs text-slate-400 mb-4">Distribute the annual budget across departments</p>
-            <div className="grid grid-cols-2 gap-4">
-              {['rnd', 'marketing', 'operations', 'compliance'].map((key) => (
-                <SliderField
-                  key={key}
-                  label={key === 'rnd' ? 'R&D' : key.charAt(0).toUpperCase() + key.slice(1)}
-                  value={(decision.capitalAllocation as Record<string, number>)?.[key] || 25}
-                  onChange={(v) => setDecision({
-                    ...decision,
-                    capitalAllocation: { ...(decision.capitalAllocation as Record<string, number> || {}), [key]: v },
-                  })}
-                  min={0}
-                  max={100}
-                  unit="%"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-
-    case 'marketing':
-      return (
-        <div className="space-y-6">
-          <SliderField
-            label="Campaign Spend"
-            description="Annual marketing campaign budget"
-            value={decision.campaignSpend as number || 2}
-            onChange={(v) => setDecision({ ...decision, campaignSpend: v })}
-            min={0}
-            max={20}
-            unit="M"
-          />
-          <SliderField
-            label="Pricing Change"
-            description="Adjust product pricing relative to current"
-            value={decision.pricingChangePct as number || 0}
-            onChange={(v) => setDecision({ ...decision, pricingChangePct: v })}
-            min={-50}
-            max={50}
-            unit="%"
-          />
-          <SelectField
-            label="Brand Positioning"
-            description="How should we position in the market?"
-            value={decision.positioning as string || 'value-first'}
-            onChange={(v) => setDecision({ ...decision, positioning: v })}
-            options={[
-              { value: 'trust-first', label: 'Trust First - Reliability and security focused' },
-              { value: 'value-first', label: 'Value First - Price-performance leader' },
-              { value: 'innovation-first', label: 'Innovation First - Cutting-edge features' },
-            ]}
-          />
-          <SelectField
-            label="Channel Mix"
-            description="Primary marketing channel"
-            value={decision.channelMix as string || 'paid'}
-            onChange={(v) => setDecision({ ...decision, channelMix: v })}
-            options={[
-              { value: 'paid', label: 'Paid Media - Direct advertising spend' },
-              { value: 'partner', label: 'Partners - Channel partnerships' },
-              { value: 'community', label: 'Community - Organic growth' },
-            ]}
-          />
-        </div>
-      );
-
-    case 'sales':
-      return (
-        <div className="space-y-6">
-          <SliderField
-            label="Enterprise Focus"
-            description="Balance between enterprise vs SMB customers"
-            value={decision.enterpriseFocus as number || 50}
-            onChange={(v) => setDecision({ ...decision, enterpriseFocus: v })}
-            min={0}
-            max={100}
-            unit="%"
-          />
-          <SliderField
-            label="Maximum Discount"
-            description="Maximum discount allowed for sales team"
-            value={decision.discountingPolicy as number || 10}
-            onChange={(v) => setDecision({ ...decision, discountingPolicy: v })}
-            min={0}
-            max={30}
-            unit="%"
-          />
-          <SliderField
-            label="Partner Program Investment"
-            description="Investment in channel partner program"
-            value={decision.partnerProgramInvestment as number || 1}
-            onChange={(v) => setDecision({ ...decision, partnerProgramInvestment: v })}
-            min={0}
-            max={5}
-            unit="M"
-          />
-          <SliderField
-            label="Pipeline Hygiene"
-            description="Effort spent on pipeline quality"
-            value={decision.pipelineHygiene as number || 50}
-            onChange={(v) => setDecision({ ...decision, pipelineHygiene: v })}
-            min={0}
-            max={100}
-            unit="%"
-          />
-        </div>
-      );
-
-    case 'operations':
-      return (
-        <div className="space-y-6">
-          <SliderField
-            label="Capacity Investment"
-            description="Investment in infrastructure capacity"
-            value={decision.capacityInvestment as number || 2}
-            onChange={(v) => setDecision({ ...decision, capacityInvestment: v })}
-            min={0}
-            max={15}
-            unit="M"
-          />
-          <SelectField
-            label="Supplier Strategy"
-            description="How to manage supplier relationships"
-            value={decision.supplierStrategy as string || 'dual-source'}
-            onChange={(v) => setDecision({ ...decision, supplierStrategy: v })}
-            options={[
-              { value: 'single-source', label: 'Single Source - Low cost, high risk' },
-              { value: 'dual-source', label: 'Dual Source - Balanced approach' },
-              { value: 'diversified', label: 'Diversified - High cost, low risk' },
-            ]}
-          />
-          <SliderField
-            label="QA Investment"
-            description="Investment in quality assurance"
-            value={decision.qaInvestment as number || 1}
-            onChange={(v) => setDecision({ ...decision, qaInvestment: v })}
-            min={0}
-            max={5}
-            unit="M"
-          />
-          <SelectField
-            label="Delivery Speed"
-            description="Speed vs quality trade-off"
-            value={decision.deliverySpeed as string || 'balanced'}
-            onChange={(v) => setDecision({ ...decision, deliverySpeed: v })}
-            options={[
-              { value: 'fast', label: 'Fast - Higher risk of issues' },
-              { value: 'balanced', label: 'Balanced - Standard pace' },
-              { value: 'stable', label: 'Stable - Higher quality, slower' },
-            ]}
-          />
-        </div>
-      );
-
-    case 'rnd':
-      return (
-        <div className="space-y-6">
-          <SelectField
-            label="Roadmap Focus"
-            description="What should R&D prioritize?"
-            value={decision.roadmapFocus as string || 'features'}
-            onChange={(v) => setDecision({ ...decision, roadmapFocus: v })}
-            options={[
-              { value: 'features', label: 'New Features - Market competitiveness' },
-              { value: 'reliability', label: 'Reliability - Tech debt reduction' },
-              { value: 'privacy-security', label: 'Privacy & Security - Compliance' },
-            ]}
-          />
-          <SelectField
-            label="Release Cadence"
-            description="How frequently to ship updates"
-            value={decision.releaseCadence as string || 'balanced'}
-            onChange={(v) => setDecision({ ...decision, releaseCadence: v })}
-            options={[
-              { value: 'fast', label: 'Fast - Weekly releases, more risk' },
-              { value: 'balanced', label: 'Balanced - Bi-weekly releases' },
-              { value: 'cautious', label: 'Cautious - Monthly releases, stable' },
-            ]}
-          />
-          <SliderField
-            label="Model Quality Investment"
-            description="Investment in AI model improvements"
-            value={decision.modelQualityInvestment as number || 2}
-            onChange={(v) => setDecision({ ...decision, modelQualityInvestment: v })}
-            min={0}
-            max={10}
-            unit="M"
-          />
-          <SliderField
-            label="Experimentation Budget"
-            description="Budget for experimental projects"
-            value={decision.experimentationBudget as number || 1}
-            onChange={(v) => setDecision({ ...decision, experimentationBudget: v })}
-            min={0}
-            max={5}
-            unit="M"
-          />
-        </div>
-      );
-
-    case 'legal':
-      return (
-        <div className="space-y-6">
-          <SliderField
-            label="Compliance Spend"
-            description="Investment in compliance programs"
-            value={decision.complianceSpend as number || 1}
-            onChange={(v) => setDecision({ ...decision, complianceSpend: v })}
-            min={0}
-            max={5}
-            unit="M"
-          />
-          <SelectField
-            label="Policy Strictness"
-            description="Internal policy enforcement level"
-            value={decision.policyStrictness as string || 'balanced'}
-            onChange={(v) => setDecision({ ...decision, policyStrictness: v })}
-            options={[
-              { value: 'tight', label: 'Tight - Maximum compliance, slower' },
-              { value: 'balanced', label: 'Balanced - Standard policies' },
-              { value: 'loose', label: 'Loose - Faster, higher risk' },
-            ]}
-          />
-          <SliderField
-            label="Audit Readiness"
-            description="Preparation level for audits"
-            value={decision.auditReadiness as number || 50}
-            onChange={(v) => setDecision({ ...decision, auditReadiness: v })}
-            min={0}
-            max={100}
-            unit="%"
-          />
-          <SelectField
-            label="Data Handling"
-            description="Data collection and usage policy"
-            value={decision.dataHandling as string || 'standard'}
-            onChange={(v) => setDecision({ ...decision, dataHandling: v })}
-            options={[
-              { value: 'minimal', label: 'Minimal - Privacy-first approach' },
-              { value: 'standard', label: 'Standard - Industry norms' },
-              { value: 'expansive', label: 'Expansive - More data, more risk' },
-            ]}
-          />
-        </div>
-      );
-
-    case 'gm':
-      return (
-        <div className="space-y-6">
-          <SelectField
-            label="Hiring Strategy"
-            description="Workforce planning for the year"
-            value={decision.hiringPlan as string || 'maintain'}
-            onChange={(v) => setDecision({ ...decision, hiringPlan: v })}
-            options={[
-              { value: 'grow', label: 'Grow - Increase headcount 10%' },
-              { value: 'maintain', label: 'Maintain - Keep current levels' },
-              { value: 'cut', label: 'Cut - Reduce headcount 10%' },
-            ]}
-          />
-          <SelectField
-            label="Organization Design"
-            description="Company structure approach"
-            value={decision.orgDesign as string || 'hybrid'}
-            onChange={(v) => setDecision({ ...decision, orgDesign: v })}
-            options={[
-              { value: 'centralized', label: 'Centralized - Unified control' },
-              { value: 'hybrid', label: 'Hybrid - Balanced approach' },
-              { value: 'decentralized', label: 'Decentralized - Autonomous teams' },
-            ]}
-          />
-          <SliderField
-            label="Culture Investment"
-            description="Investment in employee programs"
-            value={decision.cultureInvestment as number || 0.5}
-            onChange={(v) => setDecision({ ...decision, cultureInvestment: v })}
-            min={0}
-            max={3}
-            step={0.5}
-            unit="M"
-          />
-          <SelectField
-            label="Crisis Response Stance"
-            description="How to handle potential crises"
-            value={decision.crisisResponse as string || 'transparent'}
-            onChange={(v) => setDecision({ ...decision, crisisResponse: v })}
-            options={[
-              { value: 'transparent', label: 'Transparent - Open communication' },
-              { value: 'defensive', label: 'Defensive - Measured responses' },
-              { value: 'aggressive', label: 'Aggressive - Counter-narrative' },
-            ]}
-          />
-        </div>
-      );
-
-    default:
-      return null;
-  }
-}
-
-// Form Field Components
-function SelectField({
-  label,
-  description,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  description?: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-white mb-1">{label}</label>
-      {description && <p className="text-xs text-slate-400 mb-3">{description}</p>}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="input-field"
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }
 
-function SliderField({
-  label,
-  description,
-  value,
-  onChange,
-  min,
-  max,
-  step = 1,
-  unit = '',
-}: {
-  label: string;
-  description?: string;
-  value: number;
-  onChange: (value: number) => void;
-  min: number;
-  max: number;
-  step?: number;
-  unit?: string;
-}) {
-  return (
-    <div>
-      <div className="flex justify-between mb-1">
-        <label className="text-sm font-medium text-white">{label}</label>
-        <span className="text-sm font-bold text-primary-400">
-          {unit === 'M' ? `$${value}M` : `${value}${unit}`}
-        </span>
-      </div>
-      {description && <p className="text-xs text-slate-400 mb-3">{description}</p>}
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full"
-      />
-      <div className="flex justify-between text-xs text-slate-500 mt-1">
-        <span>{unit === 'M' ? `$${min}M` : `${min}${unit}`}</span>
-        <span>{unit === 'M' ? `$${max}M` : `${max}${unit}`}</span>
-      </div>
-    </div>
-  );
-}
-
-// Helper Functions
+// Helper function to calculate share price
 function calculateSharePrice(gameState: GameState): number {
+  const metrics = gameState.metrics;
   const basePrice = 100;
-  const scoreMultiplier = gameState.scorecard.totalScore / 500;
-  const profitMultiplier = 1 + (gameState.company.profit / 100);
-  const trustMultiplier = gameState.company.brandTrust / 100;
+  const revenueMultiplier = metrics.revenue / 1000000 * 0.5;
+  const marketShareBonus = metrics.marketShare * 0.8;
+  const trustBonus = metrics.trust * 0.3;
+  const profitFactor = Math.max(0, metrics.profitMargin) * 2;
 
-  return Math.max(10, basePrice * scoreMultiplier * profitMultiplier * trustMultiplier);
+  return basePrice + revenueMultiplier + marketShareBonus + trustBonus + profitFactor;
 }
 
-function getRoleDescription(role: Role): string {
-  const descriptions: Record<Role, string> = {
-    strategy: 'Set company direction, risk appetite, and capital allocation across departments.',
-    marketing: 'Manage campaigns, pricing strategy, brand positioning, and market channels.',
-    sales: 'Define sales targets, customer segmentation, discounting, and partner programs.',
-    operations: 'Control capacity, supply chain, quality assurance, and delivery speed.',
-    rnd: 'Direct R&D roadmap, release cadence, and technology investments.',
-    legal: 'Oversee compliance, policy framework, audit preparation, and data governance.',
-    gm: 'Manage hiring, organization design, culture investments, and crisis response.',
+// Helper function to get decision fields for each role
+function getDecisionFields(role: Role): Array<{
+  id: string;
+  label: string;
+  type: 'slider' | 'select';
+  min?: number;
+  max?: number;
+  default: number | string;
+  description: string;
+  options?: Array<{ value: string; label: string }>;
+}> {
+  const fields: Record<Role, typeof fields[Role]> = {
+    strategy: [
+      { id: 'riskAppetite', label: 'Risk Appetite', type: 'slider', min: 0, max: 100, default: 50, description: 'Higher risk can lead to higher rewards but also bigger losses' },
+      { id: 'growthFocus', label: 'Growth Focus', type: 'select', default: 'balanced', description: 'Choose your strategic growth direction', options: [
+        { value: 'aggressive', label: 'Aggressive Expansion' },
+        { value: 'balanced', label: 'Balanced Growth' },
+        { value: 'conservative', label: 'Conservative/Consolidate' },
+      ]},
+      { id: 'capitalAllocation', label: 'Capital Allocation', type: 'slider', min: 0, max: 100, default: 60, description: 'Percentage of capital allocated to growth initiatives' },
+      { id: 'innovation', label: 'Innovation Investment', type: 'slider', min: 0, max: 100, default: 40, description: 'Investment in new products and services' },
+    ],
+    marketing: [
+      { id: 'marketingBudget', label: 'Marketing Budget', type: 'slider', min: 0, max: 100, default: 50, description: 'Percentage of revenue allocated to marketing' },
+      { id: 'pricingStrategy', label: 'Pricing Strategy', type: 'select', default: 'competitive', description: 'Your pricing approach', options: [
+        { value: 'premium', label: 'Premium Pricing' },
+        { value: 'competitive', label: 'Competitive Pricing' },
+        { value: 'penetration', label: 'Penetration Pricing' },
+      ]},
+      { id: 'brandInvestment', label: 'Brand Investment', type: 'slider', min: 0, max: 100, default: 45, description: 'Investment in brand building and awareness' },
+      { id: 'channelMix', label: 'Digital Channel Focus', type: 'slider', min: 0, max: 100, default: 60, description: 'Percentage of marketing through digital channels' },
+    ],
+    sales: [
+      { id: 'salesTargets', label: 'Sales Targets', type: 'slider', min: 0, max: 100, default: 70, description: 'Aggressiveness of sales targets' },
+      { id: 'discountPolicy', label: 'Discount Policy', type: 'select', default: 'moderate', description: 'Your discounting approach', options: [
+        { value: 'none', label: 'No Discounts' },
+        { value: 'moderate', label: 'Moderate Discounts' },
+        { value: 'aggressive', label: 'Aggressive Discounts' },
+      ]},
+      { id: 'territoryExpansion', label: 'Territory Expansion', type: 'slider', min: 0, max: 100, default: 40, description: 'Investment in new market territories' },
+      { id: 'partnerPrograms', label: 'Partner Programs', type: 'slider', min: 0, max: 100, default: 35, description: 'Investment in partner and reseller programs' },
+    ],
+    operations: [
+      { id: 'capacity', label: 'Capacity Investment', type: 'slider', min: 0, max: 100, default: 55, description: 'Investment in production capacity' },
+      { id: 'quality', label: 'Quality Focus', type: 'slider', min: 0, max: 100, default: 70, description: 'Investment in quality control and assurance' },
+      { id: 'efficiency', label: 'Efficiency Programs', type: 'slider', min: 0, max: 100, default: 60, description: 'Investment in operational efficiency' },
+      { id: 'supplyChain', label: 'Supply Chain Resilience', type: 'slider', min: 0, max: 100, default: 50, description: 'Investment in supply chain diversification' },
+    ],
+    rnd: [
+      { id: 'rndBudget', label: 'R&D Budget', type: 'slider', min: 0, max: 100, default: 65, description: 'Percentage of revenue allocated to R&D' },
+      { id: 'innovationFocus', label: 'Innovation Focus', type: 'select', default: 'balanced', description: 'Your R&D strategy', options: [
+        { value: 'incremental', label: 'Incremental Improvements' },
+        { value: 'balanced', label: 'Balanced Portfolio' },
+        { value: 'breakthrough', label: 'Breakthrough Innovation' },
+      ]},
+      { id: 'techStack', label: 'Technology Investment', type: 'slider', min: 0, max: 100, default: 55, description: 'Investment in core technology infrastructure' },
+      { id: 'security', label: 'Security & Privacy', type: 'slider', min: 0, max: 100, default: 70, description: 'Investment in security and data privacy' },
+    ],
+    legal: [
+      { id: 'compliance', label: 'Compliance Investment', type: 'slider', min: 0, max: 100, default: 60, description: 'Investment in regulatory compliance' },
+      { id: 'riskManagement', label: 'Risk Management', type: 'slider', min: 0, max: 100, default: 55, description: 'Investment in risk assessment and mitigation' },
+      { id: 'dataGovernance', label: 'Data Governance', type: 'slider', min: 0, max: 100, default: 65, description: 'Investment in data governance and protection' },
+      { id: 'auditReadiness', label: 'Audit Readiness', type: 'slider', min: 0, max: 100, default: 50, description: 'Investment in audit preparation' },
+    ],
+    gm: [
+      { id: 'hiring', label: 'Hiring Investment', type: 'slider', min: 0, max: 100, default: 50, description: 'Investment in recruiting and hiring' },
+      { id: 'compensation', label: 'Compensation Level', type: 'select', default: 'competitive', description: 'Your compensation strategy', options: [
+        { value: 'below', label: 'Below Market' },
+        { value: 'competitive', label: 'Market Competitive' },
+        { value: 'above', label: 'Above Market' },
+      ]},
+      { id: 'culture', label: 'Culture Investment', type: 'slider', min: 0, max: 100, default: 60, description: 'Investment in company culture and engagement' },
+      { id: 'development', label: 'Talent Development', type: 'slider', min: 0, max: 100, default: 55, description: 'Investment in training and development' },
+    ],
   };
-  return descriptions[role];
+
+  return fields[role] || [];
 }
