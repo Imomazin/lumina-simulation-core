@@ -652,7 +652,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
 
                 {/* CTA */}
                 <Link
-                  href={`/simulations/${sim.id}`}
+                  href={`/simulations/${sim.id}` as `/simulations/strategic-leadership`}
                   className={`w-full py-4 bg-gradient-to-r ${style.gradient} text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
                 >
                   <Play className="w-5 h-5" />
