@@ -30,8 +30,392 @@ import {
   Sun,
   Moon,
   Sparkles,
+  Hexagon,
+  Triangle,
+  Circle,
+  Square,
+  Layers,
+  Activity,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+
+// =============================================================================
+// COVER PAGE COMPONENT
+// =============================================================================
+
+function CoverPage({ onEnter }: { onEnter: () => void }) {
+  const { theme, toggleTheme } = useTheme();
+  const [isHovering, setIsHovering] = useState(false);
+  const [showTagline, setShowTagline] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    const taglineTimer = setTimeout(() => setShowTagline(true), 800);
+    const buttonTimer = setTimeout(() => setShowButton(true), 1600);
+    return () => {
+      clearTimeout(taglineTimer);
+      clearTimeout(buttonTimer);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden ${
+        theme === 'light'
+          ? 'bg-gradient-to-br from-violet-50 via-white to-pink-50'
+          : 'bg-[#050508]'
+      }`}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.8, ease: 'easeInOut' }}
+    >
+      {/* Theme Toggle on Cover */}
+      <motion.button
+        onClick={toggleTheme}
+        className={`absolute top-8 right-8 p-4 rounded-2xl transition-all duration-300 ${
+          theme === 'light'
+            ? 'bg-white/60 backdrop-blur-sm border border-purple-200/50 hover:bg-white'
+            : 'bg-white/5 backdrop-blur-sm border border-cyan-500/20 hover:bg-white/10'
+        }`}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        {theme === 'light' ? (
+          <Sun className="w-6 h-6 text-amber-500" />
+        ) : (
+          <Moon className="w-6 h-6 text-cyan-400" />
+        )}
+      </motion.button>
+
+      {/* Light Theme Background */}
+      {theme === 'light' && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Flowing gradient orbs */}
+          <motion.div
+            className="absolute -top-1/3 -left-1/4 w-[900px] h-[900px] bg-gradient-to-br from-purple-200/60 via-pink-100/40 to-blue-200/60 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.15, 1],
+              rotate: [0, 30, 0],
+              x: [0, 80, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -bottom-1/3 -right-1/4 w-[800px] h-[800px] bg-gradient-to-tl from-blue-200/60 via-violet-100/40 to-pink-200/60 rounded-full blur-3xl"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              rotate: [30, 0, 30],
+              x: [0, -60, 0],
+              y: [0, 60, 0],
+            }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-100/40 via-purple-100/30 to-cyan-100/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.4, 0.6, 0.4],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Floating shapes */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${15 + (i * 12) % 70}%`,
+                top: `${20 + (i * 17) % 60}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                rotate: [0, 180, 360],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 10 + i * 2,
+                repeat: Infinity,
+                delay: i * 0.5,
+                ease: "easeInOut"
+              }}
+            >
+              {i % 4 === 0 && <Circle className="w-8 h-8 text-purple-300/40" strokeWidth={1} />}
+              {i % 4 === 1 && <Triangle className="w-10 h-10 text-pink-300/40" strokeWidth={1} />}
+              {i % 4 === 2 && <Square className="w-6 h-6 text-blue-300/40" strokeWidth={1} />}
+              {i % 4 === 3 && <Hexagon className="w-12 h-12 text-violet-300/40" strokeWidth={1} />}
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Dark Theme Background */}
+      {theme === 'dark' && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Subtle grid */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px)
+              `,
+              backgroundSize: '60px 60px',
+            }}
+          />
+
+          {/* Neon orbs */}
+          <motion.div
+            className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-cyan-500/8 rounded-full blur-[150px]"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.08, 0.15, 0.08] }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/3 w-[450px] h-[450px] bg-fuchsia-500/8 rounded-full blur-[130px]"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.05, 0.1] }}
+            transition={{ duration: 12, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-violet-500/5 rounded-full blur-[100px] transform -translate-x-1/2 -translate-y-1/2"
+            animate={{ scale: [1, 1.4, 1], opacity: [0.05, 0.1, 0.05] }}
+            transition={{ duration: 15, repeat: Infinity }}
+          />
+
+          {/* Floating particles */}
+          {[...Array(25)].map((_, i) => (
+            <motion.div
+              key={i}
+              className={`absolute w-1 h-1 rounded-full ${
+                i % 3 === 0 ? 'bg-cyan-400/60' : i % 3 === 1 ? 'bg-fuchsia-400/60' : 'bg-violet-400/60'
+              }`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -150],
+                x: [0, (Math.random() - 0.5) * 50],
+                opacity: [0, 0.8, 0],
+                scale: [0.5, 1.5, 0.5],
+              }}
+              transition={{
+                duration: 8 + Math.random() * 6,
+                repeat: Infinity,
+                delay: Math.random() * 8,
+                ease: "easeOut"
+              }}
+            />
+          ))}
+
+          {/* Scanning line effect */}
+          <motion.div
+            className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"
+            animate={{ top: ['0%', '100%'] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="relative z-10 text-center px-6 max-w-4xl">
+        {/* Logo/Brand Mark */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5, rotateY: -180 }}
+          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="mb-12"
+        >
+          <div className={`relative inline-flex items-center justify-center w-32 h-32 mx-auto ${
+            theme === 'light'
+              ? 'bg-gradient-to-br from-purple-500 to-pink-500'
+              : 'bg-gradient-to-br from-cyan-500 to-violet-600'
+          } rounded-3xl shadow-2xl ${
+            theme === 'light' ? 'shadow-purple-500/30' : 'shadow-cyan-500/30'
+          }`}>
+            <Layers className="w-16 h-16 text-white" strokeWidth={1.5} />
+
+            {/* Orbiting elements */}
+            <motion.div
+              className="absolute inset-0"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              <div className={`absolute -top-2 left-1/2 w-4 h-4 -translate-x-1/2 rounded-full ${
+                theme === 'light' ? 'bg-pink-400' : 'bg-cyan-400'
+              }`} />
+            </motion.div>
+            <motion.div
+              className="absolute inset-0"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            >
+              <div className={`absolute top-1/2 -right-2 w-3 h-3 -translate-y-1/2 rounded-full ${
+                theme === 'light' ? 'bg-violet-400' : 'bg-fuchsia-400'
+              }`} />
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className={`text-6xl md:text-8xl lg:text-9xl font-bold mb-6 tracking-tight ${
+            theme === 'light'
+              ? 'text-slate-800'
+              : 'text-white'
+          }`}
+        >
+          <span className={`${
+            theme === 'light'
+              ? 'bg-gradient-to-r from-purple-600 via-pink-500 to-violet-600 bg-clip-text text-transparent'
+              : 'bg-gradient-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-transparent'
+          }`}>
+            LUMINA
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className={`text-2xl md:text-3xl font-medium mb-4 tracking-wide ${
+            theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+          }`}
+        >
+          SIMULATION SUITE
+        </motion.p>
+
+        {/* Tagline */}
+        <AnimatePresence>
+          {showTagline && (
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className={`text-xl md:text-2xl mb-16 max-w-2xl mx-auto leading-relaxed ${
+                theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+              }`}
+            >
+              Run the company. Feel the consequences.
+              <span className={`block mt-2 text-lg ${
+                theme === 'light' ? 'text-slate-500' : 'text-slate-500'
+              }`}>
+                Executive simulations for those who lead—or aspire to.
+              </span>
+            </motion.p>
+          )}
+        </AnimatePresence>
+
+        {/* Enter Button */}
+        <AnimatePresence>
+          {showButton && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.button
+                onClick={onEnter}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                className={`group relative px-16 py-6 text-2xl font-bold rounded-2xl transition-all duration-500 ${
+                  theme === 'light'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60'
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-900 shadow-2xl shadow-cyan-500/40 hover:shadow-cyan-500/60'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {/* Glow effect */}
+                <motion.div
+                  className={`absolute inset-0 rounded-2xl ${
+                    theme === 'light'
+                      ? 'bg-gradient-to-r from-purple-400 to-pink-400'
+                      : 'bg-gradient-to-r from-cyan-400 to-blue-400'
+                  } opacity-0 blur-xl transition-opacity duration-500 ${isHovering ? 'opacity-50' : ''}`}
+                />
+
+                <span className="relative flex items-center gap-4">
+                  <Play className="w-7 h-7" />
+                  Enter Experience
+                  <motion.span
+                    animate={{ x: isHovering ? 8 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowRight className="w-6 h-6" />
+                  </motion.span>
+                </span>
+              </motion.button>
+
+              {/* Pulse rings */}
+              <div className="relative mt-8 flex justify-center">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className={`absolute w-4 h-4 rounded-full ${
+                      theme === 'light' ? 'bg-purple-400' : 'bg-cyan-400'
+                    }`}
+                    animate={{
+                      scale: [1, 3, 1],
+                      opacity: [0.6, 0, 0.6],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.6,
+                      ease: "easeOut"
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Bottom Attribution */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className={`absolute bottom-8 text-center ${
+          theme === 'light' ? 'text-slate-400' : 'text-slate-600'
+        }`}
+      >
+        <p className="text-sm tracking-wider uppercase">
+          Crafted for Executive Education & Leadership Development
+        </p>
+      </motion.div>
+
+      {/* Activity indicator */}
+      <motion.div
+        className={`absolute bottom-8 right-8 flex items-center gap-2 ${
+          theme === 'light' ? 'text-purple-400' : 'text-cyan-400'
+        }`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        <Activity className="w-4 h-4" />
+        <motion.div
+          className={`w-2 h-2 rounded-full ${
+            theme === 'light' ? 'bg-purple-400' : 'bg-cyan-400'
+          }`}
+          animate={{ opacity: [1, 0.3, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+}
 
 // =============================================================================
 // CINEMATIC HERO DATA
@@ -1131,23 +1515,63 @@ function Footer() {
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
+  const [showCover, setShowCover] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Check if user has already seen the cover
+    const hasSeenCover = sessionStorage.getItem('lumina-cover-seen');
+    if (hasSeenCover) {
+      setShowCover(false);
+    }
   }, []);
+
+  const handleEnter = () => {
+    setIsExiting(true);
+    sessionStorage.setItem('lumina-cover-seen', 'true');
+    setTimeout(() => {
+      setShowCover(false);
+    }, 800);
+  };
 
   if (!mounted) return null;
 
   return (
     <div className="min-h-screen">
-      <ThemeToggle />
-      <CinematicHero />
-      <PhilosophySection />
-      <SimulationsSection />
-      <TestimonialsSection />
-      <AudienceSection />
-      <FinalCTA />
-      <Footer />
+      <AnimatePresence mode="wait">
+        {showCover && !isExiting && (
+          <CoverPage onEnter={handleEnter} />
+        )}
+        {showCover && isExiting && (
+          <motion.div
+            key="cover-exit"
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+            className="fixed inset-0 z-50"
+          >
+            <CoverPage onEnter={() => {}} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!showCover && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ThemeToggle />
+          <CinematicHero />
+          <PhilosophySection />
+          <SimulationsSection />
+          <TestimonialsSection />
+          <AudienceSection />
+          <FinalCTA />
+          <Footer />
+        </motion.div>
+      )}
     </div>
   );
 }
