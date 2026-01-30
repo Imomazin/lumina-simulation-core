@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
   Users,
@@ -14,693 +14,1581 @@ import {
   ChevronRight,
   Clock,
   BarChart3,
-  PieChart,
   Activity,
   Zap,
   Award,
   MapPin,
   UserMinus,
   UserPlus,
-  ArrowUpRight,
-  ArrowDownRight,
-  Minus,
-  Percent,
   Heart,
   AlertCircle,
   Trophy,
   Flame,
-  Gift,
   Handshake,
+  Crown,
+  Skull,
+  LifeBuoy,
+  RefreshCw,
+  Play,
+  Percent,
+  Shield,
+  XCircle,
+  Gift,
+  Scale,
+  Briefcase,
+  BadgeDollarSign,
+  ThumbsDown,
+  Users2,
+  Building2,
 } from 'lucide-react';
 
 // =============================================================================
-// TYPES
+// TYPES & INTERFACES
 // =============================================================================
 
-type Role = 'head-of-sales' | 'regional-north' | 'regional-south' | 'marketing-liaison' | 'finance-liaison';
-
-interface Territory {
-  id: string;
-  name: string;
-  region: 'north' | 'south';
-  potential: number;
-  penetration: number;
-  headcount: number;
-  quotaAttainment: number;
-  pipeline: number;
-}
+type Phase = 'intro' | 'briefing' | 'decision' | 'consequence' | 'quarterly-report' | 'ending';
+type EndingType = 'fired-missing-targets' | 'team-exodus' | 'survival' | 'sales-champion' | 'revenue-machine';
 
 interface SalesRep {
   id: string;
   name: string;
-  territory: string;
-  performance: number;
-  motivation: number;
-  attritionRisk: 'low' | 'medium' | 'high';
+  region: string;
+  performance: number; // % of quota
+  motivation: number; // 0-100
+  tenure: number; // years
+  atRisk: boolean;
   isTopPerformer: boolean;
 }
 
-interface GameState {
-  round: number;
-  maxRounds: number;
+interface SalesCrisis {
+  id: string;
+  quarter: number;
+  title: string;
+  description: string;
+  severity: 'moderate' | 'severe' | 'critical';
+  category: 'quota' | 'compensation' | 'territory' | 'pricing' | 'talent' | 'customer' | 'pipeline';
+  choices: CrisisChoice[];
+}
+
+interface CrisisChoice {
+  id: string;
+  label: string;
+  description: string;
+  shortTermImpact: string;
+  longTermRisk: string;
+  consequences: ChoiceConsequence;
+}
+
+interface ChoiceConsequence {
   revenue: number;
-  revenueGrowth: number;
-  bookings: number;
-  pipeline: number;
-  pipelineCoverage: number;
-  grossMargin: number;
-  averageDiscount: number;
-  discountTrend: 'improving' | 'stable' | 'eroding';
-  newCustomers: number;
-  retention: number;
-  nrr: number;
-  ltv: number;
-  cac: number;
-  ltvCacRatio: number;
-  territories: Territory[];
-  reps: SalesRep[];
-  totalHeadcount: number;
-  attrition: number;
-  burnoutIndex: number;
-  winRate: number;
-  avgDealSize: number;
-  salesCycle: number;
-  channelConflict: number;
+  quotaAttainment: number;
   customerTrust: number;
-  sandbagging: number;
+  teamMorale: number;
+  burnout: number;
+  discountTrend: number;
+  retention: number;
+  pipelineHealth: number;
+  specialEffect?: string;
+}
+
+interface DecisionRecord {
+  quarter: number;
+  crisisId: string;
+  choiceId: string;
+  choiceLabel: string;
+  consequences: ChoiceConsequence;
+}
+
+interface GameState {
+  quarter: number;
+  phase: Phase;
+  // Revenue metrics
+  revenue: number; // $M
+  revenueTarget: number; // $M
+  quotaAttainment: number; // %
+  bookings: number; // $M
+  pipeline: number; // $M
+  pipelineCoverage: number; // ratio
+  // Customer metrics
+  customerTrust: number; // 0-100
+  customerRetention: number; // %
+  newLogos: number;
+  nrr: number; // Net Revenue Retention %
+  churnRisk: number; // % of ARR at risk
+  // Team metrics
+  teamMorale: number; // 0-100
+  burnoutIndex: number; // 0-100 (higher = worse)
+  attritionRate: number; // %
+  openReqs: number;
+  topPerformerRisk: number; // 0-100 (risk of losing top performers)
+  // Sales health metrics
+  winRate: number; // %
+  avgDealSize: number; // $K
+  salesCycle: number; // days
+  discountTrend: number; // 0-100 (higher = more discounting)
+  sandbagIndex: number; // 0-100 (higher = more sandbagging)
+  pipelineHealth: number; // 0-100
+  // Territory & Comp
+  territoryBalance: number; // 0-100
+  compSatisfaction: number; // 0-100
+  // Team data
+  salesReps: SalesRep[];
+  // Game state
+  currentCrisis: SalesCrisis | null;
+  decisionHistory: DecisionRecord[];
+  activeEffects: string[];
+  gameOver: boolean;
+  endingType: EndingType | null;
+  endingNarrative: string;
 }
 
 // =============================================================================
-// MOCK DATA
+// NARRATIVE CONTENT
 // =============================================================================
 
-const ROLES: Record<Role, { title: string; description: string; icon: typeof Target }> = {
-  'head-of-sales': {
-    title: 'Head of Sales',
-    description: 'Owns revenue targets, sales strategy, and team leadership',
-    icon: Trophy,
-  },
-  'regional-north': {
-    title: 'Regional Manager - North',
-    description: 'Drives performance in northern territories',
-    icon: MapPin,
-  },
-  'regional-south': {
-    title: 'Regional Manager - South',
-    description: 'Drives performance in southern territories',
-    icon: MapPin,
-  },
-  'marketing-liaison': {
-    title: 'Marketing Liaison',
-    description: 'Aligns sales and marketing, manages lead generation',
-    icon: Zap,
-  },
-  'finance-liaison': {
-    title: 'Finance Liaison',
-    description: 'Manages pricing authority, deal desk, and revenue recognition',
-    icon: DollarSign,
-  },
+const COMPANY_STORY = {
+  name: 'Apex Software',
+  industry: 'Enterprise SaaS',
+  situation: `You are Jordan Blake, newly appointed VP of Sales at Apex Software, a $85M ARR enterprise SaaS company.
+
+Your predecessor was fired six weeks ago after missing quota for three consecutive quarters. The board has lost patience. Revenue growth has stalled at 12% while competitors are growing 40%+.
+
+The situation you've inherited is fragile:
+- 40% of the sales team missed quota last quarter
+- Your top performer is interviewing at Salesforce
+- Customers are complaining about aggressive upselling tactics
+- The pipeline is stuffed with "happy ears" deals that won't close
+- Finance is demanding you cut discounts by 50%
+- Marketing says sales is wasting all their leads
+
+The CEO gave you eight quarters to turn this around. "Hit the number or we're all out of jobs," she said. No pressure.`,
+
+  vpBackground: `Former enterprise AE who rose through the ranks at Oracle and HubSpot. You've seen what good looks like—and what bad looks like. Apex is somewhere in between, sliding toward bad. Your playbook: build trust, fix fundamentals, then scale. But the board wants results now, not later.`,
 };
 
-const INITIAL_TERRITORIES: Territory[] = [
-  { id: 'ter-1', name: 'Northeast', region: 'north', potential: 85, penetration: 32, headcount: 12, quotaAttainment: 94, pipeline: 4.2 },
-  { id: 'ter-2', name: 'Midwest', region: 'north', potential: 72, penetration: 28, headcount: 8, quotaAttainment: 87, pipeline: 2.8 },
-  { id: 'ter-3', name: 'Southwest', region: 'south', potential: 78, penetration: 24, headcount: 10, quotaAttainment: 108, pipeline: 3.5 },
-  { id: 'ter-4', name: 'Southeast', region: 'south', potential: 68, penetration: 35, headcount: 9, quotaAttainment: 92, pipeline: 2.9 },
+const INITIAL_SALES_REPS: SalesRep[] = [
+  { id: 'rep-1', name: 'Marcus Chen', region: 'West', performance: 156, motivation: 72, tenure: 4, atRisk: true, isTopPerformer: true },
+  { id: 'rep-2', name: 'Sarah Williams', region: 'East', performance: 142, motivation: 85, tenure: 3, atRisk: false, isTopPerformer: true },
+  { id: 'rep-3', name: 'Jake Rodriguez', region: 'Central', performance: 98, motivation: 68, tenure: 2, atRisk: false, isTopPerformer: false },
+  { id: 'rep-4', name: 'Emily Thompson', region: 'West', performance: 87, motivation: 55, tenure: 1, atRisk: true, isTopPerformer: false },
+  { id: 'rep-5', name: 'David Park', region: 'East', performance: 76, motivation: 45, tenure: 2, atRisk: true, isTopPerformer: false },
+  { id: 'rep-6', name: 'Lisa Johnson', region: 'Central', performance: 112, motivation: 78, tenure: 5, atRisk: false, isTopPerformer: false },
 ];
 
-const INITIAL_REPS: SalesRep[] = [
-  { id: 'rep-1', name: 'Alex Chen', territory: 'Northeast', performance: 142, motivation: 85, attritionRisk: 'low', isTopPerformer: true },
-  { id: 'rep-2', name: 'Sarah Johnson', territory: 'Southwest', performance: 128, motivation: 78, attritionRisk: 'medium', isTopPerformer: true },
-  { id: 'rep-3', name: 'Mike Williams', territory: 'Midwest', performance: 95, motivation: 62, attritionRisk: 'high', isTopPerformer: false },
-  { id: 'rep-4', name: 'Emma Davis', territory: 'Southeast', performance: 88, motivation: 71, attritionRisk: 'medium', isTopPerformer: false },
+const SALES_CRISES: SalesCrisis[] = [
+  // Quarter 1: The Quota Crucible
+  {
+    id: 'quota-reset',
+    quarter: 1,
+    title: 'The Quota Crucible',
+    description: `It's annual planning time and the board wants 35% revenue growth—up from your current 12%. Finance has proposed increasing quotas by 40% across the board. Your sales team is already demoralized from missing targets. A 40% quota increase could break them. But pushing back on the board could cost you your job before you've even started.`,
+    severity: 'critical',
+    category: 'quota',
+    choices: [
+      {
+        id: 'accept-quota',
+        label: 'Accept the 40% Increase',
+        description: 'Take the board\'s number, figure out how to hit it',
+        shortTermImpact: 'Shows alignment with leadership',
+        longTermRisk: 'Team may see quotas as unattainable and give up',
+        consequences: {
+          revenue: 5,
+          quotaAttainment: -20,
+          customerTrust: -5,
+          teamMorale: -25,
+          burnout: 20,
+          discountTrend: 10,
+          retention: -5,
+          pipelineHealth: -10,
+          specialEffect: 'crushing-quotas',
+        },
+      },
+      {
+        id: 'counter-proposal',
+        label: 'Counter with 25% + Investment',
+        description: 'Propose lower quota with headcount and enablement investment',
+        shortTermImpact: 'May frustrate the board',
+        longTermRisk: 'Seen as not aggressive enough',
+        consequences: {
+          revenue: -3,
+          quotaAttainment: 5,
+          customerTrust: 0,
+          teamMorale: 10,
+          burnout: -5,
+          discountTrend: 0,
+          retention: 5,
+          pipelineHealth: 10,
+        },
+      },
+      {
+        id: 'tiered-quota',
+        label: 'Propose Tiered Quota Model',
+        description: 'Higher quotas for top performers, attainable for others',
+        shortTermImpact: 'Creates quota inequality',
+        longTermRisk: 'May create team friction',
+        consequences: {
+          revenue: 2,
+          quotaAttainment: -5,
+          customerTrust: 0,
+          teamMorale: -5,
+          burnout: 5,
+          discountTrend: 0,
+          retention: 0,
+          pipelineHealth: 5,
+          specialEffect: 'tiered-quotas',
+        },
+      },
+    ],
+  },
+  // Quarter 2: Top Performer Hostage Situation
+  {
+    id: 'top-performer-leaving',
+    quarter: 2,
+    title: 'The Rainmaker Ultimatum',
+    description: `Marcus Chen, your top performer who carries 25% of the team's bookings, just walked into your office. He has an offer from Salesforce—$150K base increase plus accelerated equity vesting. He wants you to match it, plus guarantee him the best territory, or he's gone in two weeks. The rest of the team is watching how you handle this.`,
+    severity: 'critical',
+    category: 'talent',
+    choices: [
+      {
+        id: 'match-offer',
+        label: 'Match the Full Package',
+        description: 'Give him everything he wants',
+        shortTermImpact: 'Keeps your rainmaker',
+        longTermRisk: 'Sets dangerous precedent, others will follow',
+        consequences: {
+          revenue: 5,
+          quotaAttainment: 10,
+          customerTrust: 0,
+          teamMorale: -15,
+          burnout: 0,
+          discountTrend: 0,
+          retention: -8,
+          pipelineHealth: 5,
+          specialEffect: 'precedent-set',
+        },
+      },
+      {
+        id: 'partial-match',
+        label: 'Counter with Retention Package',
+        description: 'Offer RSU retention bonus tied to 2-year cliff',
+        shortTermImpact: '50/50 he stays',
+        longTermRisk: 'May lose him anyway',
+        consequences: {
+          revenue: 0,
+          quotaAttainment: -5,
+          customerTrust: 0,
+          teamMorale: 5,
+          burnout: 0,
+          discountTrend: 0,
+          retention: 5,
+          pipelineHealth: 0,
+        },
+      },
+      {
+        id: 'let-him-go',
+        label: 'Wish Him Well',
+        description: 'Don\'t negotiate with hostage-takers',
+        shortTermImpact: 'Lose your best seller',
+        longTermRisk: 'Short-term revenue hit, but maintain fairness',
+        consequences: {
+          revenue: -15,
+          quotaAttainment: -15,
+          customerTrust: 0,
+          teamMorale: 5,
+          burnout: 0,
+          discountTrend: 0,
+          retention: 10,
+          pipelineHealth: -10,
+          specialEffect: 'top-performer-lost',
+        },
+      },
+    ],
+  },
+  // Quarter 3: Territory Wars
+  {
+    id: 'territory-conflict',
+    quarter: 3,
+    title: 'Territory Wars',
+    description: `Two of your best reps are at each other's throats. Sarah claims Jake is poaching her named accounts by finding different contacts. Jake says Sarah is sandbagging accounts she's not actively working. Both threaten to quit if you don't rule in their favor. Meanwhile, you've discovered that 30% of territories are either over or under-assigned.`,
+    severity: 'severe',
+    category: 'territory',
+    choices: [
+      {
+        id: 'full-realignment',
+        label: 'Complete Territory Redesign',
+        description: 'Blow it all up, create fair territories from scratch',
+        shortTermImpact: 'Major disruption, Q3 will be chaotic',
+        longTermRisk: 'Some reps will hate their new territories',
+        consequences: {
+          revenue: -10,
+          quotaAttainment: -15,
+          customerTrust: -5,
+          teamMorale: -10,
+          burnout: 10,
+          discountTrend: 0,
+          retention: -5,
+          pipelineHealth: -15,
+          specialEffect: 'territory-reset',
+        },
+      },
+      {
+        id: 'split-baby',
+        label: 'Mediate and Split Disputed Accounts',
+        description: 'Rule case-by-case, keep everyone somewhat unhappy',
+        shortTermImpact: 'Stops the bleeding',
+        longTermRisk: 'Doesn\'t fix structural problems',
+        consequences: {
+          revenue: -3,
+          quotaAttainment: -5,
+          customerTrust: 0,
+          teamMorale: -5,
+          burnout: 5,
+          discountTrend: 0,
+          retention: 0,
+          pipelineHealth: 0,
+        },
+      },
+      {
+        id: 'add-overlay',
+        label: 'Create Account Development Team',
+        description: 'Add overlay reps to work underpenetrated accounts',
+        shortTermImpact: 'Adds headcount cost',
+        longTermRisk: 'Creates complexity, potential for more conflicts',
+        consequences: {
+          revenue: 5,
+          quotaAttainment: 5,
+          customerTrust: 5,
+          teamMorale: 5,
+          burnout: -5,
+          discountTrend: 0,
+          retention: 5,
+          pipelineHealth: 10,
+          specialEffect: 'overlay-team',
+        },
+      },
+    ],
+  },
+  // Quarter 4: Discount Death Spiral
+  {
+    id: 'discount-wars',
+    quarter: 4,
+    title: 'The Discount Death Spiral',
+    description: `Your CFO is furious. Average discount rates have increased from 18% to 32% in the past year. "You're giving away the company!" she screams. Your reps say they can't win without discounting—competitors are undercutting you. Finance wants to cap discounts at 15% with no exceptions. Your reps say they'll miss quota by 40% if you do.`,
+    severity: 'critical',
+    category: 'pricing',
+    choices: [
+      {
+        id: 'hard-cap',
+        label: 'Implement Hard Discount Cap',
+        description: '15% max discount, no exceptions without CEO approval',
+        shortTermImpact: 'Deal velocity will crater',
+        longTermRisk: 'Will lose deals but protect margins',
+        consequences: {
+          revenue: -12,
+          quotaAttainment: -20,
+          customerTrust: -5,
+          teamMorale: -15,
+          burnout: 10,
+          discountTrend: -30,
+          retention: -3,
+          pipelineHealth: -10,
+          specialEffect: 'discount-cap',
+        },
+      },
+      {
+        id: 'value-selling',
+        label: 'Launch Value-Based Selling Training',
+        description: 'Invest in training, phase in discount controls over 6 months',
+        shortTermImpact: 'Slow change, CFO unhappy',
+        longTermRisk: 'May not work if culture is broken',
+        consequences: {
+          revenue: -3,
+          quotaAttainment: -5,
+          customerTrust: 5,
+          teamMorale: 5,
+          burnout: -5,
+          discountTrend: -10,
+          retention: 5,
+          pipelineHealth: 5,
+        },
+      },
+      {
+        id: 'deal-desk',
+        label: 'Create Deal Desk with Pricing Authority',
+        description: 'All discounts over 20% require deal desk approval',
+        shortTermImpact: 'Adds friction to deals',
+        longTermRisk: 'Reps may game the system',
+        consequences: {
+          revenue: -5,
+          quotaAttainment: -8,
+          customerTrust: 0,
+          teamMorale: -8,
+          burnout: 5,
+          discountTrend: -15,
+          retention: 0,
+          pipelineHealth: 0,
+          specialEffect: 'deal-desk-created',
+        },
+      },
+    ],
+  },
+  // Quarter 5: Customer Trust Erosion
+  {
+    id: 'customer-trust-crisis',
+    quarter: 5,
+    title: 'The Trust Deficit',
+    description: `Your largest customer, representing 8% of ARR, just called to cancel. "Your team promised us features that don't exist, pushed us into a 3-year contract we didn't need, and now we're stuck with shelfware." NPS has dropped from +40 to +12 in six months. Your renewal rates are falling. The customer success team is pointing fingers at sales.`,
+    severity: 'severe',
+    category: 'customer',
+    choices: [
+      {
+        id: 'customer-first',
+        label: 'Launch Customer Recovery Program',
+        description: 'Let customers out of bad contracts, rebuild trust',
+        shortTermImpact: 'Massive revenue hit this quarter',
+        longTermRisk: 'Right thing to do, expensive short-term',
+        consequences: {
+          revenue: -15,
+          quotaAttainment: -10,
+          customerTrust: 25,
+          teamMorale: 5,
+          burnout: 0,
+          discountTrend: 5,
+          retention: 15,
+          pipelineHealth: 5,
+          specialEffect: 'trust-rebuilt',
+        },
+      },
+      {
+        id: 'hold-contracts',
+        label: 'Enforce Contracts',
+        description: 'A deal is a deal—hold customers to their commitments',
+        shortTermImpact: 'Protects near-term revenue',
+        longTermRisk: 'Will damage reputation and referrals',
+        consequences: {
+          revenue: 5,
+          quotaAttainment: 5,
+          customerTrust: -20,
+          teamMorale: -5,
+          burnout: 5,
+          discountTrend: 0,
+          retention: -15,
+          pipelineHealth: -5,
+          specialEffect: 'contract-hardball',
+        },
+      },
+      {
+        id: 'case-by-case',
+        label: 'Case-by-Case Resolution',
+        description: 'Review each unhappy customer individually',
+        shortTermImpact: 'Time-consuming, inconsistent',
+        longTermRisk: 'May please no one',
+        consequences: {
+          revenue: -5,
+          quotaAttainment: -3,
+          customerTrust: 5,
+          teamMorale: 0,
+          burnout: 5,
+          discountTrend: 0,
+          retention: 0,
+          pipelineHealth: 0,
+        },
+      },
+    ],
+  },
+  // Quarter 6: Comp Plan Revolt
+  {
+    id: 'comp-revolt',
+    quarter: 6,
+    title: 'The Compensation Revolt',
+    description: `The new comp plan rolled out last month. Finance designed it to discourage discounting and reward multi-year deals. Your team hates it. They claim it's unfair, complicated, and will reduce their earnings by 30%. Three reps have already quit. The remaining team is threatening a mass exodus unless you fix it. Finance says no changes for 12 months.`,
+    severity: 'critical',
+    category: 'compensation',
+    choices: [
+      {
+        id: 'fight-finance',
+        label: 'Go to War with Finance',
+        description: 'Escalate to CEO, demand comp plan rollback',
+        shortTermImpact: 'Political capital spent',
+        longTermRisk: 'Makes enemy of CFO',
+        consequences: {
+          revenue: 5,
+          quotaAttainment: 5,
+          customerTrust: 0,
+          teamMorale: 20,
+          burnout: -10,
+          discountTrend: 5,
+          retention: 10,
+          pipelineHealth: 5,
+          specialEffect: 'finance-war',
+        },
+      },
+      {
+        id: 'spiffs-workaround',
+        label: 'Create SPIFF Programs',
+        description: 'Work around comp plan with bonus incentives',
+        shortTermImpact: 'Band-aid solution, adds cost',
+        longTermRisk: 'Creates comp plan complexity',
+        consequences: {
+          revenue: 0,
+          quotaAttainment: 0,
+          customerTrust: 0,
+          teamMorale: 10,
+          burnout: -5,
+          discountTrend: 0,
+          retention: 5,
+          pipelineHealth: 0,
+        },
+      },
+      {
+        id: 'hold-line',
+        label: 'Defend the New Comp Plan',
+        description: 'Stand with Finance, explain the "why" to the team',
+        shortTermImpact: 'Team will be angry',
+        longTermRisk: 'More attrition likely',
+        consequences: {
+          revenue: -5,
+          quotaAttainment: -10,
+          customerTrust: 0,
+          teamMorale: -20,
+          burnout: 15,
+          discountTrend: -10,
+          retention: -15,
+          pipelineHealth: -5,
+          specialEffect: 'team-resentment',
+        },
+      },
+    ],
+  },
+  // Quarter 7: Pipeline Scandal
+  {
+    id: 'sandbagging-crisis',
+    quarter: 7,
+    title: 'The Pipeline Mirage',
+    description: `An internal audit just revealed that 40% of your pipeline is either stale (no activity in 60+ days), duplicate, or fantasy (deals with no real buyer intent). Your reps have been sandbagging deals to make future quarters look achievable. The board presentation next week shows $45M in pipeline. The real number is closer to $27M. Do you tell the truth?`,
+    severity: 'critical',
+    category: 'pipeline',
+    choices: [
+      {
+        id: 'clean-pipeline',
+        label: 'Clean House and Come Clean',
+        description: 'Scrub the pipeline, tell the board the truth',
+        shortTermImpact: 'Board will be furious, your job at risk',
+        longTermRisk: 'Only path to credibility',
+        consequences: {
+          revenue: -5,
+          quotaAttainment: -10,
+          customerTrust: 5,
+          teamMorale: 5,
+          burnout: 0,
+          discountTrend: 0,
+          retention: 5,
+          pipelineHealth: 25,
+          specialEffect: 'clean-slate',
+        },
+      },
+      {
+        id: 'gradual-cleanup',
+        label: 'Quietly Clean Over Two Quarters',
+        description: 'Phase out bad deals without announcing it',
+        shortTermImpact: 'Buys time',
+        longTermRisk: 'Problem may get worse before better',
+        consequences: {
+          revenue: -3,
+          quotaAttainment: -5,
+          customerTrust: 0,
+          teamMorale: 0,
+          burnout: 0,
+          discountTrend: 0,
+          retention: 0,
+          pipelineHealth: 10,
+        },
+      },
+      {
+        id: 'present-as-is',
+        label: 'Present Current Numbers',
+        description: 'Hope enough deals close to make it work',
+        shortTermImpact: 'Kicks can down road',
+        longTermRisk: 'Board will find out eventually, career-ending',
+        consequences: {
+          revenue: 0,
+          quotaAttainment: 0,
+          customerTrust: -5,
+          teamMorale: -5,
+          burnout: 10,
+          discountTrend: 5,
+          retention: 0,
+          pipelineHealth: -15,
+          specialEffect: 'deferred-reckoning',
+        },
+      },
+    ],
+  },
+  // Quarter 8: Final Reckoning
+  {
+    id: 'final-quarter',
+    quarter: 8,
+    title: 'The Final Forecast',
+    description: `Eight quarters. This is it. The board meets in four weeks for annual review. You're tracking to hit 94% of the revised target—not quite 100%, but a far cry from the disaster you inherited. The CEO wants to know: should she present you as the turnaround leader or start looking for your replacement? Your final quarter strategy will determine your fate.`,
+    severity: 'critical',
+    category: 'quota',
+    choices: [
+      {
+        id: 'pull-forward',
+        label: 'Pull Forward Q1 Deals',
+        description: 'Offer deep discounts to close next quarter\'s deals now',
+        shortTermImpact: 'Hit the number, look like a hero',
+        longTermRisk: 'Q1 will be a disaster, mortgaging future',
+        consequences: {
+          revenue: 15,
+          quotaAttainment: 20,
+          customerTrust: -10,
+          teamMorale: 5,
+          burnout: 10,
+          discountTrend: 15,
+          retention: -5,
+          pipelineHealth: -20,
+          specialEffect: 'borrowed-time',
+        },
+      },
+      {
+        id: 'honest-forecast',
+        label: 'Present Honest Assessment',
+        description: 'Show progress made, realistic path to growth',
+        shortTermImpact: 'May not satisfy board',
+        longTermRisk: 'Sustainable path if they trust you',
+        consequences: {
+          revenue: 0,
+          quotaAttainment: 5,
+          customerTrust: 10,
+          teamMorale: 10,
+          burnout: -5,
+          discountTrend: -5,
+          retention: 5,
+          pipelineHealth: 10,
+          specialEffect: 'credibility-built',
+        },
+      },
+      {
+        id: 'all-hands-blitz',
+        label: 'Launch End-of-Year Blitz',
+        description: 'All-hands-on-deck push, everyone in the field',
+        shortTermImpact: 'Maximize effort, may close more',
+        longTermRisk: 'Team burnout guaranteed',
+        consequences: {
+          revenue: 10,
+          quotaAttainment: 12,
+          customerTrust: -5,
+          teamMorale: -10,
+          burnout: 20,
+          discountTrend: 8,
+          retention: -8,
+          pipelineHealth: -5,
+          specialEffect: 'burnout-blitz',
+        },
+      },
+    ],
+  },
 ];
+
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
+function calculateEnding(state: GameState): { type: EndingType; narrative: string } {
+  // Fired for missing targets
+  if (state.quotaAttainment < 60 || state.revenue < 70) {
+    return {
+      type: 'fired-missing-targets',
+      narrative: `The board called an emergency meeting. When you walked in, the CEO wouldn't meet your eyes. "We appreciate your efforts, but the numbers speak for themselves." Your tenure at Apex lasted 22 months—longer than your predecessor, but not by much. As you packed your office, you wondered if the job was ever winnable, or if you were just the fall guy for problems years in the making.`,
+    };
+  }
+
+  // Team exodus
+  if (state.teamMorale < 30 || state.burnoutIndex > 75 || state.attritionRate > 35) {
+    return {
+      type: 'team-exodus',
+      narrative: `You hit the numbers. The board is satisfied. But look around—where is everyone? Your top performers are gone. The remaining team is burned out, resentful, and interviewing elsewhere. You built a machine that worked for exactly eight quarters, then collapsed. The next VP of Sales will inherit the same mess you did, maybe worse. Some victories aren't worth the cost.`,
+    };
+  }
+
+  // Revenue Machine
+  if (state.quotaAttainment >= 110 && state.revenue >= 115 && state.customerTrust >= 70 && state.teamMorale >= 60) {
+    return {
+      type: 'revenue-machine',
+      narrative: `The impossible happened. Revenue up 38%. Customer NPS at all-time highs. Team retention at 92%. When you presented at the board meeting, the CEO smiled—actually smiled. "This is what a world-class sales organization looks like," she said. The VCs are now talking IPO. And every recruiter in Silicon Valley has your number. You didn't just turn around a struggling sales team—you built a revenue machine that will outlast you.`,
+    };
+  }
+
+  // Sales Champion
+  if (state.quotaAttainment >= 95 && state.customerTrust >= 60 && state.teamMorale >= 50 && state.pipelineHealth >= 60) {
+    return {
+      type: 'sales-champion',
+      narrative: `You did it. Not perfectly, not without scars, but you did it. Quota attainment is back above 90%. Customer trust is rebuilding. The team believes in the mission again. When you look at where Apex was two years ago—the chaos, the finger-pointing, the desperation—and compare it to today, the transformation is remarkable. You're not a turnaround artist anymore. You're a sales leader. The CEO just asked you to stay for another three years.`,
+    };
+  }
+
+  // Survival
+  return {
+    type: 'survival',
+    narrative: `Apex survived. You survived. It's not the triumphant turnaround story you imagined when you took the job, but it's not failure either. Revenue stabilized. Attrition slowed. Customers stopped leaving in droves. The board renewed your contract with a "meets expectations" rating and a modest bonus. In sales leadership, survival is an achievement. Many don't even get that. Now the real work begins—turning survival into success.`,
+  };
+}
+
+// =============================================================================
+// INITIAL STATE
+// =============================================================================
 
 const INITIAL_STATE: GameState = {
-  round: 1,
-  maxRounds: 8,
-  revenue: 42.5,
-  revenueGrowth: 18,
-  bookings: 48.2,
-  pipeline: 145,
+  quarter: 0,
+  phase: 'intro',
+  revenue: 85, // $M ARR
+  revenueTarget: 100,
+  quotaAttainment: 72, // %
+  bookings: 18, // $M this quarter
+  pipeline: 145, // $M
   pipelineCoverage: 3.2,
-  grossMargin: 68,
-  averageDiscount: 15,
-  discountTrend: 'eroding',
-  newCustomers: 128,
-  retention: 88,
-  nrr: 112,
-  ltv: 45000,
-  cac: 8500,
-  ltvCacRatio: 5.3,
-  territories: INITIAL_TERRITORIES,
-  reps: INITIAL_REPS,
-  totalHeadcount: 39,
-  attrition: 12,
-  burnoutIndex: 42,
-  winRate: 28,
-  avgDealSize: 32500,
-  salesCycle: 45,
-  channelConflict: 35,
-  customerTrust: 72,
-  sandbagging: 25,
+  customerTrust: 58,
+  customerRetention: 82, // %
+  newLogos: 24,
+  nrr: 98, // %
+  churnRisk: 18,
+  teamMorale: 45,
+  burnoutIndex: 55,
+  attritionRate: 22,
+  openReqs: 8,
+  topPerformerRisk: 65,
+  winRate: 22, // %
+  avgDealSize: 45, // $K
+  salesCycle: 78, // days
+  discountTrend: 62, // higher = more discounting
+  sandbagIndex: 48,
+  pipelineHealth: 42,
+  territoryBalance: 55,
+  compSatisfaction: 38,
+  salesReps: INITIAL_SALES_REPS,
+  currentCrisis: null,
+  decisionHistory: [],
+  activeEffects: [],
+  gameOver: false,
+  endingType: null,
+  endingNarrative: '',
 };
 
 // =============================================================================
 // COMPONENTS
 // =============================================================================
 
-function RevenueGauge({ revenue, growth, target }: { revenue: number; growth: number; target: number }) {
-  const attainment = (revenue / target) * 100;
-
+function IntroScreen({ onStart }: { onStart: () => void }) {
   return (
-    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Revenue vs Target</h3>
-        <Target className="w-5 h-5 text-slate-500" />
-      </div>
-
-      <div className="relative h-8 bg-slate-800 rounded-full overflow-hidden mb-4">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${Math.min(attainment, 100)}%` }}
-          transition={{ duration: 1 }}
-          className={`h-full rounded-full ${
-            attainment >= 100 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' :
-            attainment >= 80 ? 'bg-gradient-to-r from-amber-600 to-amber-400' :
-            'bg-gradient-to-r from-red-600 to-red-400'
-          }`}
-        />
-        <div className="absolute left-[100%] top-0 bottom-0 w-0.5 bg-white/50 transform -translate-x-1/2" />
-      </div>
-
-      <div className="flex items-end justify-between">
-        <div>
-          <span className="text-4xl font-bold text-white">${revenue}M</span>
-          <span className={`ml-2 text-sm font-medium ${growth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            {growth > 0 ? '+' : ''}{growth}% YoY
-          </span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-rose-950 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl"
+      >
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            className="w-24 h-24 bg-gradient-to-br from-rose-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-6"
+          >
+            <Target className="w-12 h-12 text-white" />
+          </motion.div>
+          <h1 className="text-5xl font-black text-white mb-4">Sales Mastery</h1>
+          <p className="text-2xl text-rose-400 font-light">Quota, Culture, and Survival</p>
         </div>
-        <div className="text-right">
-          <span className="text-sm text-slate-500">Target</span>
-          <p className="text-lg font-bold text-slate-300">${target}M</p>
+
+        <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border border-slate-800 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">{COMPANY_STORY.name}</h2>
+          <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
+            {COMPANY_STORY.situation}
+          </p>
+          <div className="p-4 bg-rose-900/30 border border-rose-700/50 rounded-xl">
+            <p className="text-rose-300 italic">{COMPANY_STORY.vpBackground}</p>
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
 
-function TerritoryMap({ territories }: { territories: Territory[] }) {
-  return (
-    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-white">Territory Performance</h3>
-        <MapPin className="w-5 h-5 text-slate-500" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {territories.map((territory) => {
-          const isOnTrack = territory.quotaAttainment >= 100;
-          return (
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          {[
+            { icon: Clock, label: '8 Quarters', desc: '2 Years to Turnaround' },
+            { icon: AlertTriangle, label: 'High Stakes', desc: 'Board Watching Closely' },
+            { icon: Target, label: 'Your Mission', desc: 'Hit the Number' },
+          ].map((item, i) => (
             <motion.div
-              key={territory.id}
-              whileHover={{ scale: 1.02 }}
-              className={`p-4 rounded-xl border ${
-                isOnTrack ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50'
-              }`}
+              key={item.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + i * 0.1 }}
+              className="bg-slate-800/50 rounded-xl p-4 text-center"
             >
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-white">{territory.name}</h4>
-                {isOnTrack && <Trophy className="w-4 h-4 text-emerald-400" />}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Quota Attainment</span>
-                  <span className={`font-bold ${territory.quotaAttainment >= 100 ? 'text-emerald-400' : territory.quotaAttainment >= 80 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {territory.quotaAttainment}%
-                  </span>
-                </div>
-                <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${territory.quotaAttainment >= 100 ? 'bg-emerald-500' : territory.quotaAttainment >= 80 ? 'bg-amber-500' : 'bg-red-500'}`}
-                    style={{ width: `${Math.min(territory.quotaAttainment, 120)}%` }}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                  <div>
-                    <span className="text-slate-500">Pipeline</span>
-                    <p className="font-semibold text-white">${territory.pipeline}M</p>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Headcount</span>
-                    <p className="font-semibold text-white">{territory.headcount}</p>
-                  </div>
-                </div>
-              </div>
+              <item.icon className="w-8 h-8 text-rose-400 mx-auto mb-2" />
+              <p className="font-bold text-white">{item.label}</p>
+              <p className="text-sm text-slate-400">{item.desc}</p>
             </motion.div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onStart}
+          className="w-full py-4 bg-gradient-to-r from-rose-600 to-pink-600 text-white text-xl font-bold rounded-xl flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-500 transition-all"
+        >
+          <Play className="w-6 h-6" />
+          Begin Your Sales Turnaround
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
 
-function HealthIndicators({ state }: { state: GameState }) {
-  const indicators = [
-    {
-      label: 'Customer Trust',
-      value: state.customerTrust,
-      threshold: 70,
-      icon: Heart,
-      warning: 'Trust erosion from aggressive sales tactics',
-    },
-    {
-      label: 'Team Burnout',
-      value: state.burnoutIndex,
-      threshold: 50,
-      icon: Flame,
-      warning: 'Team burnout risk increasing',
-      inverse: true,
-    },
-    {
-      label: 'Sandbagging',
-      value: state.sandbagging,
-      threshold: 30,
-      icon: AlertTriangle,
-      warning: 'Gaming behavior detected in pipeline',
-      inverse: true,
-    },
-  ];
+function CrisisScreen({
+  crisis,
+  onChoice,
+  state
+}: {
+  crisis: SalesCrisis;
+  onChoice: (choice: CrisisChoice) => void;
+  state: GameState;
+}) {
+  const [selectedChoice, setSelectedChoice] = useState<CrisisChoice | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const severityColors = {
+    moderate: 'from-amber-600 to-yellow-600',
+    severe: 'from-orange-600 to-red-600',
+    critical: 'from-red-600 to-red-800',
+  };
+
+  const categoryIcons = {
+    quota: Target,
+    compensation: BadgeDollarSign,
+    territory: MapPin,
+    pricing: Percent,
+    talent: Users,
+    customer: Heart,
+    pipeline: BarChart3,
+  };
+
+  const CategoryIcon = categoryIcons[crisis.category];
 
   return (
-    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Sustainability Metrics</h3>
-        <Activity className="w-5 h-5 text-slate-500" />
-      </div>
-
-      <div className="space-y-4">
-        {indicators.map((ind) => {
-          const isHealthy = ind.inverse ? ind.value < ind.threshold : ind.value >= ind.threshold;
-          return (
-            <div key={ind.label}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <ind.icon className={`w-4 h-4 ${isHealthy ? 'text-emerald-400' : 'text-red-400'}`} />
-                  <span className="text-sm text-slate-300">{ind.label}</span>
-                </div>
-                <span className={`font-bold ${isHealthy ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {ind.value}%
+    <div className="min-h-screen bg-slate-950 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Crisis Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${severityColors[crisis.severity]} flex items-center justify-center`}>
+              <CategoryIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-slate-800 rounded-full text-sm text-slate-400">
+                  Quarter {crisis.quarter}
+                </span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  crisis.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                  crisis.severity === 'severe' ? 'bg-orange-500/20 text-orange-400' :
+                  'bg-amber-500/20 text-amber-400'
+                }`}>
+                  {crisis.severity.toUpperCase()}
                 </span>
               </div>
-              <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${ind.value}%` }}
-                  transition={{ duration: 1 }}
-                  className={`h-full rounded-full ${isHealthy ? 'bg-emerald-500' : 'bg-red-500'}`}
-                />
-              </div>
-              {!isHealthy && (
-                <p className="text-xs text-red-400 mt-1">{ind.warning}</p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function TopPerformersCard({ reps }: { reps: SalesRep[] }) {
-  const topPerformers = reps.filter(r => r.isTopPerformer);
-  const atRisk = reps.filter(r => r.attritionRisk === 'high');
-
-  return (
-    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-white">Team Health</h3>
-        <Users className="w-5 h-5 text-slate-500" />
-      </div>
-
-      {topPerformers.length > 0 && (
-        <div className="mb-4">
-          <p className="text-xs text-slate-500 mb-2">Top Performers</p>
-          <div className="space-y-2">
-            {topPerformers.map((rep) => (
-              <div key={rep.id} className="flex items-center justify-between p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-emerald-400" />
-                  <span className="text-sm text-white">{rep.name}</span>
-                </div>
-                <span className="text-sm font-bold text-emerald-400">{rep.performance}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {atRisk.length > 0 && (
-        <div>
-          <p className="text-xs text-slate-500 mb-2">Attrition Risk</p>
-          <div className="space-y-2">
-            {atRisk.map((rep) => (
-              <div key={rep.id} className="flex items-center justify-between p-2 bg-red-500/10 rounded-lg border border-red-500/30">
-                <div className="flex items-center gap-2">
-                  <UserMinus className="w-4 h-4 text-red-400" />
-                  <span className="text-sm text-white">{rep.name}</span>
-                </div>
-                <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-400 rounded">High Risk</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DecisionPanel({ role, onSubmit }: { role: Role; onSubmit: (decisions: Record<string, string | number>) => void }) {
-  const [decisions, setDecisions] = useState<Record<string, string | number>>({});
-
-  const roleDecisions: Record<Role, Array<{
-    id: string;
-    label: string;
-    type: 'select' | 'slider';
-    options?: Array<{ value: string; label: string }>;
-    min?: number;
-    max?: number;
-    description: string;
-  }>> = {
-    'head-of-sales': [
-      {
-        id: 'quotaChange',
-        label: 'Quota Adjustment',
-        type: 'slider',
-        min: -20,
-        max: 30,
-        description: 'Change to team quotas (%)',
-      },
-      {
-        id: 'incentiveModel',
-        label: 'Incentive Model',
-        type: 'select',
-        options: [
-          { value: 'accelerators', label: 'Aggressive Accelerators' },
-          { value: 'balanced', label: 'Balanced Comp' },
-          { value: 'base-heavy', label: 'Base-Heavy (Retention)' },
-        ],
-        description: 'Compensation structure approach',
-      },
-    ],
-    'regional-north': [
-      {
-        id: 'territoryFocus',
-        label: 'Territory Focus',
-        type: 'select',
-        options: [
-          { value: 'expansion', label: 'New Territory Expansion' },
-          { value: 'penetration', label: 'Deeper Penetration' },
-          { value: 'retention', label: 'Customer Retention' },
-        ],
-        description: 'Primary regional strategy',
-      },
-      {
-        id: 'headcountRequest',
-        label: 'Headcount Request',
-        type: 'slider',
-        min: -5,
-        max: 10,
-        description: 'Net headcount change',
-      },
-    ],
-    'regional-south': [
-      {
-        id: 'territoryFocus',
-        label: 'Territory Focus',
-        type: 'select',
-        options: [
-          { value: 'expansion', label: 'New Territory Expansion' },
-          { value: 'penetration', label: 'Deeper Penetration' },
-          { value: 'retention', label: 'Customer Retention' },
-        ],
-        description: 'Primary regional strategy',
-      },
-      {
-        id: 'headcountRequest',
-        label: 'Headcount Request',
-        type: 'slider',
-        min: -5,
-        max: 10,
-        description: 'Net headcount change',
-      },
-    ],
-    'marketing-liaison': [
-      {
-        id: 'leadQuality',
-        label: 'Lead Quality vs Quantity',
-        type: 'slider',
-        min: 0,
-        max: 100,
-        description: '0 = Volume, 100 = Quality',
-      },
-      {
-        id: 'salesAlignment',
-        label: 'Sales Alignment',
-        type: 'select',
-        options: [
-          { value: 'enterprise', label: 'Enterprise Focus' },
-          { value: 'mid-market', label: 'Mid-Market Focus' },
-          { value: 'smb', label: 'SMB Volume' },
-        ],
-        description: 'Marketing-Sales alignment priority',
-      },
-    ],
-    'finance-liaison': [
-      {
-        id: 'discountAuthority',
-        label: 'Discount Authority',
-        type: 'slider',
-        min: 5,
-        max: 40,
-        description: 'Maximum discount without approval (%)',
-      },
-      {
-        id: 'dealApproval',
-        label: 'Deal Approval Threshold',
-        type: 'select',
-        options: [
-          { value: 'strict', label: 'Strict (Margin Protection)' },
-          { value: 'standard', label: 'Standard Process' },
-          { value: 'flexible', label: 'Flexible (Volume Focus)' },
-        ],
-        description: 'Deal desk approval criteria',
-      },
-    ],
-  };
-
-  const currentDecisions = roleDecisions[role] || [];
-
-  return (
-    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-rose-600/20 rounded-xl flex items-center justify-center">
-          {(() => {
-            const RoleIcon = ROLES[role].icon;
-            return <RoleIcon className="w-6 h-6 text-rose-400" />;
-          })()}
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-white">{ROLES[role].title} Decisions</h2>
-          <p className="text-sm text-slate-400">{ROLES[role].description}</p>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        {currentDecisions.map((decision) => (
-          <div key={decision.id} className="space-y-2">
-            <label className="block text-sm font-medium text-slate-300">{decision.label}</label>
-            <p className="text-xs text-slate-500 mb-2">{decision.description}</p>
-
-            {decision.type === 'select' && decision.options && (
-              <div className="space-y-2">
-                {decision.options.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setDecisions({ ...decisions, [decision.id]: opt.value })}
-                    className={`w-full p-3 rounded-lg border text-sm font-medium transition-all text-left ${
-                      decisions[decision.id] === opt.value
-                        ? 'border-rose-500 bg-rose-500/20 text-rose-300'
-                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {decision.type === 'slider' && (
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min={decision.min}
-                  max={decision.max}
-                  value={decisions[decision.id] as number || 0}
-                  onChange={(e) => setDecisions({ ...decisions, [decision.id]: parseInt(e.target.value) })}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
-                />
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>{decision.min}</span>
-                  <span className="font-medium text-rose-400">{decisions[decision.id] || 0}</span>
-                  <span>{decision.max}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={() => onSubmit(decisions)}
-        className="mt-6 w-full py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold rounded-xl hover:from-rose-500 hover:to-pink-500 transition-all flex items-center justify-center gap-2"
-      >
-        Submit Decisions
-        <ChevronRight className="w-4 h-4" />
-      </button>
-    </div>
-  );
-}
-
-// =============================================================================
-// MAIN PAGE
-// =============================================================================
-
-export default function SalesMasteryPage() {
-  const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
-  const [selectedRole, setSelectedRole] = useState<Role>('head-of-sales');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  const handleDecisionSubmit = (decisions: Record<string, string | number>) => {
-    console.log('Submitted decisions:', decisions);
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Header */}
-      <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/" className="text-slate-400 hover:text-white transition-colors">
-                <ChevronLeft className="w-5 h-5" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center">
-                  <Target className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-bold text-white">Sales Mastery</h1>
-                  <p className="text-xs text-slate-400">Growth Without Erosion</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-slate-500" />
-                <span className="text-sm text-slate-400">Round</span>
-                <span className="text-lg font-bold text-white">{gameState.round}</span>
-                <span className="text-sm text-slate-500">/ {gameState.maxRounds}</span>
-              </div>
-
-              {gameState.discountTrend === 'eroding' && (
-                <div className="px-3 py-1.5 bg-amber-500/20 border border-amber-500/30 rounded-lg flex items-center gap-2">
-                  <TrendingDown className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-medium text-amber-300">Margin Erosion</span>
-                </div>
-              )}
+              <h1 className="text-3xl font-bold text-white mt-2">{crisis.title}</h1>
             </div>
           </div>
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* KPI Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+          <div className="bg-slate-900/80 backdrop-blur rounded-2xl p-6 border border-slate-800">
+            <p className="text-lg text-slate-300 leading-relaxed">{crisis.description}</p>
+          </div>
+        </motion.div>
+
+        {/* Current Status Bar */}
+        <div className="grid grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Revenue', value: `$${gameState.revenue}M`, icon: DollarSign, trend: 'up' },
-            { label: 'Bookings', value: `$${gameState.bookings}M`, icon: BarChart3, trend: 'up' },
-            { label: 'Win Rate', value: `${gameState.winRate}%`, icon: Trophy, trend: 'neutral' },
-            { label: 'Avg Deal', value: `$${(gameState.avgDealSize / 1000).toFixed(1)}K`, icon: Target, trend: 'up' },
-            { label: 'Retention', value: `${gameState.retention}%`, icon: Heart, trend: 'down' },
-            { label: 'LTV:CAC', value: `${gameState.ltvCacRatio}x`, icon: Activity, trend: 'up' },
-          ].map((kpi) => (
-            <div key={kpi.label} className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-              <div className="flex items-center justify-between mb-2">
-                <kpi.icon className="w-4 h-4 text-slate-500" />
-                {kpi.trend === 'up' && <ArrowUpRight className="w-4 h-4 text-emerald-400" />}
-                {kpi.trend === 'down' && <ArrowDownRight className="w-4 h-4 text-red-400" />}
-                {kpi.trend === 'neutral' && <Minus className="w-4 h-4 text-slate-400" />}
-              </div>
-              <p className="text-xs text-slate-500 mb-1">{kpi.label}</p>
-              <p className="text-xl font-bold text-white">{kpi.value}</p>
+            { label: 'Quota Attainment', value: `${state.quotaAttainment}%`, color: state.quotaAttainment < 80 ? 'text-red-400' : state.quotaAttainment < 95 ? 'text-amber-400' : 'text-emerald-400' },
+            { label: 'Customer Trust', value: `${state.customerTrust}%`, color: state.customerTrust < 50 ? 'text-red-400' : 'text-amber-400' },
+            { label: 'Team Morale', value: `${state.teamMorale}%`, color: state.teamMorale < 40 ? 'text-red-400' : 'text-amber-400' },
+            { label: 'Burnout Index', value: `${state.burnoutIndex}%`, color: state.burnoutIndex > 60 ? 'text-red-400' : 'text-emerald-400' },
+          ].map((metric) => (
+            <div key={metric.label} className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+              <p className="text-xs text-slate-500 mb-1">{metric.label}</p>
+              <p className={`text-2xl font-bold ${metric.color}`}>{metric.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Revenue Gauge */}
-            <RevenueGauge revenue={gameState.revenue} growth={gameState.revenueGrowth} target={50} />
+        {/* Choices */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-white mb-4">Your Decision</h2>
+          {crisis.choices.map((choice, index) => (
+            <motion.div
+              key={choice.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              onClick={() => {
+                setSelectedChoice(choice);
+                setShowConfirm(true);
+              }}
+              className={`p-6 rounded-2xl border cursor-pointer transition-all ${
+                selectedChoice?.id === choice.id
+                  ? 'bg-rose-900/30 border-rose-500'
+                  : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+              }`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white">{choice.label}</h3>
+                  <p className="text-slate-400 mt-1">{choice.description}</p>
+                </div>
+                <ChevronRight className={`w-6 h-6 transition-transform ${
+                  selectedChoice?.id === choice.id ? 'text-rose-400 rotate-90' : 'text-slate-600'
+                }`} />
+              </div>
 
-            {/* Role Selector */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {(Object.keys(ROLES) as Role[]).map((role) => {
-                const RoleIcon = ROLES[role].icon;
-                return (
-                  <button
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all ${
-                      selectedRole === role
-                        ? 'bg-rose-600 text-white'
-                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                    }`}
-                  >
-                    <RoleIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{ROLES[role].title.split(' - ')[0]}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Decision Panel */}
-            <DecisionPanel role={selectedRole} onSubmit={handleDecisionSubmit} />
-
-            {/* Territory Map */}
-            <TerritoryMap territories={gameState.territories} />
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Health Indicators */}
-            <HealthIndicators state={gameState} />
-
-            {/* Top Performers */}
-            <TopPerformersCard reps={gameState.reps} />
-          </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-3 bg-slate-800/50 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-1">Short-term Impact</p>
+                  <p className="text-sm text-slate-300">{choice.shortTermImpact}</p>
+                </div>
+                <div className="p-3 bg-slate-800/50 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-1">Long-term Risk</p>
+                  <p className="text-sm text-amber-400">{choice.longTermRisk}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </main>
+
+        {/* Confirm Modal */}
+        <AnimatePresence>
+          {showConfirm && selectedChoice && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-50"
+              onClick={() => setShowConfirm(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-slate-900 rounded-2xl p-8 max-w-lg w-full border border-slate-700"
+              >
+                <h3 className="text-2xl font-bold text-white mb-4">Confirm Decision</h3>
+                <p className="text-slate-300 mb-6">
+                  You are about to: <span className="text-rose-400 font-semibold">{selectedChoice.label}</span>
+                </p>
+                <p className="text-sm text-slate-400 mb-6">
+                  This decision will affect your team and numbers. Choose wisely.
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowConfirm(false)}
+                    className="flex-1 py-3 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 transition-colors"
+                  >
+                    Reconsider
+                  </button>
+                  <button
+                    onClick={() => onChoice(selectedChoice)}
+                    className="flex-1 py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold rounded-xl hover:from-rose-500 hover:to-pink-500 transition-all"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
+}
+
+function ConsequenceScreen({
+  choice,
+  crisis,
+  onContinue
+}: {
+  choice: CrisisChoice;
+  crisis: SalesCrisis;
+  onContinue: () => void;
+}) {
+  const [revealIndex, setRevealIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRevealIndex((i) => Math.min(i + 1, 8));
+    }, 500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const consequences = [
+    { label: 'Revenue Impact', value: choice.consequences.revenue, suffix: '%', positive: choice.consequences.revenue > 0 },
+    { label: 'Quota Attainment', value: choice.consequences.quotaAttainment, suffix: '%', positive: choice.consequences.quotaAttainment > 0 },
+    { label: 'Customer Trust', value: choice.consequences.customerTrust, suffix: '%', positive: choice.consequences.customerTrust > 0 },
+    { label: 'Team Morale', value: choice.consequences.teamMorale, suffix: '%', positive: choice.consequences.teamMorale > 0 },
+    { label: 'Burnout Index', value: choice.consequences.burnout, suffix: '%', positive: choice.consequences.burnout < 0 },
+    { label: 'Discount Trend', value: choice.consequences.discountTrend, suffix: '%', positive: choice.consequences.discountTrend < 0 },
+    { label: 'Retention', value: choice.consequences.retention, suffix: '%', positive: choice.consequences.retention > 0 },
+    { label: 'Pipeline Health', value: choice.consequences.pipelineHealth, suffix: '%', positive: choice.consequences.pipelineHealth > 0 },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-2xl w-full"
+      >
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Consequences Unfold</h2>
+          <p className="text-slate-400">Quarter {crisis.quarter}: {choice.label}</p>
+        </div>
+
+        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 mb-8">
+          <div className="space-y-4">
+            {consequences.map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: index < revealIndex ? 1 : 0.3, x: index < revealIndex ? 0 : -20 }}
+                className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0"
+              >
+                <span className="text-slate-400">{item.label}</span>
+                <span className={`font-bold ${
+                  item.positive ? 'text-emerald-400' : item.value === 0 ? 'text-slate-400' : 'text-red-400'
+                }`}>
+                  {item.value > 0 ? '+' : ''}{item.value}{item.suffix}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {choice.consequences.specialEffect && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: revealIndex >= 8 ? 1 : 0 }}
+            className="p-4 bg-amber-900/30 border border-amber-700/50 rounded-xl mb-8"
+          >
+            <p className="text-amber-300 text-center">
+              <AlertTriangle className="w-5 h-5 inline mr-2" />
+              Effect: <span className="font-semibold">{choice.consequences.specialEffect}</span>
+            </p>
+          </motion.div>
+        )}
+
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: revealIndex >= 8 ? 1 : 0 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onContinue}
+          className="w-full py-4 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold rounded-xl"
+        >
+          Continue
+        </motion.button>
+      </motion.div>
+    </div>
+  );
+}
+
+function QuarterlyReportScreen({
+  state,
+  onContinue
+}: {
+  state: GameState;
+  onContinue: () => void;
+}) {
+  const quotaProgress = (state.revenue / state.revenueTarget) * 100;
+
+  return (
+    <div className="min-h-screen bg-slate-950 p-6">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl font-bold text-white mb-2">Quarterly Business Review</h1>
+          <p className="text-slate-400">End of Quarter {state.quarter}</p>
+        </motion.div>
+
+        {/* Revenue Progress */}
+        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-emerald-400" />
+              Revenue Performance
+            </h3>
+            <span className={`text-2xl font-bold ${quotaProgress >= 100 ? 'text-emerald-400' : quotaProgress >= 80 ? 'text-amber-400' : 'text-red-400'}`}>
+              {quotaProgress.toFixed(0)}% to Target
+            </span>
+          </div>
+          <div className="h-4 bg-slate-800 rounded-full overflow-hidden mb-4">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(quotaProgress, 120)}%` }}
+              transition={{ duration: 1 }}
+              className={`h-full rounded-full ${
+                quotaProgress >= 100 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' :
+                quotaProgress >= 80 ? 'bg-gradient-to-r from-amber-600 to-amber-400' :
+                'bg-gradient-to-r from-red-600 to-red-400'
+              }`}
+            />
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            {[
+              { label: 'ARR', value: `$${state.revenue}M`, target: `$${state.revenueTarget}M` },
+              { label: 'Bookings', value: `$${state.bookings}M`, target: 'QTD' },
+              { label: 'Pipeline', value: `$${state.pipeline}M`, target: `${state.pipelineCoverage}x coverage` },
+              { label: 'Win Rate', value: `${state.winRate}%`, target: 'vs 25% target' },
+            ].map((item) => (
+              <div key={item.label} className="text-center">
+                <p className="text-xs text-slate-500 mb-1">{item.label}</p>
+                <p className="text-xl font-bold text-white">{item.value}</p>
+                <p className="text-xs text-slate-500">{item.target}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* Customer Health */}
+          <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-pink-400" />
+              Customer Health
+            </h3>
+            <div className="space-y-3">
+              {[
+                { label: 'Customer Trust', value: `${state.customerTrust}%`, danger: state.customerTrust < 50 },
+                { label: 'Retention Rate', value: `${state.customerRetention}%`, danger: state.customerRetention < 85 },
+                { label: 'Net Revenue Retention', value: `${state.nrr}%`, danger: state.nrr < 100 },
+                { label: 'Churn Risk (ARR)', value: `${state.churnRisk}%`, danger: state.churnRisk > 15 },
+              ].map((item) => (
+                <div key={item.label} className="flex justify-between">
+                  <span className="text-slate-400">{item.label}</span>
+                  <span className={`font-semibold ${item.danger ? 'text-red-400' : 'text-white'}`}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Team Health */}
+          <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-400" />
+              Team Health
+            </h3>
+            <div className="space-y-3">
+              {[
+                { label: 'Team Morale', value: `${state.teamMorale}%`, danger: state.teamMorale < 40 },
+                { label: 'Burnout Index', value: `${state.burnoutIndex}%`, danger: state.burnoutIndex > 60 },
+                { label: 'Attrition Rate', value: `${state.attritionRate}%`, danger: state.attritionRate > 20 },
+                { label: 'Comp Satisfaction', value: `${state.compSatisfaction}%`, danger: state.compSatisfaction < 50 },
+              ].map((item) => (
+                <div key={item.label} className="flex justify-between">
+                  <span className="text-slate-400">{item.label}</span>
+                  <span className={`font-semibold ${item.danger ? 'text-red-400' : 'text-white'}`}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sales Metrics */}
+        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 mb-6">
+          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-violet-400" />
+            Sales Effectiveness
+          </h3>
+          <div className="grid grid-cols-5 gap-4">
+            {[
+              { label: 'Quota Attainment', value: `${state.quotaAttainment}%`, danger: state.quotaAttainment < 80 },
+              { label: 'Avg Deal Size', value: `$${state.avgDealSize}K`, danger: false },
+              { label: 'Sales Cycle', value: `${state.salesCycle} days`, danger: state.salesCycle > 90 },
+              { label: 'Discount Trend', value: `${state.discountTrend}%`, danger: state.discountTrend > 50 },
+              { label: 'Pipeline Health', value: `${state.pipelineHealth}%`, danger: state.pipelineHealth < 50 },
+            ].map((item) => (
+              <div key={item.label} className="text-center p-3 bg-slate-800/50 rounded-xl">
+                <p className="text-xs text-slate-500 mb-1">{item.label}</p>
+                <p className={`text-lg font-bold ${item.danger ? 'text-red-400' : 'text-white'}`}>{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Team Roster */}
+        <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 mb-6">
+          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-400" />
+            Team Performance
+          </h3>
+          <div className="grid md:grid-cols-3 gap-3">
+            {state.salesReps.map((rep) => (
+              <div
+                key={rep.id}
+                className={`p-3 rounded-xl border ${
+                  rep.isTopPerformer ? 'bg-emerald-500/10 border-emerald-500/30' :
+                  rep.atRisk ? 'bg-red-500/10 border-red-500/30' :
+                  'bg-slate-800/50 border-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-white">{rep.name}</span>
+                  {rep.isTopPerformer && <Trophy className="w-4 h-4 text-amber-400" />}
+                  {rep.atRisk && <AlertTriangle className="w-4 h-4 text-red-400" />}
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500">{rep.region}</span>
+                  <span className={`font-bold ${
+                    rep.performance >= 100 ? 'text-emerald-400' :
+                    rep.performance >= 80 ? 'text-amber-400' :
+                    'text-red-400'
+                  }`}>
+                    {rep.performance}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Warning Banners */}
+        {state.teamMorale < 35 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-4 bg-red-900/50 border border-red-500 rounded-xl mb-4 flex items-center gap-3"
+          >
+            <Skull className="w-6 h-6 text-red-400" />
+            <p className="text-red-300">
+              <span className="font-bold">CRITICAL:</span> Team morale is dangerously low. Mass exodus imminent.
+            </p>
+          </motion.div>
+        )}
+
+        {state.customerTrust < 40 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-4 bg-orange-900/50 border border-orange-500 rounded-xl mb-4 flex items-center gap-3"
+          >
+            <AlertCircle className="w-6 h-6 text-orange-400" />
+            <p className="text-orange-300">
+              <span className="font-bold">WARNING:</span> Customer trust eroding. Churn acceleration likely.
+            </p>
+          </motion.div>
+        )}
+
+        {state.burnoutIndex > 70 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-4 bg-amber-900/50 border border-amber-500 rounded-xl mb-4 flex items-center gap-3"
+          >
+            <Flame className="w-6 h-6 text-amber-400" />
+            <p className="text-amber-300">
+              <span className="font-bold">ALERT:</span> Team burnout at critical levels. Performance will suffer.
+            </p>
+          </motion.div>
+        )}
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onContinue}
+          className="w-full py-4 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2"
+        >
+          {state.quarter < 8 ? 'Proceed to Next Quarter' : 'See Final Results'}
+          <ChevronRight className="w-5 h-5" />
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
+function EndingScreen({
+  state,
+  onRestart
+}: {
+  state: GameState;
+  onRestart: () => void;
+}) {
+  const endingIcons: Record<EndingType, typeof Crown> = {
+    'fired-missing-targets': Skull,
+    'team-exodus': UserMinus,
+    'survival': LifeBuoy,
+    'sales-champion': Trophy,
+    'revenue-machine': Crown,
+  };
+
+  const endingColors: Record<EndingType, string> = {
+    'fired-missing-targets': 'from-red-600 to-red-800',
+    'team-exodus': 'from-orange-600 to-red-600',
+    'survival': 'from-amber-600 to-orange-600',
+    'sales-champion': 'from-blue-600 to-cyan-600',
+    'revenue-machine': 'from-emerald-600 to-teal-600',
+  };
+
+  const endingTitles: Record<EndingType, string> = {
+    'fired-missing-targets': 'Terminated',
+    'team-exodus': 'Team Exodus',
+    'survival': 'Survived',
+    'sales-champion': 'Sales Champion',
+    'revenue-machine': 'Revenue Machine',
+  };
+
+  const EndingIcon = state.endingType ? endingIcons[state.endingType] : Crown;
+  const colorClass = state.endingType ? endingColors[state.endingType] : 'from-slate-600 to-slate-800';
+  const title = state.endingType ? endingTitles[state.endingType] : 'The End';
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-2xl w-full text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring' }}
+          className={`w-32 h-32 rounded-3xl bg-gradient-to-br ${colorClass} flex items-center justify-center mx-auto mb-8`}
+        >
+          <EndingIcon className="w-16 h-16 text-white" />
+        </motion.div>
+
+        <h1 className="text-5xl font-black text-white mb-4">{title}</h1>
+
+        <div className="bg-slate-900/80 backdrop-blur rounded-2xl p-8 border border-slate-800 mb-8">
+          <p className="text-lg text-slate-300 leading-relaxed">{state.endingNarrative}</p>
+        </div>
+
+        {/* Final Stats */}
+        <div className="grid grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Revenue', value: `$${state.revenue}M` },
+            { label: 'Quota %', value: `${state.quotaAttainment}%` },
+            { label: 'Team Morale', value: `${state.teamMorale}%` },
+            { label: 'Quarters', value: state.quarter },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-slate-800/50 rounded-xl p-4">
+              <p className="text-xs text-slate-500 mb-1">{stat.label}</p>
+              <p className="text-xl font-bold text-white">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onRestart}
+          className="py-4 px-8 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 mx-auto"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Play Again
+        </motion.button>
+      </motion.div>
+    </div>
+  );
+}
+
+// =============================================================================
+// MAIN GAME COMPONENT
+// =============================================================================
+
+export default function SalesMasteryPage() {
+  const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
+  const [lastChoice, setLastChoice] = useState<CrisisChoice | null>(null);
+
+  const startGame = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      quarter: 1,
+      phase: 'decision',
+      currentCrisis: SALES_CRISES.find((c) => c.quarter === 1) || null,
+    }));
+  }, []);
+
+  const handleChoice = useCallback((choice: CrisisChoice) => {
+    setLastChoice(choice);
+
+    setGameState((prev) => {
+      // Apply consequences
+      const newRevenue = Math.max(50, prev.revenue + (prev.revenue * choice.consequences.revenue / 100));
+      const newQuotaAttainment = Math.max(0, Math.min(150, prev.quotaAttainment + choice.consequences.quotaAttainment));
+      const newCustomerTrust = Math.max(0, Math.min(100, prev.customerTrust + choice.consequences.customerTrust));
+      const newTeamMorale = Math.max(0, Math.min(100, prev.teamMorale + choice.consequences.teamMorale));
+      const newBurnout = Math.max(0, Math.min(100, prev.burnoutIndex + choice.consequences.burnout));
+      const newDiscountTrend = Math.max(0, Math.min(100, prev.discountTrend + choice.consequences.discountTrend));
+      const newRetention = Math.max(50, Math.min(100, prev.customerRetention + choice.consequences.retention));
+      const newPipelineHealth = Math.max(0, Math.min(100, prev.pipelineHealth + choice.consequences.pipelineHealth));
+
+      // Update attrition based on morale and burnout
+      const newAttrition = Math.max(5, Math.min(50, prev.attritionRate + (newBurnout > 60 ? 5 : 0) + (newTeamMorale < 40 ? 5 : -2)));
+
+      // Update comp satisfaction based on morale
+      const newCompSat = Math.max(0, Math.min(100, prev.compSatisfaction + (choice.consequences.teamMorale > 0 ? 5 : -3)));
+
+      // Record decision
+      const newDecisionHistory = [...prev.decisionHistory, {
+        quarter: prev.quarter,
+        crisisId: prev.currentCrisis?.id || '',
+        choiceId: choice.id,
+        choiceLabel: choice.label,
+        consequences: choice.consequences,
+      }];
+
+      // Track special effects
+      const newEffects = choice.consequences.specialEffect
+        ? [...prev.activeEffects, choice.consequences.specialEffect]
+        : prev.activeEffects;
+
+      // Update reps based on consequences
+      const updatedReps = prev.salesReps.map(rep => ({
+        ...rep,
+        motivation: Math.max(0, Math.min(100, rep.motivation + choice.consequences.teamMorale / 2)),
+        atRisk: rep.motivation + choice.consequences.teamMorale / 2 < 50 || (rep.isTopPerformer && newCompSat < 40),
+      }));
+
+      return {
+        ...prev,
+        revenue: Math.round(newRevenue),
+        quotaAttainment: Math.round(newQuotaAttainment),
+        customerTrust: Math.round(newCustomerTrust),
+        teamMorale: Math.round(newTeamMorale),
+        burnoutIndex: Math.round(newBurnout),
+        discountTrend: Math.round(newDiscountTrend),
+        customerRetention: Math.round(newRetention),
+        pipelineHealth: Math.round(newPipelineHealth),
+        attritionRate: Math.round(newAttrition),
+        compSatisfaction: Math.round(newCompSat),
+        salesReps: updatedReps,
+        decisionHistory: newDecisionHistory,
+        activeEffects: newEffects,
+        phase: 'consequence',
+      };
+    });
+  }, []);
+
+  const handleConsequenceContinue = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      phase: 'quarterly-report',
+    }));
+  }, []);
+
+  const handleQuarterlyContinue = useCallback(() => {
+    setGameState((prev) => {
+      // Check for game over conditions
+      const shouldEnd =
+        prev.quotaAttainment < 50 ||  // Fired for missing targets badly
+        prev.teamMorale < 20 ||        // Team exodus
+        prev.customerTrust < 25 ||     // Customer trust collapse
+        prev.quarter >= 8;             // Natural end
+
+      if (shouldEnd) {
+        const ending = calculateEnding(prev);
+        return {
+          ...prev,
+          phase: 'ending',
+          gameOver: true,
+          endingType: ending.type,
+          endingNarrative: ending.narrative,
+        };
+      }
+
+      // Advance to next quarter
+      const nextQuarter = prev.quarter + 1;
+      const nextCrisis = SALES_CRISES.find((c) => c.quarter === nextQuarter) || null;
+
+      // Quarterly natural changes
+      const quarterlyRevenueDrift = (Math.random() - 0.4) * 3; // slight positive bias
+      const quarterlyMoraleDrift = prev.burnoutIndex > 50 ? -3 : 1;
+      const quarterlyBurnoutDrift = prev.teamMorale < 50 ? 3 : -2;
+
+      // Pipeline naturally decays if not healthy
+      const pipelineDecay = prev.pipelineHealth < 50 ? -5 : 2;
+
+      // Win rate affected by morale and trust
+      const winRateAdjust = (prev.teamMorale - 50) / 20 + (prev.customerTrust - 50) / 30;
+
+      return {
+        ...prev,
+        quarter: nextQuarter,
+        phase: 'decision',
+        currentCrisis: nextCrisis,
+        revenue: Math.round(prev.revenue * (1 + quarterlyRevenueDrift / 100)),
+        teamMorale: Math.max(0, Math.min(100, prev.teamMorale + quarterlyMoraleDrift)),
+        burnoutIndex: Math.max(0, Math.min(100, prev.burnoutIndex + quarterlyBurnoutDrift)),
+        pipelineHealth: Math.max(0, Math.min(100, prev.pipelineHealth + pipelineDecay)),
+        winRate: Math.max(10, Math.min(50, prev.winRate + winRateAdjust)),
+        bookings: Math.round(prev.bookings * (0.95 + Math.random() * 0.1)),
+        pipeline: Math.round(prev.pipeline * (0.9 + Math.random() * 0.2)),
+      };
+    });
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setGameState(INITIAL_STATE);
+    setLastChoice(null);
+  }, []);
+
+  // Render based on phase
+  if (gameState.phase === 'intro') {
+    return <IntroScreen onStart={startGame} />;
+  }
+
+  if (gameState.phase === 'decision' && gameState.currentCrisis) {
+    return (
+      <CrisisScreen
+        crisis={gameState.currentCrisis}
+        state={gameState}
+        onChoice={handleChoice}
+      />
+    );
+  }
+
+  if (gameState.phase === 'consequence' && lastChoice && gameState.currentCrisis) {
+    return (
+      <ConsequenceScreen
+        choice={lastChoice}
+        crisis={gameState.currentCrisis}
+        onContinue={handleConsequenceContinue}
+      />
+    );
+  }
+
+  if (gameState.phase === 'quarterly-report') {
+    return (
+      <QuarterlyReportScreen
+        state={gameState}
+        onContinue={handleQuarterlyContinue}
+      />
+    );
+  }
+
+  if (gameState.phase === 'ending') {
+    return (
+      <EndingScreen
+        state={gameState}
+        onRestart={handleRestart}
+      />
+    );
+  }
+
+  // Fallback
+  return <IntroScreen onStart={startGame} />;
 }
