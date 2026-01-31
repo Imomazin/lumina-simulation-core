@@ -220,7 +220,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl">
+      <div className="relative z-10 text-center px-6 lg:px-12 max-w-5xl">
         {/* Logo/Brand Mark */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5, rotateY: -180 }}
@@ -299,7 +299,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.8 }}
-              className={`text-xl md:text-2xl mb-16 max-w-2xl mx-auto leading-relaxed ${
+              className={`text-xl md:text-2xl mb-16 max-w-3xl mx-auto leading-relaxed ${
                 theme === 'light' ? 'text-slate-600' : 'text-slate-400'
               }`}
             >
@@ -732,7 +732,7 @@ function CinematicHero() {
       )}
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 text-center">
         {/* Pre-title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -780,7 +780,7 @@ function CinematicHero() {
             animate={{ opacity: isTransitioning ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className={`text-2xl md:text-3xl max-w-3xl mx-auto mb-14 leading-relaxed ${
+            className={`text-2xl md:text-3xl max-w-4xl mx-auto mb-14 leading-relaxed ${
               theme === 'light' ? 'text-slate-600' : 'text-slate-300'
             }`}
           >
@@ -884,7 +884,7 @@ function PhilosophySection() {
         )}
       </div>
 
-      <div className="relative max-w-5xl mx-auto px-6">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1188,7 +1188,7 @@ function SimulationsSection() {
         ? 'bg-gradient-to-b from-purple-50/50 via-white to-pink-50/30'
         : 'bg-gradient-to-b from-slate-950 to-slate-900'
     }`}>
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1227,7 +1227,7 @@ function TestimonialsSection() {
     <section className={`py-36 ${
       theme === 'light' ? 'bg-white/70' : 'bg-slate-900'
     }`}>
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1328,7 +1328,7 @@ function AudienceSection() {
         ? 'bg-gradient-to-b from-white to-purple-50/50'
         : 'bg-gradient-to-b from-slate-900 to-slate-950'
     }`}>
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1416,7 +1416,7 @@ function FinalCTA() {
         )}
       </div>
 
-      <div className="relative max-w-4xl mx-auto px-6 text-center">
+      <div className="relative max-w-6xl mx-auto px-6 lg:px-12 text-center">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1478,7 +1478,7 @@ function Footer() {
         ? 'bg-white/80 border-purple-100'
         : 'bg-slate-950 border-slate-900'
     }`}>
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="text-center md:text-left">
             <div className={`text-3xl font-bold mb-3 ${
