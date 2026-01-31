@@ -9,7 +9,7 @@ import {
   Briefcase, Scale, Zap, Globe, FileText, CheckCircle, XCircle, AlertCircle,
   ArrowUpRight, ArrowDownRight, Play, RotateCcw, Lock, Gavel, Eye, Settings,
   Database, Server, Cloud, Cpu, LineChart, PieChart, ArrowRight, Home,
-  CreditCard, Wallet, Receipt, BadgeDollarSign, Percent, TrendingUpDown,
+  CreditCard, Wallet, Receipt, BadgeDollarSign, Percent,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -521,7 +521,7 @@ export default function MarginCallPage() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 ${theme === 'light' ? 'bg-amber-100' : 'bg-amber-500/20'}`}>
-              <TrendingUpDown className={`w-10 h-10 ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`} />
+              <BarChart3 className={`w-10 h-10 ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`} />
             </div>
             <h1 className={`text-5xl font-bold mb-4 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>MARGIN CALL</h1>
             <p className={`text-2xl ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`}>Scale-up vs. Profitability Tradeoff</p>
@@ -592,7 +592,7 @@ export default function MarginCallPage() {
       <header className={`sticky top-0 z-40 ${theme === 'light' ? 'bg-white/90 border-b border-slate-200' : 'bg-slate-900/90 border-b border-slate-800'} backdrop-blur-sm`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <TrendingUpDown className={`w-8 h-8 ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`} />
+            <BarChart3 className={`w-8 h-8 ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`} />
             <div>
               <h1 className={`font-bold ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>MARGIN CALL</h1>
               <p className={`text-sm ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>Round {gameState.round} of 8</p>
