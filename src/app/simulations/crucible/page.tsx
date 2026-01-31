@@ -476,7 +476,7 @@ export default function CruciblePage() {
     const trust = Object.values(state.trust).reduce((a, b) => a + b, 0) / 6 * 0.4;
     const metrics = ((state.metrics.patientTrust / 100) * 20) +
                    ((state.metrics.regulatoryStanding / 100) * 15) +
-                   ((100 - state.metrics.litigationExposure) / 100) * 15) +
+                   (((100 - state.metrics.litigationExposure) / 100) * 15) +
                    ((state.metrics.stockPrice / 100) * 10);
     return Math.min(100, Math.max(0, trust + metrics));
   };
