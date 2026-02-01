@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Crown,
@@ -455,6 +456,7 @@ const SIMULATIONS = [
     subtitle: 'Governing Under Uncertainty',
     tagline: 'The boardroom simulation where your job is on the line',
     icon: Crown,
+    iconImage: '/images/icons/icon-sim-strategic-leadership.svg',
     color: 'violet',
     duration: '3-4 hours',
     players: '3-5 players',
@@ -474,6 +476,7 @@ const SIMULATIONS = [
     subtitle: 'Competing in Motion',
     tagline: 'Multiplayer market warfare where survival is optional',
     icon: TrendingUp,
+    iconImage: '/images/icons/icon-sim-market-dynamics.svg',
     color: 'blue',
     duration: '2-3 hours',
     players: '2-6 teams',
@@ -493,6 +496,7 @@ const SIMULATIONS = [
     subtitle: 'Capital, Risk, and Survival',
     tagline: 'Where CFOs are made—and unmade',
     icon: DollarSign,
+    iconImage: '/images/icons/icon-sim-financial-acumen.svg',
     color: 'emerald',
     duration: '3-4 hours',
     players: '3-4 players',
@@ -512,6 +516,7 @@ const SIMULATIONS = [
     subtitle: 'Flow, Capacity, and Fragility',
     tagline: 'The supply chain simulation that breaks before you do',
     icon: Cog,
+    iconImage: '/images/icons/icon-sim-operations-excellence.svg',
     color: 'orange',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -531,6 +536,7 @@ const SIMULATIONS = [
     subtitle: 'Growth Without Erosion',
     tagline: 'Hit the number—without destroying the future',
     icon: Target,
+    iconImage: '/images/icons/icon-sim-sales-mastery.svg',
     color: 'rose',
     duration: '2-3 hours',
     players: '3-5 players',
@@ -550,6 +556,7 @@ const SIMULATIONS = [
     subtitle: 'Betting on the Future',
     tagline: 'Where R&D leaders learn to kill their darlings',
     icon: Lightbulb,
+    iconImage: '/images/icons/icon-sim-innovation-lab.svg',
     color: 'yellow',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -656,6 +663,17 @@ function CinematicHero() {
 
   return (
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br ${gradient} transition-all duration-1000`}>
+      {/* Hero background image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <Image
+          src="/images/hero/hero-abstract-strategy-bg.png"
+          alt=""
+          fill
+          className={`object-cover ${theme === 'light' ? 'opacity-10' : 'opacity-20'} mix-blend-overlay`}
+          priority
+        />
+      </div>
+
       {/* Light theme: Flowing ribbon shapes */}
       {theme === 'light' && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -1058,8 +1076,18 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-start gap-5">
-            <div className={`w-16 h-16 ${style.bg} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-              <Icon className={`w-8 h-8 ${style.text}`} />
+            <div className={`w-16 h-16 ${style.bg} rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden`}>
+              {sim.iconImage ? (
+                <Image
+                  src={sim.iconImage}
+                  alt={sim.title}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              ) : (
+                <Icon className={`w-8 h-8 ${style.text}`} />
+              )}
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
