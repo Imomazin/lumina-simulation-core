@@ -37,6 +37,8 @@ import {
   Square,
   Layers,
   Activity,
+  ShieldAlert,
+  Scale,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -576,6 +578,48 @@ const SIMULATIONS = [
     ],
     preview: "Learn the hardest lesson in innovation: knowing when to kill something you believe in.",
   },
+  {
+    id: 'risk-intelligence',
+    title: 'Risk Intelligence',
+    subtitle: 'Navigating Uncertainty',
+    tagline: 'Where risk officers learn that prevention is invisible until it fails',
+    icon: ShieldAlert,
+    iconImage: '/assets/icon-sim-strategic-leadership.svg',
+    bgImage: '/assets/bg-regulatory-crisis.png',
+    color: 'cyan',
+    duration: '3-4 hours',
+    players: '3-5 players',
+    rounds: 10,
+    hook: "Your enterprise risk dashboard shows green across the board. But three seemingly unrelated events are converging: a cyber vulnerability in your supply chain, a geopolitical shift in your key market, and a whistleblower complaint that just landed on your desk. You have 48 hours before the board meeting.",
+    stakes: [
+      "Black swans hide in plain sight",
+      "Risk appetite shifts under pressure",
+      "Mitigation costs compete with growth",
+      "The risks you ignore choose you.",
+    ],
+    preview: "Discover why the biggest risks aren't on your radar—and why your risk register is a map of yesterday's threats.",
+  },
+  {
+    id: 'governance-compliance',
+    title: 'Governance & Compliance',
+    subtitle: 'Ethics Under Fire',
+    tagline: 'The GRC simulation where doing the right thing has a price',
+    icon: Scale,
+    iconImage: '/assets/icon-sim-financial-acumen.svg',
+    bgImage: '/assets/bg-boardroom-dark.png',
+    color: 'indigo',
+    duration: '3-4 hours',
+    players: '4-6 players',
+    rounds: 8,
+    hook: "You're the Chief Compliance Officer. A major revenue stream may violate regulations in three jurisdictions. Sales says it's fine. Legal is hedging. The CEO wants growth. The audit committee meets Friday. And a journalist just called asking about 'irregularities.'",
+    stakes: [
+      "Compliance is everyone's job—until it isn't",
+      "Regulators have long memories",
+      "Reputation damage compounds",
+      "The cover-up is always worse.",
+    ],
+    preview: "Experience the tension between growth and governance. Learn why 'technically legal' is the most dangerous phrase in business.",
+  },
 ];
 
 const TESTIMONIALS = [
@@ -1063,6 +1107,14 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
       light: { bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-600', gradient: 'from-amber-500 to-orange-500' },
       dark: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-400', gradient: 'from-yellow-500 to-orange-500' },
     },
+    cyan: {
+      light: { bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-600', gradient: 'from-cyan-500 to-teal-500' },
+      dark: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-400', gradient: 'from-cyan-500 to-teal-600' },
+    },
+    indigo: {
+      light: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-600', gradient: 'from-indigo-500 to-purple-500' },
+      dark: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-400', gradient: 'from-indigo-500 to-purple-600' },
+    },
   };
 
   const style = colorStyles[sim.color as keyof typeof colorStyles][theme];
@@ -1250,7 +1302,7 @@ function SimulationsSection() {
           <h2 className={`text-base md:text-lg font-bold mb-6 ${
             theme === 'light' ? 'text-slate-900' : 'text-white'
           }`}>
-            Six Simulations.
+            Eight Simulations.
             <span className={`block ${
               theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
             }`}>Infinite Lessons.</span>
