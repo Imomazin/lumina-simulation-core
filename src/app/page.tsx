@@ -456,7 +456,7 @@ const SIMULATIONS = [
     subtitle: 'Governing Under Uncertainty',
     tagline: 'The boardroom simulation where your job is on the line',
     icon: Crown,
-    iconImage: '/images/icons/icon-sim-strategic-leadership.svg',
+    iconImage: '/assets/icon-sim-strategic-leadership.svg',
     color: 'violet',
     duration: '3-4 hours',
     players: '3-5 players',
@@ -476,7 +476,7 @@ const SIMULATIONS = [
     subtitle: 'Competing in Motion',
     tagline: 'Multiplayer market warfare where survival is optional',
     icon: TrendingUp,
-    iconImage: '/images/icons/icon-sim-market-dynamics.svg',
+    iconImage: '/assets/icon-sim-market-dynamics.svg',
     color: 'blue',
     duration: '2-3 hours',
     players: '2-6 teams',
@@ -496,7 +496,7 @@ const SIMULATIONS = [
     subtitle: 'Capital, Risk, and Survival',
     tagline: 'Where CFOs are made—and unmade',
     icon: DollarSign,
-    iconImage: '/images/icons/icon-sim-financial-acumen.svg',
+    iconImage: '/assets/icon-sim-financial-acumen.svg',
     color: 'emerald',
     duration: '3-4 hours',
     players: '3-4 players',
@@ -516,7 +516,7 @@ const SIMULATIONS = [
     subtitle: 'Flow, Capacity, and Fragility',
     tagline: 'The supply chain simulation that breaks before you do',
     icon: Cog,
-    iconImage: '/images/icons/icon-sim-operations-excellence.svg',
+    iconImage: '/assets/icon-sim-operations-excellence.svg',
     color: 'orange',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -536,7 +536,7 @@ const SIMULATIONS = [
     subtitle: 'Growth Without Erosion',
     tagline: 'Hit the number—without destroying the future',
     icon: Target,
-    iconImage: '/images/icons/icon-sim-sales-mastery.svg',
+    iconImage: '/assets/icon-sim-sales-mastery.svg',
     color: 'rose',
     duration: '2-3 hours',
     players: '3-5 players',
@@ -556,7 +556,7 @@ const SIMULATIONS = [
     subtitle: 'Betting on the Future',
     tagline: 'Where R&D leaders learn to kill their darlings',
     icon: Lightbulb,
-    iconImage: '/images/icons/icon-sim-innovation-lab.svg',
+    iconImage: '/assets/icon-sim-innovation-lab.svg',
     color: 'yellow',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -666,7 +666,7 @@ function CinematicHero() {
       {/* Hero background image */}
       <div className="absolute inset-0 pointer-events-none">
         <Image
-          src="/images/hero/hero-abstract-strategy-bg.png"
+          src="/assets/hero-abstract-strategy-bg.png"
           alt=""
           fill
           className={`object-cover ${theme === 'light' ? 'opacity-10' : 'opacity-20'} mix-blend-overlay`}
