@@ -221,7 +221,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 text-center px-6 lg:px-12 max-w-5xl">
+      <div className="relative z-10 text-center px-8 lg:px-16 max-w-6xl mx-auto">
         {/* Logo/Brand Mark */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5, rotateY: -180 }}
@@ -669,7 +669,7 @@ function CinematicHero() {
           src="/assets/hero-abstract-strategy-bg.png"
           alt=""
           fill
-          className={`object-cover ${theme === 'light' ? 'opacity-10' : 'opacity-20'} mix-blend-overlay`}
+          className={`object-cover ${theme === 'light' ? 'opacity-20' : 'opacity-30'} mix-blend-overlay`}
           priority
         />
       </div>
@@ -750,7 +750,7 @@ function CinematicHero() {
       )}
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 text-center">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-8 lg:px-16 text-center">
         {/* Pre-title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -902,7 +902,7 @@ function PhilosophySection() {
         )}
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1216,7 +1216,7 @@ function SimulationsSection() {
         ? 'bg-gradient-to-b from-purple-50/50 via-white to-pink-50/30'
         : 'bg-gradient-to-b from-slate-950 to-slate-900'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1238,7 +1238,7 @@ function SimulationsSection() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {SIMULATIONS.map((sim, index) => (
             <SimulationCard key={sim.id} sim={sim} index={index} />
           ))}
@@ -1255,7 +1255,7 @@ function TestimonialsSection() {
     <section className={`py-36 ${
       theme === 'light' ? 'bg-white/70' : 'bg-slate-900'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1356,7 +1356,7 @@ function AudienceSection() {
         ? 'bg-gradient-to-b from-white to-purple-50/50'
         : 'bg-gradient-to-b from-slate-900 to-slate-950'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1444,7 +1444,7 @@ function FinalCTA() {
         )}
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-6 lg:px-12 text-center">
+      <div className="relative max-w-[1400px] mx-auto px-8 lg:px-16 text-center">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1506,7 +1506,7 @@ function Footer() {
         ? 'bg-white/80 border-purple-100'
         : 'bg-slate-950 border-slate-900'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
         <div className="flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="text-center md:text-left">
             <div className={`text-3xl font-bold mb-3 ${
