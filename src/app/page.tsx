@@ -265,7 +265,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className={`text-6xl md:text-8xl lg:text-9xl font-bold mb-6 tracking-tight ${
+          className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight ${
             theme === 'light'
               ? 'text-slate-800'
               : 'text-white'
@@ -285,7 +285,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className={`text-2xl md:text-3xl font-medium mb-4 tracking-wide ${
+          className={`text-lg md:text-xl font-medium mb-4 tracking-wide ${
             theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
           }`}
         >
@@ -300,7 +300,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.8 }}
-              className={`text-xl md:text-2xl mb-16 max-w-3xl mx-auto leading-relaxed ${
+              className={`text-base md:text-lg mb-16 max-w-3xl mx-auto leading-relaxed ${
                 theme === 'light' ? 'text-slate-600' : 'text-slate-400'
               }`}
             >
@@ -327,7 +327,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
                 onClick={onEnter}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
-                className={`group relative px-16 py-6 text-2xl font-bold rounded-2xl transition-all duration-500 ${
+                className={`group relative px-16 py-6 text-lg font-bold rounded-2xl transition-all duration-500 ${
                   theme === 'light'
                     ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60'
                     : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-900 shadow-2xl shadow-cyan-500/40 hover:shadow-cyan-500/60'
@@ -781,7 +781,7 @@ function CinematicHero() {
               animate={{ opacity: isTransitioning ? 0 : 1, y: isTransitioning ? -30 : 0 }}
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.5 }}
-              className={`text-5xl md:text-7xl lg:text-8xl font-bold leading-tight ${
+              className={`text-xl md:text-5xl lg:text-6xl font-bold leading-tight ${
                 theme === 'light' ? 'text-slate-800' : 'text-white'
               }`}
             >
@@ -798,7 +798,7 @@ function CinematicHero() {
             animate={{ opacity: isTransitioning ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className={`text-2xl md:text-3xl max-w-4xl mx-auto mb-14 leading-relaxed ${
+            className={`text-lg md:text-xl max-w-4xl mx-auto mb-14 leading-relaxed ${
               theme === 'light' ? 'text-slate-600' : 'text-slate-300'
             }`}
           >
@@ -910,7 +910,7 @@ function PhilosophySection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-24"
         >
-          <h2 className={`text-5xl md:text-6xl font-bold mb-8 ${
+          <h2 className={`text-base md:text-lg font-bold mb-8 ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             Most simulations are games.
@@ -928,7 +928,7 @@ function PhilosophySection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className={`text-2xl font-bold mb-8 flex items-center gap-3 ${
+            <h3 className={`text-lg font-bold mb-8 flex items-center gap-3 ${
               theme === 'light' ? 'text-rose-500' : 'text-red-400'
             }`}>
               <AlertTriangle className="w-7 h-7" />
@@ -961,7 +961,7 @@ function PhilosophySection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h3 className={`text-2xl font-bold mb-8 flex items-center gap-3 ${
+            <h3 className={`text-lg font-bold mb-8 flex items-center gap-3 ${
               theme === 'light' ? 'text-emerald-600' : 'text-emerald-400'
             }`}>
               <Shield className="w-7 h-7" />
@@ -1003,7 +1003,7 @@ function PhilosophySection() {
           <Quote className={`w-12 h-12 mb-6 ${
             theme === 'light' ? 'text-purple-400' : 'text-violet-500'
           }`} />
-          <blockquote className={`text-3xl md:text-4xl font-medium mb-8 leading-relaxed ${
+          <blockquote className={`text-base md:text-lg font-medium mb-8 leading-relaxed ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             "The goal isn't to teach you what to decide. It's to make you feel the weight of deciding—so when it's real, you've been here before."
@@ -1091,7 +1091,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h3 className={`text-2xl font-bold ${
+                <h3 className={`text-lg font-bold ${
                   theme === 'light' ? 'text-slate-800' : 'text-white'
                 }`}>{sim.title}</h3>
                 <motion.div
@@ -1223,7 +1223,7 @@ function SimulationsSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className={`text-5xl md:text-6xl font-bold mb-6 ${
+          <h2 className={`text-base md:text-lg font-bold mb-6 ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             Six Simulations.
@@ -1231,7 +1231,7 @@ function SimulationsSection() {
               theme === 'light' ? 'text-purple-400' : 'text-slate-500'
             }`}>Infinite Lessons.</span>
           </h2>
-          <p className={`text-2xl max-w-2xl mx-auto ${
+          <p className={`text-lg max-w-2xl mx-auto ${
             theme === 'light' ? 'text-slate-600' : 'text-slate-400'
           }`}>
             Each simulation is a complete experience—story-driven, consequence-heavy, and designed to reveal how you think under pressure.
@@ -1262,12 +1262,12 @@ function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className={`text-5xl md:text-6xl font-bold mb-6 ${
+          <h2 className={`text-base md:text-lg font-bold mb-6 ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             From the Trenches
           </h2>
-          <p className={`text-2xl ${
+          <p className={`text-lg ${
             theme === 'light' ? 'text-slate-600' : 'text-slate-400'
           }`}>
             What executives say after they've been through it.
@@ -1363,12 +1363,12 @@ function AudienceSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className={`text-5xl md:text-6xl font-bold mb-6 ${
+          <h2 className={`text-base md:text-lg font-bold mb-6 ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             Built for Serious Learning
           </h2>
-          <p className={`text-2xl max-w-2xl mx-auto ${
+          <p className={`text-lg max-w-2xl mx-auto ${
             theme === 'light' ? 'text-slate-600' : 'text-slate-400'
           }`}>
             Designed in partnership with business schools, executive education programs, and Fortune 500 learning organizations.
@@ -1450,12 +1450,12 @@ function FinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-8 ${
+          <h2 className={`text-base md:text-lg lg:text-5xl font-bold mb-8 ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
           }`}>
             Ready to lead?
           </h2>
-          <p className={`text-2xl mb-5 max-w-2xl mx-auto ${
+          <p className={`text-lg mb-5 max-w-2xl mx-auto ${
             theme === 'light' ? 'text-slate-700' : 'text-slate-300'
           }`}>
             The decisions you make here will feel real because they're designed to.
@@ -1469,7 +1469,7 @@ function FinalCTA() {
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link
               href="#simulations"
-              className={`group px-12 py-6 font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-2xl ${
+              className={`group px-12 py-6 font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg ${
                 theme === 'light'
                   ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105'
                   : 'bg-white text-slate-900 hover:bg-slate-100 shadow-xl shadow-white/10'
@@ -1481,7 +1481,7 @@ function FinalCTA() {
             </Link>
             <Link
               href="/facilitator"
-              className={`px-12 py-6 font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-2xl ${
+              className={`px-12 py-6 font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg ${
                 theme === 'light'
                   ? 'bg-white/80 backdrop-blur-sm text-purple-700 border-2 border-purple-200 hover:border-purple-300 hover:bg-white'
                   : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20'
@@ -1509,7 +1509,7 @@ function Footer() {
       <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
         <div className="flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="text-center md:text-left">
-            <div className={`text-3xl font-bold mb-3 ${
+            <div className={`text-xl font-bold mb-3 ${
               theme === 'light' ? 'text-slate-800' : 'text-white'
             }`}>Lumina Simulation</div>
             <div className={`text-lg ${
