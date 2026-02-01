@@ -668,7 +668,7 @@ function CinematicHero() {
         <img
           src="/assets/hero-abstract-strategy-bg.png"
           alt=""
-          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-20' : 'opacity-30'} mix-blend-overlay`}
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-60' : 'opacity-70'}`}
         />
       </div>
 
@@ -1081,7 +1081,8 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
                   alt={sim.title}
                   width={40}
                   height={40}
-                  className="object-contain"
+                  className={`object-contain ${style.text}`}
+                  style={{ filter: theme === 'light' ? 'invert(30%) sepia(80%) saturate(500%) hue-rotate(220deg)' : 'invert(70%) sepia(50%) saturate(400%) hue-rotate(180deg)' }}
                 />
               ) : (
                 <Icon className={`w-8 h-8 ${style.text}`} />
