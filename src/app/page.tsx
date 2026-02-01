@@ -665,12 +665,10 @@ function CinematicHero() {
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br ${gradient} transition-all duration-1000`}>
       {/* Hero background image */}
       <div className="absolute inset-0 pointer-events-none">
-        <Image
+        <img
           src="/assets/hero-abstract-strategy-bg.png"
           alt=""
-          fill
-          className={`object-cover ${theme === 'light' ? 'opacity-20' : 'opacity-30'} mix-blend-overlay`}
-          priority
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-20' : 'opacity-30'} mix-blend-overlay`}
         />
       </div>
 
@@ -1078,7 +1076,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
           <div className="flex items-start gap-5">
             <div className={`w-16 h-16 ${style.bg} rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden`}>
               {sim.iconImage ? (
-                <Image
+                <img
                   src={sim.iconImage}
                   alt={sim.title}
                   width={40}
