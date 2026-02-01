@@ -457,6 +457,7 @@ const SIMULATIONS = [
     tagline: 'The boardroom simulation where your job is on the line',
     icon: Crown,
     iconImage: '/assets/icon-sim-strategic-leadership.svg',
+    bgImage: '/assets/bg-role-executive-office.png',
     color: 'violet',
     duration: '3-4 hours',
     players: '3-5 players',
@@ -477,6 +478,7 @@ const SIMULATIONS = [
     tagline: 'Multiplayer market warfare where survival is optional',
     icon: TrendingUp,
     iconImage: '/assets/icon-sim-market-dynamics.svg',
+    bgImage: '/assets/bg-competitive-shock.png',
     color: 'blue',
     duration: '2-3 hours',
     players: '2-6 teams',
@@ -497,6 +499,7 @@ const SIMULATIONS = [
     tagline: 'Where CFOs are made—and unmade',
     icon: DollarSign,
     iconImage: '/assets/icon-sim-financial-acumen.svg',
+    bgImage: '/assets/bg-enterprise-tech.png',
     color: 'emerald',
     duration: '3-4 hours',
     players: '3-4 players',
@@ -517,6 +520,7 @@ const SIMULATIONS = [
     tagline: 'The supply chain simulation that breaks before you do',
     icon: Cog,
     iconImage: '/assets/icon-sim-operations-excellence.svg',
+    bgImage: '/assets/bg-supply-chain-crisis.png',
     color: 'orange',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -537,6 +541,7 @@ const SIMULATIONS = [
     tagline: 'Hit the number—without destroying the future',
     icon: Target,
     iconImage: '/assets/icon-sim-sales-mastery.svg',
+    bgImage: '/assets/bg-sales-pressure.png',
     color: 'rose',
     duration: '2-3 hours',
     players: '3-5 players',
@@ -557,6 +562,7 @@ const SIMULATIONS = [
     tagline: 'Where R&D leaders learn to kill their darlings',
     icon: Lightbulb,
     iconImage: '/assets/icon-sim-innovation-lab.svg',
+    bgImage: '/assets/bg-briefing-gradient.png',
     color: 'yellow',
     duration: '2-3 hours',
     players: '3-4 players',
@@ -891,7 +897,15 @@ function PhilosophySection() {
     <section id="philosophy" className={`py-36 relative overflow-hidden ${
       theme === 'light' ? 'bg-white/50' : 'bg-slate-950'
     }`}>
-      {/* Background */}
+      {/* Background Image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="/assets/bg-boardroom-dark.png"
+          alt=""
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-10' : 'opacity-30'}`}
+        />
+      </div>
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 pointer-events-none">
         {theme === 'light' ? (
           <div className="absolute top-0 left-1/2 w-[900px] h-[900px] bg-gradient-to-br from-purple-200/30 via-pink-100/20 to-blue-200/30 rounded-full blur-[180px] transform -translate-x-1/2 -translate-y-1/2" />
@@ -1068,6 +1082,17 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
             : `bg-slate-900/80 backdrop-blur-sm border ${style.border} ${isExpanded ? 'shadow-2xl shadow-violet-500/10' : ''}`
         }`}
       >
+        {/* Background Image */}
+        {sim.bgImage && (
+          <div className="absolute inset-0 pointer-events-none">
+            <img
+              src={sim.bgImage}
+              alt=""
+              className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-15' : 'opacity-25'}`}
+            />
+            <div className={`absolute inset-0 ${theme === 'light' ? 'bg-gradient-to-b from-white/80 to-white/95' : 'bg-gradient-to-b from-slate-900/70 to-slate-900/95'}`} />
+          </div>
+        )}
         {/* Header */}
         <div
           className="p-8 cursor-pointer"
@@ -1251,10 +1276,19 @@ function TestimonialsSection() {
   const { theme } = useTheme();
 
   return (
-    <section className={`py-36 ${
+    <section className={`py-36 relative overflow-hidden ${
       theme === 'light' ? 'bg-white/70' : 'bg-slate-900'
     }`}>
-      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
+      {/* Background Image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="/assets/bg-briefing-gradient.png"
+          alt=""
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-20' : 'opacity-30'}`}
+        />
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/70' : 'bg-slate-900/80'}`} />
+      </div>
+      <div className="relative max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1350,12 +1384,20 @@ function AudienceSection() {
   ];
 
   return (
-    <section className={`py-36 ${
+    <section className={`py-36 relative overflow-hidden ${
       theme === 'light'
         ? 'bg-gradient-to-b from-white to-purple-50/50'
         : 'bg-gradient-to-b from-slate-900 to-slate-950'
     }`}>
-      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
+      {/* Background Image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="/assets/bg-regulatory-crisis.png"
+          alt=""
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-10' : 'opacity-20'}`}
+        />
+      </div>
+      <div className="relative max-w-[1400px] mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1420,6 +1462,14 @@ function FinalCTA() {
         ? 'bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100'
         : 'bg-gradient-to-br from-violet-900 via-slate-900 to-slate-950'
     }`}>
+      {/* Background Image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="/assets/bg-global-ambient.svg"
+          alt=""
+          className={`w-full h-full object-cover ${theme === 'light' ? 'opacity-30' : 'opacity-40'}`}
+        />
+      </div>
       {/* Background elements */}
       <div className="absolute inset-0 pointer-events-none">
         {theme === 'light' ? (
