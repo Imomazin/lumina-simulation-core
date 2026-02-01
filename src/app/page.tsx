@@ -764,8 +764,8 @@ function CinematicHero() {
         >
           <span className={`inline-flex items-center gap-3 px-6 py-3 rounded-full text-lg font-medium ${
             theme === 'light'
-              ? 'bg-white/60 backdrop-blur-sm border border-purple-200/50 text-purple-700'
-              : 'bg-white/5 backdrop-blur-sm border border-cyan-500/20 text-cyan-300'
+              ? 'bg-white/90 backdrop-blur-sm border border-purple-200 text-purple-700 shadow-lg'
+              : 'bg-slate-900/80 backdrop-blur-sm border border-cyan-500/30 text-cyan-300 shadow-lg'
           }`}>
             {theme === 'light' ? (
               <Sparkles className="w-5 h-5 text-purple-500" />
@@ -786,7 +786,7 @@ function CinematicHero() {
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.5 }}
               className={`text-xl md:text-5xl lg:text-6xl font-bold leading-tight ${
-                theme === 'light' ? 'text-slate-800' : 'text-white'
+                theme === 'light' ? 'text-slate-900 drop-shadow-lg' : 'text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]'
               }`}
             >
               {scenario.title}
@@ -803,7 +803,7 @@ function CinematicHero() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className={`text-lg md:text-xl max-w-4xl mx-auto mb-14 leading-relaxed ${
-              theme === 'light' ? 'text-slate-600' : 'text-slate-300'
+              theme === 'light' ? 'text-slate-800 drop-shadow-md' : 'text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]'
             }`}
           >
             {scenario.subtitle}
@@ -923,11 +923,11 @@ function PhilosophySection() {
           className="text-center mb-24"
         >
           <h2 className={`text-base md:text-lg font-bold mb-8 ${
-            theme === 'light' ? 'text-slate-800' : 'text-white'
+            theme === 'light' ? 'text-slate-900' : 'text-white drop-shadow-lg'
           }`}>
             Most simulations are games.
             <span className={`block mt-3 ${
-              theme === 'light' ? 'text-purple-400' : 'text-slate-500'
+              theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
             }`}>This is practice.</span>
           </h2>
         </motion.div>
@@ -955,10 +955,10 @@ function PhilosophySection() {
                 "Solitary experiences without conflict",
               ].map((item, i) => (
                 <li key={i} className={`flex items-start gap-4 text-xl ${
-                  theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                  theme === 'light' ? 'text-slate-700' : 'text-slate-200'
                 }`}>
                   <span className={`w-2 h-2 rounded-full mt-3 flex-shrink-0 ${
-                    theme === 'light' ? 'bg-rose-400' : 'bg-red-500'
+                    theme === 'light' ? 'bg-rose-500' : 'bg-red-400'
                   }`} />
                   {item}
                 </li>
@@ -988,10 +988,10 @@ function PhilosophySection() {
                 "Moments of genuine uncertainty and pressure",
               ].map((item, i) => (
                 <li key={i} className={`flex items-start gap-4 text-xl ${
-                  theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                  theme === 'light' ? 'text-slate-700' : 'text-slate-200'
                 }`}>
                   <span className={`w-2 h-2 rounded-full mt-3 flex-shrink-0 ${
-                    theme === 'light' ? 'bg-emerald-500' : 'bg-emerald-500'
+                    theme === 'light' ? 'bg-emerald-500' : 'bg-emerald-400'
                   }`} />
                   {item}
                 </li>
@@ -1127,14 +1127,14 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
               </div>
               <p className={`text-lg ${style.text} font-medium mb-2`}>{sim.subtitle}</p>
               <p className={`text-lg italic ${
-                theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                theme === 'light' ? 'text-slate-600' : 'text-slate-300'
               }`}>{sim.tagline}</p>
             </div>
           </div>
 
           {/* Meta */}
           <div className={`flex items-center gap-5 mt-6 text-lg ${
-            theme === 'light' ? 'text-slate-500' : 'text-slate-500'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             <span className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -1170,17 +1170,17 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
                 {/* The Hook */}
                 <div>
                   <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${
-                    theme === 'light' ? 'text-purple-500' : 'text-slate-400'
+                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
                   }`}>The Scenario</h4>
                   <p className={`text-xl leading-relaxed ${
-                    theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                    theme === 'light' ? 'text-slate-700' : 'text-slate-200'
                   }`}>{sim.hook}</p>
                 </div>
 
                 {/* The Stakes */}
                 <div>
                   <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${
-                    theme === 'light' ? 'text-purple-500' : 'text-slate-400'
+                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
                   }`}>The Stakes</h4>
                   <div className="grid grid-cols-2 gap-3">
                     {sim.stakes.map((stake, i) => (
@@ -1193,7 +1193,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
                         }`}
                       >
                         <span className={`text-lg ${
-                          theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                          theme === 'light' ? 'text-slate-700' : 'text-slate-200'
                         }`}>{stake}</span>
                       </div>
                     ))}
@@ -1207,7 +1207,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
                     : `bg-gradient-to-r ${style.gradient}/10`
                 }`}>
                   <p className={`text-lg leading-relaxed ${
-                    theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                    theme === 'light' ? 'text-slate-700' : 'text-slate-200'
                   }`}>{sim.preview}</p>
                 </div>
 
@@ -1248,15 +1248,15 @@ function SimulationsSection() {
           className="text-center mb-20"
         >
           <h2 className={`text-base md:text-lg font-bold mb-6 ${
-            theme === 'light' ? 'text-slate-800' : 'text-white'
+            theme === 'light' ? 'text-slate-900' : 'text-white'
           }`}>
             Six Simulations.
             <span className={`block ${
-              theme === 'light' ? 'text-purple-400' : 'text-slate-500'
+              theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
             }`}>Infinite Lessons.</span>
           </h2>
           <p className={`text-lg max-w-2xl mx-auto ${
-            theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             Each simulation is a complete experience—story-driven, consequence-heavy, and designed to reveal how you think under pressure.
           </p>
@@ -1301,7 +1301,7 @@ function TestimonialsSection() {
             From the Trenches
           </h2>
           <p className={`text-lg ${
-            theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             What executives say after they've been through it.
           </p>
@@ -1322,10 +1322,10 @@ function TestimonialsSection() {
               }`}
             >
               <Quote className={`w-10 h-10 mb-6 ${
-                theme === 'light' ? 'text-purple-300' : 'text-violet-500/50'
+                theme === 'light' ? 'text-purple-400' : 'text-cyan-500'
               }`} />
               <p className={`leading-relaxed mb-8 text-lg ${
-                theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                theme === 'light' ? 'text-slate-700' : 'text-slate-200'
               }`}>
                 "{testimonial.quote}"
               </p>
@@ -1333,7 +1333,7 @@ function TestimonialsSection() {
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${
                   theme === 'light'
                     ? 'bg-gradient-to-br from-purple-500 to-pink-500'
-                    : 'bg-gradient-to-br from-violet-600 to-purple-700'
+                    : 'bg-gradient-to-br from-cyan-500 to-blue-600'
                 }`}>
                   {testimonial.avatar}
                 </div>
@@ -1342,10 +1342,10 @@ function TestimonialsSection() {
                     theme === 'light' ? 'text-slate-800' : 'text-white'
                   }`}>{testimonial.author}</div>
                   <div className={`text-base ${
-                    theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                    theme === 'light' ? 'text-slate-600' : 'text-slate-300'
                   }`}>{testimonial.role}</div>
                   <div className={`text-sm mt-1 ${
-                    theme === 'light' ? 'text-purple-500' : 'text-violet-400'
+                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
                   }`}>{testimonial.simulation}</div>
                 </div>
               </div>
@@ -1410,7 +1410,7 @@ function AudienceSection() {
             Built for Serious Learning
           </h2>
           <p className={`text-lg max-w-2xl mx-auto ${
-            theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             Designed in partnership with business schools, executive education programs, and Fortune 500 learning organizations.
           </p>
@@ -1433,17 +1433,17 @@ function AudienceSection() {
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
                 theme === 'light'
                   ? 'bg-purple-100'
-                  : 'bg-violet-500/10'
+                  : 'bg-cyan-500/20'
               }`}>
                 <audience.icon className={`w-8 h-8 ${
-                  theme === 'light' ? 'text-purple-600' : 'text-violet-400'
+                  theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
                 }`} />
               </div>
               <h3 className={`text-xl font-bold mb-3 ${
                 theme === 'light' ? 'text-slate-800' : 'text-white'
               }`}>{audience.title}</h3>
               <p className={`text-lg leading-relaxed ${
-                theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                theme === 'light' ? 'text-slate-600' : 'text-slate-300'
               }`}>{audience.description}</p>
             </motion.div>
           ))}
@@ -1510,7 +1510,7 @@ function FinalCTA() {
             The decisions you make here will feel real because they're designed to.
           </p>
           <p className={`text-xl mb-12 ${
-            theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             No do-overs. No hints. Just the weight of command.
           </p>
@@ -1562,12 +1562,12 @@ function Footer() {
               theme === 'light' ? 'text-slate-800' : 'text-white'
             }`}>Lumina Simulation</div>
             <div className={`text-lg ${
-              theme === 'light' ? 'text-slate-500' : 'text-slate-500'
+              theme === 'light' ? 'text-slate-600' : 'text-slate-400'
             }`}>Run the company. Feel the consequences.</div>
           </div>
 
           <div className={`flex gap-10 text-lg ${
-            theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+            theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
             <Link href="#simulations" className={`hover:${theme === 'light' ? 'text-purple-600' : 'text-white'} transition-colors`}>Simulations</Link>
             <Link href="/facilitator" className={`hover:${theme === 'light' ? 'text-purple-600' : 'text-white'} transition-colors`}>Facilitator</Link>
@@ -1576,7 +1576,7 @@ function Footer() {
         </div>
 
         <div className={`mt-14 pt-10 border-t text-center text-lg ${
-          theme === 'light' ? 'border-purple-100 text-slate-400' : 'border-slate-900 text-slate-600'
+          theme === 'light' ? 'border-purple-100 text-slate-500' : 'border-slate-800 text-slate-400'
         }`}>
           <p>Designed for executive education, MBA programs, and leadership development.</p>
           <p className="mt-2">© {new Date().getFullYear()} Lumina Simulation Suite</p>
