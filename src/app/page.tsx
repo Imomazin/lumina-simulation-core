@@ -620,6 +620,27 @@ const SIMULATIONS = [
     ],
     preview: "Experience the tension between growth and governance. Learn why 'technically legal' is the most dangerous phrase in business.",
   },
+  {
+    id: 'talent-culture',
+    title: 'Talent & Culture',
+    subtitle: 'The Human Equation',
+    tagline: 'Where CHROs learn that culture eats strategy for breakfast',
+    icon: Users,
+    iconImage: '/assets/icon-sim-sales-mastery.svg',
+    bgImage: '/assets/bg-role-executive-office.png',
+    color: 'pink',
+    duration: '3-4 hours',
+    players: '4-5 players',
+    rounds: 8,
+    hook: "You're the Chief People Officer. Attrition just hit 23%. Your top engineering team is being poached by a competitor offering 40% raises. The CEO wants a RIF of 15% by Q2. Glassdoor reviews are tanking. And the union organizers just showed up at your Austin facility.",
+    stakes: [
+      "Culture is what happens when you're not looking",
+      "Your best people leave first",
+      "Layoffs have long shadows",
+      "Employer brand takes years to build, days to destroy.",
+    ],
+    preview: "Discover why people decisions are the hardest ones—and why the 'soft stuff' is actually the hard stuff.",
+  },
 ];
 
 const TESTIMONIALS = [
@@ -1115,6 +1136,10 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
       light: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-600', gradient: 'from-indigo-500 to-purple-500' },
       dark: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-400', gradient: 'from-indigo-500 to-purple-600' },
     },
+    pink: {
+      light: { bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-600', gradient: 'from-pink-500 to-rose-500' },
+      dark: { bg: 'bg-pink-500/10', border: 'border-pink-500/30', text: 'text-pink-400', gradient: 'from-pink-500 to-rose-600' },
+    },
   };
 
   const style = colorStyles[sim.color as keyof typeof colorStyles][theme];
@@ -1302,7 +1327,7 @@ function SimulationsSection() {
           <h2 className={`text-base md:text-lg font-bold mb-6 ${
             theme === 'light' ? 'text-slate-900' : 'text-white'
           }`}>
-            Eight Simulations.
+            Nine Simulations.
             <span className={`block ${
               theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
             }`}>Infinite Lessons.</span>
