@@ -1,40 +1,913 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lumina</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <title>LUMINA - Executive Leadership Simulations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background:
-          linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.88),
-            rgba(245, 240, 255, 0.82)
-          ),
-          url("/assets/hero-abstract-strategy-bg.png");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        font-family: system-ui, -apple-system, Segoe UI, sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      }
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --primary-light: #a78bfa;
+      --accent: #06b6d4;
+      --accent-gold: #f59e0b;
+      --dark: #0f172a;
+      --darker: #020617;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.12);
+    }
 
-      h1 {
-        font-size: 64px;
-        color: #7c3aed;
-        margin: 0;
-      }
-    </style>
-  </head>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  <body>
-    <h1>LUMINA</h1>
-  </body>
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--darker);
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      transition: opacity 1.5s ease, transform 1.5s ease;
+    }
+
+    .bg-scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(15,23,42,0.92) 0%, rgba(88,28,135,0.85) 50%, rgba(15,23,42,0.95) 100%);
+    }
+
+    .bg-scene img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+      filter: saturate(0.8);
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float 15s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(2,6,23,0.9) 0%, transparent 100%);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 4px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: #fff; }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 2rem;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--primary-light);
+      margin-bottom: 2rem;
+      animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--primary-light) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInUp 1s ease 0.4s both;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.7);
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+      animation: fadeInUp 1s ease 0.6s both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1.5rem;
+      animation: fadeInUp 1s ease 0.8s both;
+    }
+
+    .btn {
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      box-shadow: 0 10px 40px -10px rgba(124,58,237,0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 20px 50px -10px rgba(124,58,237,0.6);
+    }
+
+    .btn-secondary {
+      background: var(--glass);
+      color: #fff;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-3px);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-top: 5rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--glass-border);
+      animation: fadeInUp 1s ease 1s both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #fff;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Simulations Section */
+    .section {
+      padding: 8rem 3rem;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: rgba(255,255,255,0.6);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Simulation Grid */
+    .sim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .sim-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      group: sim;
+    }
+
+    .sim-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: var(--primary);
+      box-shadow: 0 30px 60px -20px rgba(124,58,237,0.4);
+    }
+
+    .sim-card-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      transition: all 0.5s;
+    }
+
+    .sim-card:hover .sim-card-bg {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+
+    .sim-card-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sim-card-content {
+      position: relative;
+      padding: 2rem;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: linear-gradient(180deg, transparent 0%, rgba(2,6,23,0.9) 100%);
+    }
+
+    .sim-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+
+    .sim-card:hover .sim-icon {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    }
+
+    .sim-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+
+    .sim-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .sim-card p {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .sim-meta {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .sim-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Experience Section */
+    .experience {
+      background: linear-gradient(180deg, transparent 0%, rgba(124,58,237,0.1) 50%, transparent 100%);
+    }
+
+    .experience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    .experience-visual {
+      position: relative;
+      height: 500px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+    }
+
+    .scene-preview {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .scene-preview.active {
+      opacity: 1;
+    }
+
+    .scene-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scene-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(2,6,23,0.95) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+    }
+
+    .scene-hud {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .hud-item {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1rem;
+      backdrop-filter: blur(10px);
+      flex: 1;
+    }
+
+    .hud-label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hud-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .experience-content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .experience-content p {
+      color: rgba(255,255,255,0.6);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--glass-border);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .feature-list li:hover {
+      padding-left: 1rem;
+      border-color: var(--primary);
+    }
+
+    .feature-list li::before {
+      content: '→';
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* Stakeholders Section */
+    .stakeholders-preview {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin: 3rem auto 0;
+    }
+
+    .stakeholder-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .stakeholder-avatar:hover {
+      transform: scale(1.15) translateY(-5px);
+      box-shadow: 0 10px 30px -10px rgba(124,58,237,0.6);
+    }
+
+    .stakeholder-avatar::after {
+      content: attr(data-role);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stakeholder-avatar:hover::after {
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      padding: 4rem 3rem;
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    footer p {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+    }
+
+    /* Animations on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 1rem; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 3rem; }
+      .stats-bar { flex-direction: column; gap: 2rem; }
+      .experience-grid { grid-template-columns: 1fr; }
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Dynamic Background -->
+  <div class="bg-scene" id="bgScene">
+    <img src="/assets/bg-boardroom-dark.png" alt="" id="bgImage">
+  </div>
+
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">LUMINA</div>
+    <ul class="nav-links">
+      <li><a href="#simulations">Simulations</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#stakeholders">Stakeholders</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>15 Immersive Simulations Available</span>
+    </div>
+    <h1>Master the Art of<br>Executive Leadership</h1>
+    <p>Step into the boardroom. Navigate high-stakes decisions. Shape the future of your organization through immersive business simulations.</p>
+    <div class="hero-cta">
+      <a href="#simulations" class="btn btn-primary">Begin Your Journey</a>
+      <a href="#experience" class="btn btn-secondary">See How It Works</a>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-value" data-count="15">0</span>
+        <span class="stat-label">Simulations</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" data-count="2160">0</span>
+        <span class="stat-label">Decision Points</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" data-count="225">0</span>
+        <span class="stat-label">Stakeholders</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" data-count="60">0</span>
+        <span class="stat-label">Configurations</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simulations Section -->
+  <section class="section" id="simulations">
+    <div class="section-header reveal">
+      <h2>Choose Your Challenge</h2>
+      <p>Each simulation offers unique scenarios, stakeholders, and strategic dilemmas to master</p>
+    </div>
+
+    <div class="sim-grid">
+      <div class="sim-card reveal" data-bg="/assets/bg-role-executive-office.png">
+        <div class="sim-card-bg"><img src="/assets/bg-role-executive-office.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <h3>Strategic Leadership</h3>
+          <p>Navigate CEO challenges from turnarounds to transformations</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-card reveal" data-bg="/assets/bg-enterprise-tech.png">
+        <div class="sim-card-bg"><img src="/assets/bg-enterprise-tech.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div>
+          <h3>Innovation Lab</h3>
+          <p>Build and scale breakthrough R&D capabilities</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-card reveal" data-bg="/assets/bg-sales-pressure.png">
+        <div class="sim-card-bg"><img src="/assets/bg-sales-pressure.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <h3>Market Dynamics</h3>
+          <p>Compete and dominate in rapidly shifting markets</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-card reveal" data-bg="/assets/bg-regulatory-crisis.png">
+        <div class="sim-card-bg"><img src="/assets/bg-regulatory-crisis.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Risk Intelligence</h3>
+          <p>Master enterprise risk and regulatory landscapes</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-card reveal" data-bg="/assets/bg-supply-chain-crisis.png">
+        <div class="sim-card-bg"><img src="/assets/bg-supply-chain-crisis.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <h3>Operations Excellence</h3>
+          <p>Drive efficiency across global supply chains</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-card reveal" data-bg="/assets/bg-competitive-shock.png">
+        <div class="sim-card-bg"><img src="/assets/bg-competitive-shock.png" alt=""></div>
+        <div class="sim-card-content">
+          <div class="sim-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-4 4-4-4"/><path d="M12 12v6"/></svg></div>
+          <h3>Margin Call</h3>
+          <p>Navigate financial crisis under extreme pressure</p>
+          <div class="sim-meta">
+            <span>24 Rounds</span>
+            <span>4 Configurations</span>
+            <span>15 Stakeholders</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="#all-simulations" class="btn btn-secondary">View All 15 Simulations →</a>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section class="section experience" id="experience">
+    <div class="experience-grid">
+      <div class="experience-visual">
+        <div class="scene-preview active" data-scene="boardroom">
+          <img src="/assets/bg-boardroom-dark.png" alt="Boardroom Scene">
+          <div class="scene-overlay">
+            <div class="scene-hud">
+              <div class="hud-item">
+                <div class="hud-label">Board Confidence</div>
+                <div class="hud-value">78%</div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Market Position</div>
+                <div class="hud-value">#2</div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Round</div>
+                <div class="hud-value">14/24</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="scene-preview" data-scene="crisis">
+          <img src="/assets/bg-regulatory-crisis.png" alt="Crisis Scene">
+          <div class="scene-overlay">
+            <div class="scene-hud">
+              <div class="hud-item">
+                <div class="hud-label">Crisis Level</div>
+                <div class="hud-value" style="color: #ef4444;">CRITICAL</div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Time Pressure</div>
+                <div class="hud-value">HIGH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="scene-preview" data-scene="market">
+          <img src="/assets/bg-sales-pressure.png" alt="Market Scene">
+          <div class="scene-overlay">
+            <div class="scene-hud">
+              <div class="hud-item">
+                <div class="hud-label">Win Rate</div>
+                <div class="hud-value">42%</div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Pipeline</div>
+                <div class="hud-value">$48M</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="experience-content reveal">
+        <h3>Immersive Decision Making</h3>
+        <p>Each simulation places you in realistic business scenarios where your decisions have cascading consequences across stakeholders, markets, and your organization's future.</p>
+
+        <ul class="feature-list">
+          <li data-scene="boardroom">Navigate high-stakes boardroom dynamics</li>
+          <li data-scene="crisis">Manage crises under time pressure</li>
+          <li data-scene="market">Compete for market dominance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stakeholders Section -->
+  <section class="section" id="stakeholders">
+    <div class="section-header reveal">
+      <h2>Every Decision Has Consequences</h2>
+      <p>15 unique stakeholders per simulation react to your choices</p>
+    </div>
+
+    <div class="stakeholders-preview reveal">
+      <div class="stakeholder-avatar" data-role="CEO" style="--delay: 0">CE</div>
+      <div class="stakeholder-avatar" data-role="CFO" style="--delay: 1">CF</div>
+      <div class="stakeholder-avatar" data-role="Board Chair" style="--delay: 2">BC</div>
+      <div class="stakeholder-avatar" data-role="Investor" style="--delay: 3">IN</div>
+      <div class="stakeholder-avatar" data-role="Regulator" style="--delay: 4">RG</div>
+      <div class="stakeholder-avatar" data-role="Union Rep" style="--delay: 5">UR</div>
+      <div class="stakeholder-avatar" data-role="Customer" style="--delay: 6">CU</div>
+      <div class="stakeholder-avatar" data-role="Analyst" style="--delay: 7">AN</div>
+      <div class="stakeholder-avatar" data-role="Media" style="--delay: 8">MD</div>
+      <div class="stakeholder-avatar" data-role="Competitor" style="--delay: 9">CO</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>LUMINA - Executive Leadership Simulations</p>
+  </footer>
+
+  <script>
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // Animate stats counter
+    const animateValue = (el, start, end, duration) => {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        el.textContent = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    // Observe stats for animation
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.stat-value').forEach(el => {
+            animateValue(el, 0, parseInt(el.dataset.count), 2000);
+          });
+          statsObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelector('.stats-bar') && statsObserver.observe(document.querySelector('.stats-bar'));
+
+    // Reveal on scroll
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), index * 100);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // Scene switching on hover
+    document.querySelectorAll('.feature-list li').forEach(li => {
+      li.addEventListener('mouseenter', () => {
+        const scene = li.dataset.scene;
+        document.querySelectorAll('.scene-preview').forEach(s => s.classList.remove('active'));
+        document.querySelector(`.scene-preview[data-scene="${scene}"]`)?.classList.add('active');
+      });
+    });
+
+    // Background change on card hover
+    const bgImage = document.getElementById('bgImage');
+    document.querySelectorAll('.sim-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        const newBg = card.dataset.bg;
+        if (newBg && bgImage) {
+          bgImage.style.opacity = '0';
+          setTimeout(() => {
+            bgImage.src = newBg;
+            bgImage.style.opacity = '0.4';
+          }, 300);
+        }
+      });
+    });
+  </script>
+</body>
 </html>
