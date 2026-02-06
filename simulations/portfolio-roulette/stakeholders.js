@@ -1,0 +1,22 @@
+// Portfolio Roulette Stakeholders - 15 stakeholders for portfolio management
+export const STAKEHOLDERS = {
+  CEO: { id: 'CEO', name: 'Chief Executive Officer', role: 'Portfolio Strategy', archetype: 'ARCHITECT', influence: 0.98, initialTrust: 70, initialAlignment: 72, priorities: ['portfolioBalance', 'growthPotential', 'stakeholderSupport'], riskTolerance: 0.55 },
+  CFO: { id: 'CFO', name: 'Chief Financial Officer', role: 'Capital Allocation', archetype: 'ALLOCATOR', influence: 0.92, initialTrust: 65, initialAlignment: 68, priorities: ['capitalEfficiency', 'riskDiversification', 'portfolioBalance'], riskTolerance: 0.40 },
+  STRATEGY_HEAD: { id: 'STRATEGY_HEAD', name: 'Chief Strategy Officer', role: 'Portfolio Planning', archetype: 'STRATEGIST', influence: 0.88, initialTrust: 72, initialAlignment: 75, priorities: ['strategicFit', 'portfolioBalance', 'growthPotential'], riskTolerance: 0.55 },
+  MA_HEAD: { id: 'MA_HEAD', name: 'M&A Director', role: 'Transaction Execution', archetype: 'DEALMAKER', influence: 0.80, initialTrust: 68, initialAlignment: 70, priorities: ['executionCapability', 'synergyCaptvre', 'growthPotential'], riskTolerance: 0.65 },
+  BU_HEAD_A: { id: 'BU_HEAD_A', name: 'Business Unit A Head', role: 'Core Business', archetype: 'OPERATOR', influence: 0.75, initialTrust: 62, initialAlignment: 58, priorities: ['capitalEfficiency', 'stakeholderSupport', 'portfolioBalance'], riskTolerance: 0.45 },
+  BU_HEAD_B: { id: 'BU_HEAD_B', name: 'Business Unit B Head', role: 'Growth Business', archetype: 'GROWER', influence: 0.72, initialTrust: 65, initialAlignment: 62, priorities: ['growthPotential', 'capitalEfficiency', 'strategicFit'], riskTolerance: 0.60 },
+  BU_HEAD_C: { id: 'BU_HEAD_C', name: 'Business Unit C Head', role: 'Turnaround Business', archetype: 'DEFENDER', influence: 0.65, initialTrust: 55, initialAlignment: 50, priorities: ['stakeholderSupport', 'executionCapability', 'capitalEfficiency'], riskTolerance: 0.35 },
+  BOARD_CHAIR: { id: 'BOARD_CHAIR', name: 'Board Chairman', role: 'Governance', archetype: 'OVERSEER', influence: 0.95, initialTrust: 58, initialAlignment: 55, priorities: ['portfolioBalance', 'riskDiversification', 'capitalEfficiency'], riskTolerance: 0.40 },
+  LEAD_INVESTOR: { id: 'LEAD_INVESTOR', name: 'Lead Investor', role: 'Shareholder Voice', archetype: 'OWNER', influence: 0.85, initialTrust: 52, initialAlignment: 50, priorities: ['capitalEfficiency', 'growthPotential', 'portfolioBalance'], riskTolerance: 0.50 },
+  ACTIVIST: { id: 'ACTIVIST', name: 'Activist Investor', role: 'Change Advocate', archetype: 'CHALLENGER', influence: 0.75, initialTrust: 35, initialAlignment: 32, priorities: ['capitalEfficiency', 'portfolioBalance', 'stakeholderSupport'], riskTolerance: 0.70 },
+  INTEGRATION_LEAD: { id: 'INTEGRATION_LEAD', name: 'Integration Director', role: 'Synergy Capture', archetype: 'INTEGRATOR', influence: 0.68, initialTrust: 70, initialAlignment: 72, priorities: ['synergyCaptvre', 'executionCapability', 'strategicFit'], riskTolerance: 0.55 },
+  TREASURY: { id: 'TREASURY', name: 'Treasurer', role: 'Funding Strategy', archetype: 'FINANCIER', influence: 0.65, initialTrust: 68, initialAlignment: 65, priorities: ['capitalEfficiency', 'riskDiversification', 'executionCapability'], riskTolerance: 0.35 },
+  IR_HEAD: { id: 'IR_HEAD', name: 'Investor Relations Head', role: 'Market Communications', archetype: 'COMMUNICATOR', influence: 0.58, initialTrust: 65, initialAlignment: 62, priorities: ['stakeholderSupport', 'portfolioBalance', 'growthPotential'], riskTolerance: 0.45 },
+  LEGAL_COUNSEL: { id: 'LEGAL_COUNSEL', name: 'General Counsel', role: 'Transaction Legal', archetype: 'PROTECTOR', influence: 0.62, initialTrust: 68, initialAlignment: 65, priorities: ['executionCapability', 'riskDiversification', 'strategicFit'], riskTolerance: 0.25 },
+  ADVISOR: { id: 'ADVISOR', name: 'External Advisor', role: 'Strategic Advisor', archetype: 'EXPERT', influence: 0.60, initialTrust: 55, initialAlignment: 58, priorities: ['portfolioBalance', 'strategicFit', 'growthPotential'], riskTolerance: 0.55 }
+};
+export const STAKEHOLDER_COMMITTEES = { INVESTMENT_COMMITTEE: ['CEO', 'CFO', 'STRATEGY_HEAD', 'MA_HEAD'], PORTFOLIO_REVIEW: ['CEO', 'BU_HEAD_A', 'BU_HEAD_B', 'BU_HEAD_C'] };
+export const RELATIONSHIP_DYNAMICS = { ALLIANCES: [['CEO', 'STRATEGY_HEAD'], ['CFO', 'TREASURY']], TENSIONS: [['BU_HEAD_C', 'ACTIVIST'], ['MA_HEAD', 'BU_HEAD_A']] };
+export const getStakeholderById = (id) => STAKEHOLDERS[id];
+export const getAllStakeholders = () => Object.values(STAKEHOLDERS);
