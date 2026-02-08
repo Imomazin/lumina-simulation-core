@@ -132,7 +132,7 @@ export default function DebriefPage() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-navy-900 mb-2">
-                Lumina Assist - Q{gameState.round} Summary
+                Praxis Assist - Q{gameState.round} Summary
               </h1>
               <p className="text-navy-500">
                 Run ID: {gameState.runId} | Seed: {gameState.seed}

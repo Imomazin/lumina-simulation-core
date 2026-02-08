@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create fresh state with the specified seed
-    state = createInitialGameState(runId, teamId, 'lumina-assist', seed);
+    state = createInitialGameState(runId, teamId, 'praxis-assist', seed);
     await saveGameState(state);
 
     return NextResponse.json({

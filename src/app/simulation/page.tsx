@@ -180,7 +180,7 @@ export default function SimulationPage() {
                   <Layers className="w-5 h-5 text-white" />
                 </motion.div>
                 <div>
-                  <span className="font-bold text-silver-800">Lumina</span>
+                  <span className="font-bold text-silver-800">Praxis</span>
                   <span className="font-bold gradient-text">Sim</span>
                 </div>
               </div>

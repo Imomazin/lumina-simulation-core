@@ -38,7 +38,7 @@ export function generateTeamId(): string {
 export function createInitialGameState(
   runId: string,
   teamId: string,
-  scenarioKey: string = 'lumina-assist',
+  scenarioKey: string = 'praxis-assist',
   seed?: number
 ): GameState {
   const scenario = getScenario(scenarioKey);
@@ -75,8 +75,8 @@ export function createInitialGameState(
         id: 'init_1',
         round: 1,
         category: 'outcome',
-        title: 'Welcome to Lumina',
-        description: `Quarter 1 begins. You're leading Lumina Assist through a critical growth phase.
+        title: 'Welcome to Praxis',
+        description: `Quarter 1 begins. You're leading Praxis Assist through a critical growth phase.
           Your AI productivity tool has early traction, but the market is evolving fast.
           Make strategic decisions across all functions to build a sustainable, trusted business.`,
         impact: 'neutral',

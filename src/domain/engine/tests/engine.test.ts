@@ -76,7 +76,7 @@ describe('Game Initialization', () => {
     const runId = generateRunId();
     const teamId = generateTeamId();
     const seed = 42;
-    const state = createInitialGameState(runId, teamId, 'lumina-assist', seed);
+    const state = createInitialGameState(runId, teamId, 'praxis-assist', seed);
 
     expect(state.seed).toBe(42);
   });
@@ -161,7 +161,7 @@ describe('Game Advancement', () => {
   let state: GameState;
 
   beforeEach(() => {
-    state = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    state = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
   });
 
   it('should advance round', () => {
@@ -208,7 +208,7 @@ describe('Role Decision Application', () => {
   let state: GameState;
 
   beforeEach(() => {
-    state = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    state = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
   });
 
   it('should store strategy decision', () => {
@@ -244,7 +244,7 @@ describe('Role Decision Application', () => {
 
 describe('Event Generation', () => {
   it('should generate events deterministically', () => {
-    const state = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    const state = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
     const rng1 = createRNG(12345, 1);
     const rng2 = createRNG(12345, 1);
 
@@ -258,7 +258,7 @@ describe('Event Generation', () => {
   });
 
   it('should not exceed 2 events per round', () => {
-    const state = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    const state = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
 
     // Try multiple times with different seeds
     for (let seed = 0; seed < 100; seed++) {
@@ -269,7 +269,7 @@ describe('Event Generation', () => {
   });
 
   it('should increase regulatory inquiry probability with low compliance', () => {
-    const lowComplianceState = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    const lowComplianceState = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
     lowComplianceState.company.compliancePosture = 20;
     lowComplianceState.risk.regulatory = 80;
 
@@ -322,7 +322,7 @@ describe('Scorecard Calculation', () => {
 
 describe('Full Game Simulation', () => {
   it('should complete 8 rounds without crashing', () => {
-    let state = createInitialGameState('run1', 'team1', 'lumina-assist', 12345);
+    let state = createInitialGameState('run1', 'team1', 'praxis-assist', 12345);
 
     for (let i = 0; i < 8; i++) {
       state = advanceRound(state);
@@ -334,7 +334,7 @@ describe('Full Game Simulation', () => {
   });
 
   it('should accumulate events over rounds', () => {
-    let state = createInitialGameState('run1', 'team1', 'lumina-assist', 54321);
+    let state = createInitialGameState('run1', 'team1', 'praxis-assist', 54321);
 
     for (let i = 0; i < 8; i++) {
       state = advanceRound(state);
@@ -345,7 +345,7 @@ describe('Full Game Simulation', () => {
   });
 
   it('should maintain valid state bounds throughout', () => {
-    let state = createInitialGameState('run1', 'team1', 'lumina-assist', 99999);
+    let state = createInitialGameState('run1', 'team1', 'praxis-assist', 99999);
 
     for (let i = 0; i < 8; i++) {
       state = advanceRound(state);

@@ -1,5 +1,5 @@
 /**
- * Lumina Simulation Engine - Core Types
+ * Praxis Simulation Engine - Core Types
  *
  * This file defines all TypeScript types for the simulation state,
  * decisions, events, and scoring system.

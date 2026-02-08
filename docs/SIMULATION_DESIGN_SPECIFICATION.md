@@ -1,4 +1,4 @@
-# LUMINA SIMULATION SUITE
+# PRAXIS SIMULATION SUITE
 ## Enterprise-Grade Strategy Simulation Design Specification
 
 Version 1.0 | Classification: Product Design Input | Status: Authoritative

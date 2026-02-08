@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
     // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('lumina-theme') as Theme | null;
+    const savedTheme = localStorage.getItem('praxis-theme') as Theme | null;
     if (savedTheme) {
       setThemeState(savedTheme);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -33,7 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Update document class and localStorage
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(theme);
-    localStorage.setItem('lumina-theme', theme);
+    localStorage.setItem('praxis-theme', theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {

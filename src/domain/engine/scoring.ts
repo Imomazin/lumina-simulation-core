@@ -279,7 +279,7 @@ export function generateEndGameSummary(
 
   if (avgScore >= 75) {
     summary += '🏆 EXCEPTIONAL PERFORMANCE\n';
-    summary += 'Lumina Assist has become a market leader in responsible AI.';
+    summary += 'Praxis Assist has become a market leader in responsible AI.';
   } else if (avgScore >= 60) {
     summary += '✅ STRONG PERFORMANCE\n';
     summary += 'The company is well-positioned for continued growth.';

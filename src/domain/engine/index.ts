@@ -1,5 +1,5 @@
 /**
- * Lumina Simulation Engine
+ * Praxis Simulation Engine
  *
  * Pure TypeScript game engine for the cross-functional business simulation.
  * No React dependencies - can be used server-side or client-side.
@@ -9,7 +9,7 @@
 export * from './types';
 
 // Configuration
-export { getScenario, LUMINA_ASSIST_SCENARIO, GAME_CONSTANTS, MARKET_REGIONS } from './config';
+export { getScenario, PRAXIS_ASSIST_SCENARIO, GAME_CONSTANTS, MARKET_REGIONS } from './config';
 
 // RNG
 export { SeededRNG, createRNG, generateSeed } from './rng';

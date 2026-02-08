@@ -6,7 +6,7 @@
  */
 
 import { SeededRNG } from './rng';
-import { LUMINA_ASSIST_SCENARIO } from './config';
+import { PRAXIS_ASSIST_SCENARIO } from './config';
 import type {
   GameState,
   GameEvent,
@@ -24,7 +24,7 @@ function getEventProbability(
   eventType: EventType,
   state: GameState
 ): number {
-  const baseProbability = LUMINA_ASSIST_SCENARIO.eventProbabilities[eventType] || 0.1;
+  const baseProbability = PRAXIS_ASSIST_SCENARIO.eventProbabilities[eventType] || 0.1;
 
   let modifier = 1.0;
 

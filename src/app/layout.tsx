@@ -3,12 +3,12 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Lumina Simulation | Cross-Functional Business Simulation',
+  title: 'Praxis Simulation | Cross-Functional Business Simulation',
   description: 'The most advanced business simulation for strategy, leadership, and decision-making. A live, cross-functional enterprise simulation for MBA capstones and corporate training.',
   keywords: ['business simulation', 'MBA', 'strategy', 'leadership', 'executive education', 'corporate training'],
   authors: [{ name: 'Ambidexters Inc' }],
   openGraph: {
-    title: 'Lumina Simulation',
+    title: 'Praxis Simulation',
     description: 'Run the company. Feel the consequences.',
     type: 'website',
   },

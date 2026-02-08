@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       case 'json':
         return NextResponse.json(state, {
           headers: {
-            'Content-Disposition': `attachment; filename="lumina-export-${runId}.json"`,
+            'Content-Disposition': `attachment; filename="praxis-export-${runId}.json"`,
           },
         });
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         return new NextResponse(csv, {
           headers: {
             'Content-Type': 'text/csv',
-            'Content-Disposition': `attachment; filename="lumina-export-${runId}.csv"`,
+            'Content-Disposition': `attachment; filename="praxis-export-${runId}.csv"`,
           },
         });
 
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         return new NextResponse(markdown, {
           headers: {
             'Content-Type': 'text/markdown',
-            'Content-Disposition': `attachment; filename="lumina-memo-${runId}.md"`,
+            'Content-Disposition': `attachment; filename="praxis-memo-${runId}.md"`,
           },
         });
 

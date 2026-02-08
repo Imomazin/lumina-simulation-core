@@ -358,7 +358,7 @@ function generateAchievementNarratives(
       round,
       category: 'achievement',
       title: '$10M Quarterly Revenue',
-      description: 'Lumina Assist has crossed the $10M quarterly revenue milestone. The business is gaining significant traction.',
+      description: 'Praxis Assist has crossed the $10M quarterly revenue milestone. The business is gaining significant traction.',
       impact: 'positive',
       metrics: ['revenue'],
     });
@@ -384,7 +384,7 @@ function generateAchievementNarratives(
       round,
       category: 'achievement',
       title: 'Trust Leader',
-      description: 'Brand trust has reached 80%+. Lumina is becoming recognized as a leader in responsible AI.',
+      description: 'Brand trust has reached 80%+. Praxis is becoming recognized as a leader in responsible AI.',
       impact: 'positive',
       metrics: ['brandTrust'],
     });
@@ -414,7 +414,7 @@ export function generateBoardMemo(state: GameState): string {
   const c = state.company;
   const round = state.round;
 
-  let memo = `# LUMINA ASSIST - BOARD MEMO\n`;
+  let memo = `# PRAXIS ASSIST - BOARD MEMO\n`;
   memo += `## Q${round} Performance Summary\n\n`;
 
   memo += `### Financial Overview\n`;

@@ -1,5 +1,5 @@
 /**
- * Lumina Business Simulation Suite - Comprehensive Type Definitions
+ * Praxis Business Simulation Suite - Comprehensive Type Definitions
  *
  * Six flagship simulations benchmarked against:
  * - Advantex/Capsim (financial realism)

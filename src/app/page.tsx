@@ -278,7 +278,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
               ? 'bg-gradient-to-r from-purple-600 via-pink-500 to-violet-600 bg-clip-text text-transparent'
               : 'bg-gradient-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-transparent'
           }`}>
-            LUMINA
+            PRAXIS
           </span>
         </motion.h1>
 
@@ -1088,7 +1088,7 @@ function PhilosophySection() {
           <div className={theme === 'light' ? 'text-slate-500' : 'text-slate-400'}>
             <span className={`font-semibold text-lg ${
               theme === 'light' ? 'text-purple-600' : 'text-slate-300'
-            }`}>Lumina Simulation</span>
+            }`}>Praxis Simulation</span>
             <span className="mx-3">·</span>
             <span className="text-lg">Design Philosophy</span>
           </div>
@@ -1637,7 +1637,7 @@ function Footer() {
           <div className="text-center md:text-left">
             <div className={`text-xl font-bold mb-3 ${
               theme === 'light' ? 'text-slate-800' : 'text-white'
-            }`}>Lumina Simulation</div>
+            }`}>Praxis Simulation</div>
             <div className={`text-lg ${
               theme === 'light' ? 'text-slate-600' : 'text-slate-400'
             }`}>Run the company. Feel the consequences.</div>
@@ -1656,7 +1656,7 @@ function Footer() {
           theme === 'light' ? 'border-purple-100 text-slate-500' : 'border-slate-800 text-slate-400'
         }`}>
           <p>Designed for executive education, MBA programs, and leadership development.</p>
-          <p className="mt-2">© {new Date().getFullYear()} Lumina Simulation Suite</p>
+          <p className="mt-2">© {new Date().getFullYear()} Praxis Simulation Suite</p>
         </div>
       </div>
     </footer>
@@ -1675,7 +1675,7 @@ export default function HomePage() {
   useEffect(() => {
     setMounted(true);
     // Check if user has already seen the cover
-    const hasSeenCover = sessionStorage.getItem('lumina-cover-seen');
+    const hasSeenCover = sessionStorage.getItem('praxis-cover-seen');
     if (hasSeenCover) {
       setShowCover(false);
     }
@@ -1683,7 +1683,7 @@ export default function HomePage() {
 
   const handleEnter = () => {
     setIsExiting(true);
-    sessionStorage.setItem('lumina-cover-seen', 'true');
+    sessionStorage.setItem('praxis-cover-seen', 'true');
     setTimeout(() => {
       setShowCover(false);
     }, 800);

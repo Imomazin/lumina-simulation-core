@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Create new state if none exists
     if (!state) {
-      state = createInitialGameState(runId, teamId, 'lumina-assist', seed);
+      state = createInitialGameState(runId, teamId, 'praxis-assist', seed);
       await saveGameState(state);
     }
 

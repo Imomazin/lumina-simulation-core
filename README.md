@@ -1,10 +1,10 @@
-# Lumina Simulation
+# Praxis Simulation
 
 The most advanced cross-functional business simulation platform for MBA capstones and corporate strategy labs.
 
 ## Overview
 
-Lumina Simulation is a live, cross-functional enterprise simulation where strategy, finance, risk, and execution collide under uncertainty. Teams manage a company over 8 quarters, making decisions across 7 functional roles while responding to market events and competitive pressures.
+Praxis Simulation is a live, cross-functional enterprise simulation where strategy, finance, risk, and execution collide under uncertainty. Teams manage a company over 8 quarters, making decisions across 7 functional roles while responding to market events and competitive pressures.
 
 ### Key Features
 
@@ -26,8 +26,8 @@ Lumina Simulation is a live, cross-functional enterprise simulation where strate
 
 ```bash
 # Clone the repository
-git clone https://github.com/Imomazin/lumina-simulation-core.git
-cd lumina-simulation-core
+git clone https://github.com/Imomazin/praxis-simulation-core.git
+cd praxis-simulation-core
 
 # Install dependencies
 npm install
@@ -53,7 +53,7 @@ The app works without Supabase using in-memory storage (data resets on server re
 ## Project Structure
 
 ```
-lumina-simulation-core/
+praxis-simulation-core/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── page.tsx            # Landing page
@@ -143,7 +143,7 @@ https://your-app.vercel.app/api/state  # API: Get state
 
 ## Simulation Scenario
 
-**Lumina Assist: Responsible AI Product Launch**
+**Praxis Assist: Responsible AI Product Launch**
 
 Navigate 8 quarters of growth while balancing innovation, trust, and compliance.
 

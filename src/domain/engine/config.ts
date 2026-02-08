@@ -1,7 +1,7 @@
 /**
  * Scenario Configuration
  *
- * Defines the "Lumina Assist: Responsible AI product launch" scenario
+ * Defines the "Praxis Assist: Responsible AI product launch" scenario
  * and its parameters.
  */
 
@@ -20,13 +20,13 @@ export interface ScenarioConfig {
 }
 
 /**
- * Default scenario: Lumina Assist AI Product Launch
+ * Default scenario: Praxis Assist AI Product Launch
  */
-export const LUMINA_ASSIST_SCENARIO: ScenarioConfig = {
-  key: 'lumina-assist',
-  name: 'Lumina Assist: Responsible AI Product Launch',
+export const PRAXIS_ASSIST_SCENARIO: ScenarioConfig = {
+  key: 'praxis-assist',
+  name: 'Praxis Assist: Responsible AI Product Launch',
   description: `
-    Your company has developed Lumina Assist, an AI-powered productivity tool.
+    Your company has developed Praxis Assist, an AI-powered productivity tool.
     Navigate 8 quarters of growth while balancing innovation, trust, and compliance.
     Compete in a dynamic market with evolving regulations and fierce competition.
   `.trim(),
@@ -84,9 +84,9 @@ export const LUMINA_ASSIST_SCENARIO: ScenarioConfig = {
  */
 export function getScenario(key: string): ScenarioConfig {
   const scenarios: Record<string, ScenarioConfig> = {
-    'lumina-assist': LUMINA_ASSIST_SCENARIO,
+    'praxis-assist': PRAXIS_ASSIST_SCENARIO,
   };
-  return scenarios[key] || LUMINA_ASSIST_SCENARIO;
+  return scenarios[key] || PRAXIS_ASSIST_SCENARIO;
 }
 
 /**
