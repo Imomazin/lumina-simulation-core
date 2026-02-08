@@ -75,3 +75,37 @@ export {
   generateBoardMemo,
   generateLessonsLearned,
 } from './narrative';
+
+// Runs (H: Replayability, J: Multiplayer, M: Replay)
+export {
+  // Types
+  type Run,
+  type RunConfig,
+  type RunStatus,
+  type TeamInfo,
+  type TeamMember,
+  type InjectedEvent,
+  type ActivityLogEntry,
+  type RunReplayData,
+  // Creation
+  generateNewRunId,
+  createRun,
+  addTeamToRun,
+  removeTeamFromRun,
+  // Run lifecycle
+  startRun,
+  pauseRun,
+  resumeRun,
+  advanceRunRound,
+  // Team management
+  recordTeamDecision,
+  updateTeamScore,
+  // Events
+  addInjectedEvent,
+  // Queries
+  allTeamsSubmitted,
+  getLeaderboard,
+  // Replay
+  exportRunForReplay,
+  createRunFromReplay,
+} from './runs';
