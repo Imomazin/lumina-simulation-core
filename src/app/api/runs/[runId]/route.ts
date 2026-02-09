@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import type { GameState } from '@/domain/engine/types';
 import {
   startRun,
   pauseRun,
@@ -22,6 +23,13 @@ import {
   loadTeamGameState,
   saveTeamGameState,
 } from '@/lib/runStore';
+import {
+  recordSimulationStarted,
+  recordSimulationPaused,
+  recordSimulationResumed,
+  recordSimulationCompleted,
+  recordRoundComplete,
+} from '@/lib/simulationStore';
 
 interface RouteParams {
   params: Promise<{ runId: string }>;
@@ -79,28 +87,57 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           );
         }
         run = startRun(run);
+        // Record simulation started checkpoint
+        recordSimulationStarted(run).catch(err =>
+          console.error('Failed to record simulation start:', err)
+        );
         break;
 
       case 'pause':
         run = pauseRun(run);
+        // Record simulation paused checkpoint
+        recordSimulationPaused(run).catch(err =>
+          console.error('Failed to record simulation pause:', err)
+        );
         break;
 
       case 'resume':
         run = resumeRun(run);
+        // Record simulation resumed checkpoint
+        recordSimulationResumed(run).catch(err =>
+          console.error('Failed to record simulation resume:', err)
+        );
         break;
 
-      case 'advance':
+      case 'advance': {
         // Advance all team game states
+        const advancedStates: Array<{ teamId: string; state: GameState }> = [];
         for (const team of run.teams) {
           const gameState = await loadTeamGameState(runId, team.teamId);
           if (gameState) {
             const newState = advanceGameRound(gameState);
             await saveTeamGameState(runId, team.teamId, newState);
             run = updateTeamScore(run, team.teamId, newState.scorecard.totalScore);
+            advancedStates.push({ teamId: team.teamId, state: newState });
           }
         }
         run = advanceRunRound(run);
+
+        // Record round completion checkpoints for each team (async, non-blocking)
+        for (const { teamId, state } of advancedStates) {
+          recordRoundComplete(run, teamId, state).catch(err =>
+            console.error(`Failed to record round complete for team ${teamId}:`, err)
+          );
+        }
+
+        // Check if simulation completed
+        if (run.status === 'completed') {
+          recordSimulationCompleted(run).catch(err =>
+            console.error('Failed to record simulation completion:', err)
+          );
+        }
         break;
+      }
 
       default:
         return NextResponse.json(

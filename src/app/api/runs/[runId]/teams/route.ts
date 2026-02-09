@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { addTeamToRun, type TeamMember } from '@/domain/engine/runs';
 import { createInitialGameState } from '@/domain/engine';
 import { loadRun, saveRun, saveTeamGameState, getRunTeamStates } from '@/lib/runStore';
+import { recordTeamJoined } from '@/lib/simulationStore';
 
 interface RouteParams {
   params: Promise<{ runId: string }>;
@@ -87,6 +88,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     await saveTeamGameState(runId, newTeam.teamId, gameState);
     await saveRun(run);
+
+    // Record team joined checkpoint (async, non-blocking)
+    recordTeamJoined(run, newTeam.teamId, newTeam.name).catch(err =>
+      console.error('Failed to record team joined:', err)
+    );
 
     return NextResponse.json({
       team: newTeam,

@@ -7,6 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { advanceRound, AdvanceRequestSchema } from '@/domain/engine';
 import { loadGameState, saveGameState } from '@/lib/store';
+import { loadRun } from '@/lib/runStore';
+import { recordRoundComplete, recordSimulationCompleted } from '@/lib/simulationStore';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,6 +45,24 @@ export async function POST(request: NextRequest) {
     // Advance the round
     const updatedState = advanceRound(state);
     await saveGameState(updatedState);
+
+    // Record round completion checkpoint (async, non-blocking)
+    // Load run context if available for proper tracking
+    loadRun(runId).then(run => {
+      if (run) {
+        recordRoundComplete(run, teamId, updatedState).catch(err =>
+          console.error('Failed to record round complete:', err)
+        );
+        // Check if simulation completed
+        if (updatedState.round >= updatedState.maxRounds) {
+          recordSimulationCompleted(run).catch(err =>
+            console.error('Failed to record simulation completion:', err)
+          );
+        }
+      }
+    }).catch(err => {
+      console.error('Failed to load run for checkpoint:', err);
+    });
 
     return NextResponse.json(updatedState);
   } catch (error) {

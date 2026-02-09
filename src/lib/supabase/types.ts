@@ -96,6 +96,90 @@ export type RunInsert = Database['public']['Tables']['runs']['Insert'];
 export type RunUpdate = Database['public']['Tables']['runs']['Update'];
 
 // =============================================================================
+// SIMULATION TRACKING TYPES
+// =============================================================================
+
+/**
+ * Simulation status values
+ */
+export type SimulationStatus = 'setup' | 'active' | 'paused' | 'completed';
+
+/**
+ * Checkpoint types for simulation_runs
+ */
+export type CheckpointType =
+  | 'simulation_created'
+  | 'simulation_started'
+  | 'round_complete'
+  | 'simulation_paused'
+  | 'simulation_resumed'
+  | 'simulation_completed'
+  | 'team_joined'
+  | 'decision_submitted';
+
+/**
+ * Simulation record (registry of all simulations)
+ */
+export interface Simulation {
+  id: string;
+  name: string;
+  scenarioKey: string;
+  seed: number;
+  status: SimulationStatus;
+  config: Record<string, unknown>;
+  teamCount: number;
+  maxRounds: number;
+  currentRound: number;
+  createdAt: string;
+  updatedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+/**
+ * Metrics snapshot for checkpoints (lightweight)
+ */
+export interface CheckpointMetrics {
+  // Financial
+  cash?: number;
+  revenue?: number;
+  costs?: number;
+  profit?: number;
+
+  // Performance
+  totalScore?: number;
+  brandTrust?: number;
+  compliancePosture?: number;
+  productQuality?: number;
+
+  // Risk
+  operationalRisk?: number;
+  regulatoryRisk?: number;
+  reputationalRisk?: number;
+
+  // Progress
+  decisionsSubmitted?: number;
+  teamsActive?: number;
+}
+
+/**
+ * Simulation run checkpoint record
+ */
+export interface SimulationCheckpoint {
+  id: string;
+  simulationId: string;
+  runId: string;
+  teamId?: string;
+  round: number;
+  checkpointType: CheckpointType;
+  metrics: CheckpointMetrics;
+  stateSnapshot?: Record<string, unknown>;
+  triggeredBy?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+// =============================================================================
 // TYPE CASTING HELPERS
 // =============================================================================
 

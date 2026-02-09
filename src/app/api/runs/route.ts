@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRun, type RunConfig } from '@/domain/engine/runs';
 import { listRuns, saveRun } from '@/lib/runStore';
+import { recordSimulationCreated } from '@/lib/simulationStore';
 
 export async function GET() {
   try {
@@ -38,6 +39,11 @@ export async function POST(request: NextRequest) {
 
     const run = createRun(name, seed, config);
     await saveRun(run);
+
+    // Persist to simulation tracking (async, non-blocking)
+    recordSimulationCreated(run).catch(err =>
+      console.error('Failed to record simulation creation:', err)
+    );
 
     return NextResponse.json(run, { status: 201 });
   } catch (error) {

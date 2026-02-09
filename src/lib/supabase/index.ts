@@ -25,4 +25,9 @@ export type {
   RunRow,
   RunInsert,
   RunUpdate,
+  SimulationStatus,
+  CheckpointType,
+  Simulation,
+  CheckpointMetrics,
+  SimulationCheckpoint,
 } from './types';
