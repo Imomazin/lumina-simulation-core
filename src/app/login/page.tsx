@@ -242,12 +242,24 @@ export default function LoginPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
       {/* ===================================================================
-          LEFT PANEL - Video/Animation Background (2/3 width on desktop)
+          FULL-SCREEN VIDEO BACKGROUND - Always visible on all screen sizes
           =================================================================== */}
-      <div className="hidden lg:flex lg:flex-1 relative">
-        <LoginVideoBackground />
+      <video
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        src="/scenarios/scenario-01.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+      {/* ===================================================================
+          LEFT PANEL - Overlay content on video (2/3 width on desktop)
+          =================================================================== */}
+      <div className="hidden lg:flex lg:flex-1 relative z-10">
+        {/* Dark gradient overlay for text readability over video */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
 
         {/* Branding overlay */}
         <div className="absolute inset-0 flex flex-col justify-between p-12 z-10">
@@ -314,7 +326,7 @@ export default function LoginPage() {
           RIGHT PANEL - Login Form (1/3 width on desktop, full on mobile)
           =================================================================== */}
       <div
-        className={`w-full lg:w-[420px] xl:w-[480px] flex flex-col relative
+        className={`w-full lg:w-[420px] xl:w-[480px] flex flex-col relative z-10
                    ${
                      theme === 'light'
                        ? 'bg-gray-900'
