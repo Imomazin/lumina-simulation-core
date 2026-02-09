@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Route } from 'next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
@@ -410,15 +411,15 @@ export default function LoginPage() {
             {/* Terms */}
             <p className="text-gray-500 text-sm mt-8 leading-relaxed">
               By signing in, you agree to our{' '}
-              <Link href="/terms" className="text-gray-300 hover:text-white underline">
+              <Link href={'/terms' as Route} className="text-gray-300 hover:text-white underline">
                 Terms of Service
               </Link>
               ,{' '}
-              <Link href="/privacy" className="text-gray-300 hover:text-white underline">
+              <Link href={'/privacy' as Route} className="text-gray-300 hover:text-white underline">
                 Privacy Policy
               </Link>
               , and{' '}
-              <Link href="/acceptable-use" className="text-gray-300 hover:text-white underline">
+              <Link href={'/acceptable-use' as Route} className="text-gray-300 hover:text-white underline">
                 Acceptable Use Policy
               </Link>
               .
@@ -429,26 +430,30 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="px-8 lg:px-12 py-6 border-t border-gray-800">
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-            <Link
+            <a
               href="https://twitter.com"
               className="text-gray-500 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Twitter
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://linkedin.com"
               className="text-gray-500 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               LinkedIn
-            </Link>
+            </a>
             <Link
-              href="/careers"
+              href={'/careers' as Route}
               className="text-gray-500 hover:text-white transition-colors"
             >
               Careers
             </Link>
             <Link
-              href="/blog"
+              href={'/blog' as Route}
               className="text-gray-500 hover:text-white transition-colors"
             >
               Blog
@@ -456,13 +461,13 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 mt-4 text-xs text-gray-600">
-            <Link href="/privacy" className="hover:text-gray-400 transition-colors">
+            <Link href={'/privacy' as Route} className="hover:text-gray-400 transition-colors">
               Privacy policy
             </Link>
-            <Link href="/terms" className="hover:text-gray-400 transition-colors">
+            <Link href={'/terms' as Route} className="hover:text-gray-400 transition-colors">
               Terms of service
             </Link>
-            <Link href="/support" className="hover:text-gray-400 transition-colors">
+            <Link href={'/support' as Route} className="hover:text-gray-400 transition-colors">
               Support
             </Link>
           </div>
