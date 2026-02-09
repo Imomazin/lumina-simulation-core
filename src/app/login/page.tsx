@@ -247,7 +247,13 @@ export default function LoginPage() {
           FULL-SCREEN VIDEO BACKGROUND - Always visible on all screen sizes
           =================================================================== */}
       <video
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{
+          zIndex: 0,
+          opacity: 1,
+          display: 'block',
+          visibility: 'visible',
+        }}
         src="/scenarios/scenario-01.mp4"
         autoPlay
         muted
@@ -329,8 +335,8 @@ export default function LoginPage() {
         className={`w-full lg:w-[420px] xl:w-[480px] flex flex-col relative z-10
                    ${
                      theme === 'light'
-                       ? 'bg-gray-900'
-                       : 'bg-[#0a0a12]'
+                       ? 'bg-gray-900/90 backdrop-blur-sm'
+                       : 'bg-[#0a0a12]/90 backdrop-blur-sm'
                    }`}
       >
         {/* Theme toggle */}
