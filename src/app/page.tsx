@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,25 +46,12 @@ import { useTheme } from '@/contexts/ThemeContext';
 // COVER PAGE COMPONENT
 // =============================================================================
 
-const COVER_VIDEOS = [
-  '/scenarios/scenario-01.mp4',
-  '/scenarios/scenario-02.mp4',
-  '/scenarios/scenario-03.mp4',
-  '/scenarios/scenario-04.mp4',
-  '/scenarios/scenario-05.mp4',
-  '/scenarios/scenario-06.mp4',
-  '/scenarios/scenario-07.mp4',
-];
-
 function CoverPage({ onEnter }: { onEnter: () => void }) {
   const { theme, toggleTheme } = useTheme();
   const [isHovering, setIsHovering] = useState(false);
   const [showTagline, setShowTagline] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const taglineTimer = setTimeout(() => setShowTagline(true), 800);
@@ -73,18 +60,6 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       clearTimeout(taglineTimer);
       clearTimeout(buttonTimer);
     };
-  }, []);
-
-  // Cycle through videos every 10 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVideoTransitioning(true);
-      setTimeout(() => {
-        setCurrentVideoIndex((prev) => (prev + 1) % COVER_VIDEOS.length);
-        setIsVideoTransitioning(false);
-      }, 500);
-    }, 10000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -97,15 +72,11 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.8, ease: 'easeInOut' }}
     >
-      {/* Video Background - Cycles through all 7 scenario videos */}
+      {/* Video Background */}
       {!videoError && (
         <video
-          ref={videoRef}
-          key={currentVideoIndex}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            isVideoTransitioning ? 'opacity-0' : 'opacity-100'
-          }`}
-          src={COVER_VIDEOS[currentVideoIndex]}
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/scenarios/scenario-01.mp4"
           autoPlay
           muted
           loop
