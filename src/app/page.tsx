@@ -1762,6 +1762,12 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
+    // Check if user is logged in - if not, redirect to login
+    const isLoggedIn = sessionStorage.getItem('praxis-logged-in');
+    if (!isLoggedIn) {
+      window.location.href = '/login';
+      return;
+    }
     // Check if user has already seen the cover
     const hasSeenCover = sessionStorage.getItem('praxis-cover-seen');
     if (hasSeenCover) {

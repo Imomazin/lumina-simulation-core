@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Route } from 'next';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
   Loader2,
@@ -12,8 +12,201 @@ import {
   Moon,
   Building2,
   Layers,
+  Sparkles,
+  Star,
+  Zap,
+  Crown,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+
+// =============================================================================
+// ROTATING 3D GRAPHIC COMPONENT
+// =============================================================================
+
+function RotatingGraphic() {
+  const { theme } = useTheme();
+
+  // Icon set for orbiting elements
+  const orbitIcons = [
+    { Icon: Crown, delay: 0 },
+    { Icon: Target, delay: 0.5 },
+    { Icon: TrendingUp, delay: 1 },
+    { Icon: Zap, delay: 1.5 },
+    { Icon: Star, delay: 2 },
+    { Icon: Sparkles, delay: 2.5 },
+  ];
+
+  return (
+    <div className="relative w-80 h-80 mx-auto">
+      {/* Outer glow ring */}
+      <motion.div
+        className={`absolute inset-0 rounded-full ${
+          theme === 'light'
+            ? 'bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20'
+            : 'bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-blue-500/10'
+        }`}
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Rotating outer ring */}
+      <motion.div
+        className="absolute inset-4"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      >
+        <div className={`w-full h-full rounded-full border-2 border-dashed ${
+          theme === 'light' ? 'border-purple-300/50' : 'border-cyan-500/30'
+        }`} />
+
+        {/* Orbiting icons on outer ring */}
+        {orbitIcons.slice(0, 3).map(({ Icon, delay }, i) => (
+          <motion.div
+            key={`outer-${i}`}
+            className={`absolute w-10 h-10 rounded-xl flex items-center justify-center ${
+              theme === 'light'
+                ? 'bg-white shadow-lg shadow-purple-200/50'
+                : 'bg-slate-800 shadow-lg shadow-cyan-500/20'
+            }`}
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: `rotate(${i * 120}deg) translateX(140px) rotate(-${i * 120}deg) translate(-50%, -50%)`,
+            }}
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity, delay }}
+          >
+            <Icon className={`w-5 h-5 ${
+              theme === 'light' ? 'text-purple-500' : 'text-cyan-400'
+            }`} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Counter-rotating middle ring */}
+      <motion.div
+        className="absolute inset-12"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      >
+        <div className={`w-full h-full rounded-full border ${
+          theme === 'light' ? 'border-indigo-200' : 'border-purple-500/30'
+        }`} />
+
+        {/* Orbiting icons on middle ring */}
+        {orbitIcons.slice(3, 6).map(({ Icon, delay }, i) => (
+          <motion.div
+            key={`middle-${i}`}
+            className={`absolute w-8 h-8 rounded-lg flex items-center justify-center ${
+              theme === 'light'
+                ? 'bg-gradient-to-br from-pink-100 to-purple-100 shadow-md'
+                : 'bg-gradient-to-br from-purple-900/50 to-blue-900/50 shadow-md shadow-purple-500/10'
+            }`}
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: `rotate(${i * 120 + 60}deg) translateX(90px) rotate(-${i * 120 + 60}deg) translate(-50%, -50%)`,
+            }}
+            animate={{
+              scale: [1, 1.15, 1],
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, delay }}
+          >
+            <Icon className={`w-4 h-4 ${
+              theme === 'light' ? 'text-indigo-500' : 'text-purple-400'
+            }`} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Inner rotating ring */}
+      <motion.div
+        className="absolute inset-20"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+      >
+        <div className={`w-full h-full rounded-full ${
+          theme === 'light'
+            ? 'bg-gradient-to-br from-purple-200/50 to-pink-200/50'
+            : 'bg-gradient-to-br from-cyan-900/30 to-purple-900/30'
+        }`} />
+      </motion.div>
+
+      {/* Center logo */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          className={`w-28 h-28 rounded-3xl flex items-center justify-center shadow-2xl ${
+            theme === 'light'
+              ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 shadow-purple-500/40'
+              : 'bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 shadow-cyan-500/40'
+          }`}
+          animate={{
+            rotateY: [0, 360],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <Layers className="w-14 h-14 text-white" strokeWidth={1.5} />
+        </motion.div>
+      </div>
+
+      {/* Floating particles */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className={`absolute w-2 h-2 rounded-full ${
+            theme === 'light'
+              ? i % 3 === 0 ? 'bg-purple-400' : i % 3 === 1 ? 'bg-pink-400' : 'bg-indigo-400'
+              : i % 3 === 0 ? 'bg-cyan-400' : i % 3 === 1 ? 'bg-purple-400' : 'bg-blue-400'
+          }`}
+          style={{
+            top: `${20 + Math.random() * 60}%`,
+            left: `${20 + Math.random() * 60}%`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            x: [0, (i % 2 === 0 ? 15 : -15), 0],
+            opacity: [0.3, 0.8, 0.3],
+            scale: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: 3 + Math.random() * 2,
+            repeat: Infinity,
+            delay: i * 0.3,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Pulse rings from center */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={`pulse-${i}`}
+          className={`absolute inset-0 rounded-full border ${
+            theme === 'light' ? 'border-purple-400/40' : 'border-cyan-400/30'
+          }`}
+          animate={{
+            scale: [0.3, 1.5],
+            opacity: [0.6, 0],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            delay: i * 1,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 // =============================================================================
 // MICROSOFT ICON COMPONENT
@@ -118,34 +311,56 @@ export default function LoginPage() {
     setMounted(true);
   }, []);
 
+  const completeLogin = () => {
+    // Set session to indicate user is logged in
+    sessionStorage.setItem('praxis-logged-in', 'true');
+    // Redirect to home page
+    window.location.href = '/';
+  };
+
   const handleMicrosoftLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement Microsoft auth
-    setTimeout(() => setIsLoading(false), 1500);
+    // TODO: Implement Microsoft auth - for now, simulate login
+    setTimeout(() => {
+      setIsLoading(false);
+      completeLogin();
+    }, 1500);
   };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement Google auth
-    setTimeout(() => setIsLoading(false), 1500);
+    // TODO: Implement Google auth - for now, simulate login
+    setTimeout(() => {
+      setIsLoading(false);
+      completeLogin();
+    }, 1500);
   };
 
   const handleEmailLogin = async () => {
     setIsLoading(true);
-    // TODO: Navigate to email login flow
-    setTimeout(() => setIsLoading(false), 1500);
+    // TODO: Navigate to email login flow - for now, simulate login
+    setTimeout(() => {
+      setIsLoading(false);
+      completeLogin();
+    }, 1500);
   };
 
   const handleWorkLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement work/school auth
-    setTimeout(() => setIsLoading(false), 1500);
+    // TODO: Implement work/school auth - for now, simulate login
+    setTimeout(() => {
+      setIsLoading(false);
+      completeLogin();
+    }, 1500);
   };
 
   const handleGitHubLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement GitHub auth
-    setTimeout(() => setIsLoading(false), 1500);
+    // TODO: Implement GitHub auth - for now, simulate login
+    setTimeout(() => {
+      setIsLoading(false);
+      completeLogin();
+    }, 1500);
   };
 
   if (!mounted) return null;
@@ -243,7 +458,7 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Link href="/" className="inline-flex items-center gap-3">
+            <div className="inline-flex items-center gap-3">
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   theme === 'light'
@@ -260,107 +475,40 @@ export default function LoginPage() {
               >
                 Praxis
               </span>
-            </Link>
+            </div>
           </motion.div>
 
-          {/* Main content */}
+          {/* Rotating Graphic - Center piece */}
           <motion.div
-            className="max-w-lg"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex-1 flex items-center justify-center py-8"
+          >
+            <RotatingGraphic />
+          </motion.div>
+
+          {/* Bottom tagline */}
+          <motion.div
+            className="text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
             <h1
-              className={`text-4xl xl:text-5xl font-bold mb-6 leading-tight ${
+              className={`text-3xl xl:text-4xl font-bold mb-4 leading-tight ${
                 theme === 'light' ? 'text-gray-900' : 'text-white'
               }`}
             >
-              Master leadership through simulation
+              Master Leadership Through Simulation
             </h1>
             <p
-              className={`text-lg mb-8 ${
+              className={`text-lg ${
                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
               }`}
             >
-              Experience high-stakes executive decisions in a safe environment.
-              Build the skills you need to lead with confidence.
+              Run the company. Feel the consequences.
             </p>
-          </motion.div>
-
-          {/* Feature showcase image area */}
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <div
-              className={`relative rounded-2xl overflow-hidden shadow-2xl ${
-                theme === 'light'
-                  ? 'bg-white/80 backdrop-blur-sm border border-purple-100'
-                  : 'bg-gray-900/80 backdrop-blur-sm border border-gray-700'
-              }`}
-            >
-              {/* Simulated dashboard preview */}
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      theme === 'light' ? 'bg-red-400' : 'bg-red-500'
-                    }`}
-                  />
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      theme === 'light' ? 'bg-yellow-400' : 'bg-yellow-500'
-                    }`}
-                  />
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      theme === 'light' ? 'bg-green-400' : 'bg-green-500'
-                    }`}
-                  />
-                </div>
-                <div
-                  className={`h-40 rounded-lg flex items-center justify-center ${
-                    theme === 'light'
-                      ? 'bg-gradient-to-br from-purple-50 to-indigo-50'
-                      : 'bg-gradient-to-br from-gray-800 to-gray-900'
-                  }`}
-                >
-                  <div className="text-center">
-                    <div
-                      className={`text-2xl font-bold mb-2 ${
-                        theme === 'light'
-                          ? 'text-purple-600'
-                          : 'text-cyan-400'
-                      }`}
-                    >
-                      9 Simulations
-                    </div>
-                    <div
-                      className={`text-sm ${
-                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                      }`}
-                    >
-                      Strategy • Finance • Operations • Leadership
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating accent elements */}
-            <motion.div
-              className={`absolute -top-4 -right-4 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg ${
-                theme === 'light'
-                  ? 'bg-gradient-to-br from-pink-400 to-purple-500'
-                  : 'bg-gradient-to-br from-cyan-500 to-blue-600'
-              }`}
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <span className="text-white text-2xl">🎯</span>
-            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -395,26 +543,39 @@ export default function LoginPage() {
           </motion.button>
         </div>
 
-        {/* Mobile logo */}
-        <div className="lg:hidden px-8 pb-6">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                theme === 'light'
-                  ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
-                  : 'bg-gradient-to-br from-cyan-500 to-blue-600'
-              }`}
-            >
-              <Layers className="w-5 h-5 text-white" />
+        {/* Mobile header with logo and mini graphic */}
+        <div className="lg:hidden px-8 pb-4">
+          <div className="flex items-center justify-between mb-6">
+            <div className="inline-flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  theme === 'light'
+                    ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
+                    : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+                }`}
+              >
+                <Layers className="w-5 h-5 text-white" />
+              </div>
+              <span
+                className={`text-xl font-bold ${
+                  theme === 'light' ? 'text-gray-900' : 'text-white'
+                }`}
+              >
+                Praxis
+              </span>
             </div>
-            <span
-              className={`text-xl font-bold ${
-                theme === 'light' ? 'text-gray-900' : 'text-white'
-              }`}
-            >
-              Praxis
-            </span>
-          </Link>
+          </div>
+
+          {/* Mini rotating graphic for mobile */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex justify-center mb-4"
+          >
+            <div className="transform scale-50 -my-16">
+              <RotatingGraphic />
+            </div>
+          </motion.div>
         </div>
 
         {/* Main login content */}
