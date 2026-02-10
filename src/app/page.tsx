@@ -66,7 +66,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
     <motion.div
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden ${
         theme === 'light'
-          ? 'bg-gradient-to-br from-violet-50 via-white to-pink-50'
+          ? 'bg-gradient-to-br from-[#E8DCFF] via-[#F5F0FF] to-[#E8F0FF]'
           : 'bg-[#050508]'
       }`}
       exit={{ opacity: 0, scale: 1.1 }}
@@ -88,7 +88,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       <div
         className={`absolute inset-0 ${
           theme === 'light'
-            ? 'bg-gradient-to-br from-white/70 via-white/50 to-white/70'
+            ? 'bg-gradient-to-br from-[#E8DCFF]/80 via-[#F5F0FF]/70 to-[#E8F0FF]/80'
             : 'bg-gradient-to-br from-black/60 via-black/40 to-black/60'
         }`}
       />
@@ -97,7 +97,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
         onClick={toggleTheme}
         className={`absolute top-8 right-8 p-4 rounded-2xl transition-all duration-300 ${
           theme === 'light'
-            ? 'bg-white/60 backdrop-blur-sm border border-purple-200/50 hover:bg-white'
+            ? 'bg-white/70 backdrop-blur-sm border border-indigo-200/50 hover:bg-white shadow-sm'
             : 'bg-white/5 backdrop-blur-sm border border-cyan-500/20 hover:bg-white/10'
         }`}
         whileHover={{ scale: 1.05 }}
@@ -113,12 +113,12 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
         )}
       </motion.button>
 
-      {/* Light Theme Background */}
+      {/* Light Theme Background - Clipchamp style */}
       {theme === 'light' && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Flowing gradient orbs */}
           <motion.div
-            className="absolute -top-1/3 -left-1/4 w-[900px] h-[900px] bg-gradient-to-br from-purple-200/60 via-pink-100/40 to-blue-200/60 rounded-full blur-3xl"
+            className="absolute -top-1/3 -left-1/4 w-[900px] h-[900px] bg-gradient-to-br from-indigo-300/50 via-purple-200/40 to-violet-200/50 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.15, 1],
               rotate: [0, 30, 0],
@@ -128,7 +128,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute -bottom-1/3 -right-1/4 w-[800px] h-[800px] bg-gradient-to-tl from-blue-200/60 via-violet-100/40 to-pink-200/60 rounded-full blur-3xl"
+            className="absolute -bottom-1/3 -right-1/4 w-[800px] h-[800px] bg-gradient-to-tl from-purple-200/50 via-indigo-100/40 to-blue-200/50 rounded-full blur-3xl"
             animate={{
               scale: [1.1, 1, 1.1],
               rotate: [30, 0, 30],
@@ -138,7 +138,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
             transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-100/40 via-purple-100/30 to-cyan-100/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"
+            className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-gradient-to-r from-violet-100/40 via-indigo-100/30 to-purple-100/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.4, 0.6, 0.4],
@@ -167,9 +167,9 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
                 ease: "easeInOut"
               }}
             >
-              {i % 4 === 0 && <Circle className="w-8 h-8 text-purple-300/40" strokeWidth={1} />}
-              {i % 4 === 1 && <Triangle className="w-10 h-10 text-pink-300/40" strokeWidth={1} />}
-              {i % 4 === 2 && <Square className="w-6 h-6 text-blue-300/40" strokeWidth={1} />}
+              {i % 4 === 0 && <Circle className="w-8 h-8 text-indigo-300/40" strokeWidth={1} />}
+              {i % 4 === 1 && <Triangle className="w-10 h-10 text-purple-300/40" strokeWidth={1} />}
+              {i % 4 === 2 && <Square className="w-6 h-6 text-indigo-300/40" strokeWidth={1} />}
               {i % 4 === 3 && <Hexagon className="w-12 h-12 text-violet-300/40" strokeWidth={1} />}
             </motion.div>
           ))}
@@ -254,10 +254,10 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
         >
           <div className={`relative inline-flex items-center justify-center w-32 h-32 mx-auto ${
             theme === 'light'
-              ? 'bg-gradient-to-br from-purple-500 to-pink-500'
+              ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
               : 'bg-gradient-to-br from-cyan-500 to-violet-600'
           } rounded-3xl shadow-2xl ${
-            theme === 'light' ? 'shadow-purple-500/30' : 'shadow-cyan-500/30'
+            theme === 'light' ? 'shadow-indigo-500/30' : 'shadow-cyan-500/30'
           }`}>
             <Layers className="w-16 h-16 text-white" strokeWidth={1.5} />
 
@@ -268,7 +268,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             >
               <div className={`absolute -top-2 left-1/2 w-4 h-4 -translate-x-1/2 rounded-full ${
-                theme === 'light' ? 'bg-pink-400' : 'bg-cyan-400'
+                theme === 'light' ? 'bg-purple-400' : 'bg-cyan-400'
               }`} />
             </motion.div>
             <motion.div
@@ -277,7 +277,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
             >
               <div className={`absolute top-1/2 -right-2 w-3 h-3 -translate-y-1/2 rounded-full ${
-                theme === 'light' ? 'bg-violet-400' : 'bg-fuchsia-400'
+                theme === 'light' ? 'bg-indigo-400' : 'bg-fuchsia-400'
               }`} />
             </motion.div>
           </div>
@@ -296,7 +296,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
         >
           <span className={`${
             theme === 'light'
-              ? 'bg-gradient-to-r from-purple-600 via-pink-500 to-violet-600 bg-clip-text text-transparent'
+              ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 bg-clip-text text-transparent'
               : 'bg-gradient-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-transparent'
           }`}>
             PRAXIS
@@ -309,7 +309,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
           className={`text-lg md:text-xl font-medium mb-4 tracking-wide ${
-            theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+            theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
           }`}
         >
           SIMULATION SUITE
@@ -352,7 +352,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
                 onMouseLeave={() => setIsHovering(false)}
                 className={`group relative px-16 py-6 text-lg font-bold rounded-2xl transition-all duration-500 ${
                   theme === 'light'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xl shadow-indigo-500/40 hover:shadow-indigo-500/60'
                     : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-900 shadow-2xl shadow-cyan-500/40 hover:shadow-cyan-500/60'
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -362,7 +362,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
                 <motion.div
                   className={`absolute inset-0 rounded-2xl ${
                     theme === 'light'
-                      ? 'bg-gradient-to-r from-purple-400 to-pink-400'
+                      ? 'bg-gradient-to-r from-indigo-400 to-purple-400'
                       : 'bg-gradient-to-r from-cyan-400 to-blue-400'
                   } opacity-0 blur-xl transition-opacity duration-500 ${isHovering ? 'opacity-50' : ''}`}
                 />
@@ -385,7 +385,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
                   <motion.div
                     key={i}
                     className={`absolute w-4 h-4 rounded-full ${
-                      theme === 'light' ? 'bg-purple-400' : 'bg-cyan-400'
+                      theme === 'light' ? 'bg-indigo-400' : 'bg-cyan-400'
                     }`}
                     animate={{
                       scale: [1, 3, 1],
@@ -422,7 +422,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       {/* Activity indicator */}
       <motion.div
         className={`absolute bottom-8 right-8 flex items-center gap-2 ${
-          theme === 'light' ? 'text-purple-400' : 'text-cyan-400'
+          theme === 'light' ? 'text-indigo-500' : 'text-cyan-400'
         }`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -431,7 +431,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
         <Activity className="w-4 h-4" />
         <motion.div
           className={`w-2 h-2 rounded-full ${
-            theme === 'light' ? 'bg-purple-400' : 'bg-cyan-400'
+            theme === 'light' ? 'bg-indigo-500' : 'bg-cyan-400'
           }`}
           animate={{ opacity: [1, 0.3, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -449,25 +449,25 @@ const HERO_SCENARIOS = [
   {
     title: "The board wants blood.",
     subtitle: "Your stock is down 40%. Activist investors circle. The CFO says cut costs. The CPO says you'll lose your best people. You have 72 hours.",
-    lightGradient: "from-rose-100 via-purple-50 to-indigo-100",
+    lightGradient: "from-[#E8DCFF] via-[#F0E6FF] to-[#E8F0FF]",
     darkGradient: "from-red-950 via-slate-950 to-purple-950",
   },
   {
     title: "Your competitor just blinked.",
     subtitle: "They've slashed prices 30%. Your sales team is panicking. Marketing wants to match. Finance says you'll destroy two years of margin. The clock is ticking.",
-    lightGradient: "from-blue-100 via-violet-50 to-cyan-100",
+    lightGradient: "from-[#E0E8FF] via-[#F0F0FF] to-[#E8ECFF]",
     darkGradient: "from-blue-950 via-slate-950 to-cyan-950",
   },
   {
     title: "Cash runs out in 6 months.",
     subtitle: "The Series C fell through. Your burn rate is $2.3M/month. The team doesn't know. Do you tell them now, or wait until you have a plan?",
-    lightGradient: "from-emerald-100 via-teal-50 to-cyan-100",
+    lightGradient: "from-[#E0F0F0] via-[#F0F8FF] to-[#E8F4FF]",
     darkGradient: "from-emerald-950 via-slate-950 to-teal-950",
   },
   {
     title: "The factory just went dark.",
     subtitle: "Your sole supplier in Taiwan stopped shipping. Three weeks of inventory. Q4 commitments to 50 enterprise clients. The COO is calling.",
-    lightGradient: "from-orange-100 via-amber-50 to-yellow-100",
+    lightGradient: "from-[#F0E8E0] via-[#FFF8F0] to-[#FFF0E8]",
     darkGradient: "from-orange-950 via-slate-950 to-amber-950",
   },
 ];
@@ -850,11 +850,11 @@ function CinematicHero() {
         >
           <span className={`inline-flex items-center gap-3 px-6 py-3 rounded-full text-lg font-medium ${
             theme === 'light'
-              ? 'bg-white/90 backdrop-blur-sm border border-purple-200 text-purple-700 shadow-lg'
+              ? 'bg-white/90 backdrop-blur-sm border border-indigo-200 text-indigo-700 shadow-lg'
               : 'bg-slate-900/80 backdrop-blur-sm border border-cyan-500/30 text-cyan-300 shadow-lg'
           }`}>
             {theme === 'light' ? (
-              <Sparkles className="w-5 h-5 text-purple-500" />
+              <Sparkles className="w-5 h-5 text-indigo-500" />
             ) : (
               <Flame className="w-5 h-5 text-orange-400" />
             )}
@@ -907,7 +907,7 @@ function CinematicHero() {
             href="#simulations"
             className={`group px-10 py-5 font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-xl ${
               theme === 'light'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105'
                 : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-900 shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 neon-glow'
             }`}
           >
@@ -919,7 +919,7 @@ function CinematicHero() {
             href="#philosophy"
             className={`px-10 py-5 font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-xl ${
               theme === 'light'
-                ? 'bg-white/70 backdrop-blur-sm text-purple-700 border-2 border-purple-200 hover:border-purple-300 hover:bg-white'
+                ? 'bg-white/70 backdrop-blur-sm text-indigo-700 border-2 border-indigo-200 hover:border-indigo-300 hover:bg-white'
                 : 'bg-white/5 backdrop-blur-sm text-white border border-white/20 hover:bg-white/10'
             }`}
           >
@@ -943,7 +943,7 @@ function CinematicHero() {
               className={`h-3 rounded-full transition-all duration-300 ${
                 i === currentScenario
                   ? theme === 'light'
-                    ? 'bg-purple-500 w-10'
+                    ? 'bg-indigo-500 w-10'
                     : 'bg-cyan-400 w-10'
                   : theme === 'light'
                     ? 'bg-purple-300/50 w-3 hover:bg-purple-400/50'
@@ -965,7 +965,7 @@ function CinematicHero() {
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
           className={`flex flex-col items-center gap-2 ${
-            theme === 'light' ? 'text-purple-500' : 'text-cyan-400'
+            theme === 'light' ? 'text-indigo-500' : 'text-cyan-400'
           }`}
         >
           <span className="text-sm uppercase tracking-wider font-medium">Scroll to explore</span>
@@ -1013,7 +1013,7 @@ function PhilosophySection() {
           }`}>
             Most simulations are games.
             <span className={`block mt-3 ${
-              theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+              theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
             }`}>This is practice.</span>
           </h2>
         </motion.div>
@@ -1094,12 +1094,12 @@ function PhilosophySection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className={`mt-24 p-10 rounded-3xl ${
             theme === 'light'
-              ? 'bg-gradient-to-br from-purple-50 via-white to-pink-50 border border-purple-100 shadow-xl shadow-purple-100/50'
+              ? 'bg-gradient-to-br from-purple-50 via-white to-pink-50 border border-indigo-100 shadow-xl shadow-indigo-100/50'
               : 'bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700'
           }`}
         >
           <Quote className={`w-12 h-12 mb-6 ${
-            theme === 'light' ? 'text-purple-400' : 'text-violet-500'
+            theme === 'light' ? 'text-indigo-400' : 'text-violet-500'
           }`} />
           <blockquote className={`text-base md:text-lg font-medium mb-8 leading-relaxed ${
             theme === 'light' ? 'text-slate-800' : 'text-white'
@@ -1108,7 +1108,7 @@ function PhilosophySection() {
           </blockquote>
           <div className={theme === 'light' ? 'text-slate-500' : 'text-slate-400'}>
             <span className={`font-semibold text-lg ${
-              theme === 'light' ? 'text-purple-600' : 'text-slate-300'
+              theme === 'light' ? 'text-indigo-600' : 'text-slate-300'
             }`}>Praxis Simulation</span>
             <span className="mx-3">·</span>
             <span className="text-lg">Design Philosophy</span>
@@ -1176,7 +1176,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
       <div
         className={`relative rounded-3xl overflow-hidden transition-all duration-500 ${
           theme === 'light'
-            ? `bg-white/80 backdrop-blur-sm border-2 ${style.border} ${isExpanded ? 'shadow-2xl shadow-purple-200/50' : 'shadow-lg shadow-purple-100/30'}`
+            ? `bg-white/80 backdrop-blur-sm border-2 ${style.border} ${isExpanded ? 'shadow-2xl shadow-indigo-200/50' : 'shadow-lg shadow-indigo-100/30'}`
             : `bg-slate-900/80 backdrop-blur-sm border ${style.border} ${isExpanded ? 'shadow-2xl shadow-violet-500/10' : ''}`
         }`}
       >
@@ -1262,13 +1262,13 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
               <div className="px-8 pb-8 space-y-8">
                 {/* Divider */}
                 <div className={`h-px ${
-                  theme === 'light' ? 'bg-purple-100' : 'bg-slate-800'
+                  theme === 'light' ? 'bg-indigo-100' : 'bg-slate-800'
                 }`} />
 
                 {/* The Hook */}
                 <div>
                   <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${
-                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+                    theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
                   }`}>The Scenario</h4>
                   <p className={`text-xl leading-relaxed ${
                     theme === 'light' ? 'text-slate-700' : 'text-slate-200'
@@ -1278,7 +1278,7 @@ function SimulationCard({ sim, index }: { sim: typeof SIMULATIONS[0]; index: num
                 {/* The Stakes */}
                 <div>
                   <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${
-                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+                    theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
                   }`}>The Stakes</h4>
                   <div className="grid grid-cols-2 gap-3">
                     {sim.stakes.map((stake, i) => (
@@ -1350,7 +1350,7 @@ function SimulationsSection() {
           }`}>
             Nine Simulations.
             <span className={`block ${
-              theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+              theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
             }`}>Infinite Lessons.</span>
           </h2>
           <p className={`text-lg max-w-2xl mx-auto ${
@@ -1415,12 +1415,12 @@ function TestimonialsSection() {
               transition={{ delay: index * 0.1 }}
               className={`rounded-3xl p-10 ${
                 theme === 'light'
-                  ? 'bg-gradient-to-br from-purple-50 via-white to-pink-50 border border-purple-100 shadow-xl shadow-purple-100/30'
+                  ? 'bg-gradient-to-br from-purple-50 via-white to-pink-50 border border-indigo-100 shadow-xl shadow-indigo-100/30'
                   : 'bg-slate-800/50 backdrop-blur-sm border border-slate-700'
               }`}
             >
               <Quote className={`w-10 h-10 mb-6 ${
-                theme === 'light' ? 'text-purple-400' : 'text-cyan-500'
+                theme === 'light' ? 'text-indigo-400' : 'text-cyan-500'
               }`} />
               <p className={`leading-relaxed mb-8 text-lg ${
                 theme === 'light' ? 'text-slate-700' : 'text-slate-200'
@@ -1443,7 +1443,7 @@ function TestimonialsSection() {
                     theme === 'light' ? 'text-slate-600' : 'text-slate-300'
                   }`}>{testimonial.role}</div>
                   <div className={`text-sm mt-1 ${
-                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+                    theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
                   }`}>{testimonial.simulation}</div>
                 </div>
               </div>
@@ -1524,17 +1524,17 @@ function AudienceSection() {
               transition={{ delay: index * 0.1 }}
               className={`p-8 rounded-3xl transition-all duration-300 ${
                 theme === 'light'
-                  ? 'bg-white/80 border border-purple-100 shadow-lg shadow-purple-100/20 hover:shadow-xl hover:shadow-purple-200/30 hover:border-purple-200'
+                  ? 'bg-white/80 border border-indigo-100 shadow-lg shadow-indigo-100/20 hover:shadow-xl hover:shadow-indigo-200/30 hover:border-indigo-200'
                   : 'bg-slate-900/50 border border-slate-800 hover:border-slate-700'
               }`}
             >
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
                 theme === 'light'
-                  ? 'bg-purple-100'
+                  ? 'bg-indigo-100'
                   : 'bg-cyan-500/20'
               }`}>
                 <audience.icon className={`w-8 h-8 ${
-                  theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
+                  theme === 'light' ? 'text-indigo-600' : 'text-cyan-400'
                 }`} />
               </div>
               <h3 className={`text-xl font-bold mb-3 ${
@@ -1618,7 +1618,7 @@ function FinalCTA() {
               href="#simulations"
               className={`group px-12 py-6 font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg ${
                 theme === 'light'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105'
                   : 'bg-white text-slate-900 hover:bg-slate-100 shadow-xl shadow-white/10'
               }`}
             >
@@ -1630,7 +1630,7 @@ function FinalCTA() {
               href="/facilitator"
               className={`px-12 py-6 font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg ${
                 theme === 'light'
-                  ? 'bg-white/80 backdrop-blur-sm text-purple-700 border-2 border-purple-200 hover:border-purple-300 hover:bg-white'
+                  ? 'bg-white/80 backdrop-blur-sm text-indigo-700 border-2 border-indigo-200 hover:border-indigo-300 hover:bg-white'
                   : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20'
               }`}
             >
@@ -1650,7 +1650,7 @@ function Footer() {
   return (
     <footer className={`py-20 border-t ${
       theme === 'light'
-        ? 'bg-white/80 border-purple-100'
+        ? 'bg-white/80 border-indigo-100'
         : 'bg-slate-950 border-slate-900'
     }`}>
       <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
@@ -1667,14 +1667,14 @@ function Footer() {
           <div className={`flex gap-10 text-lg ${
             theme === 'light' ? 'text-slate-600' : 'text-slate-300'
           }`}>
-            <Link href="#simulations" className={`hover:${theme === 'light' ? 'text-purple-600' : 'text-white'} transition-colors`}>Simulations</Link>
-            <Link href="/facilitator" className={`hover:${theme === 'light' ? 'text-purple-600' : 'text-white'} transition-colors`}>Facilitator</Link>
-            <Link href="/debrief" className={`hover:${theme === 'light' ? 'text-purple-600' : 'text-white'} transition-colors`}>Debrief</Link>
+            <Link href="#simulations" className={`hover:${theme === 'light' ? 'text-indigo-600' : 'text-white'} transition-colors`}>Simulations</Link>
+            <Link href="/facilitator" className={`hover:${theme === 'light' ? 'text-indigo-600' : 'text-white'} transition-colors`}>Facilitator</Link>
+            <Link href="/debrief" className={`hover:${theme === 'light' ? 'text-indigo-600' : 'text-white'} transition-colors`}>Debrief</Link>
           </div>
         </div>
 
         <div className={`mt-14 pt-10 border-t text-center text-lg ${
-          theme === 'light' ? 'border-purple-100 text-slate-500' : 'border-slate-800 text-slate-400'
+          theme === 'light' ? 'border-indigo-100 text-slate-500' : 'border-slate-800 text-slate-400'
         }`}>
           <p>Designed for executive education, MBA programs, and leadership development.</p>
           <p className="mt-2">© {new Date().getFullYear()} Praxis Simulation Suite</p>

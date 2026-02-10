@@ -1,214 +1,94 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Route } from 'next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Mail,
-  Chrome,
   Loader2,
   Sun,
   Moon,
-  Volume2,
-  VolumeX,
-  Play,
-  ChevronRight,
+  Building2,
+  Layers,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 // =============================================================================
-// VIDEO BACKGROUND COMPONENT (INLINE FOR LOGIN PAGE)
+// MICROSOFT ICON COMPONENT
 // =============================================================================
 
-function LoginVideoBackground() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasError, setHasError] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showControls, setShowControls] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || hasError) return;
-
-    const attemptPlay = async () => {
-      try {
-        video.muted = true;
-        await video.play();
-        setIsPlaying(true);
-        setShowControls(true);
-      } catch {
-        setShowControls(true);
-      }
-    };
-
-    attemptPlay();
-  }, [hasError]);
-
-  const toggleSound = async () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isMuted) {
-      video.muted = false;
-      setIsMuted(false);
-      try {
-        await video.play();
-        setIsPlaying(true);
-      } catch {
-        video.muted = true;
-        setIsMuted(true);
-      }
-    } else {
-      video.muted = true;
-      setIsMuted(true);
-    }
-  };
-
-  const handlePlay = async () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    try {
-      await video.play();
-      setIsPlaying(true);
-    } catch {
-      // Autoplay blocked
-    }
-  };
-
-  // Fallback gradient when no video or error
-  if (hasError) {
-    return (
-      <div
-        className={`absolute inset-0 ${
-          theme === 'light'
-            ? 'bg-gradient-to-br from-violet-100 via-pink-50 to-blue-100'
-            : 'bg-gradient-to-br from-[#0a0a1a] via-[#1a1a3e] to-[#0f0f2e]'
-        }`}
-      >
-        {/* Animated gradient orbs */}
-        <motion.div
-          className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl ${
-            theme === 'light' ? 'bg-purple-200/50' : 'bg-cyan-500/10'
-          }`}
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 30, 0],
-            y: [0, -20, 0],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className={`absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl ${
-            theme === 'light' ? 'bg-pink-200/50' : 'bg-fuchsia-500/10'
-          }`}
-          animate={{
-            scale: [1.2, 1, 1.2],
-            x: [0, -20, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
-    );
-  }
-
+function MicrosoftIcon({ className }: { className?: string }) {
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/scenarios/scenario-01.mp4"
-        autoPlay
-        loop
-        playsInline
-        muted={isMuted}
-        preload="auto"
-        onError={() => setHasError(true)}
-      />
-
-      {/* Subtle overlay */}
-      <div
-        className={`absolute inset-0 ${
-          theme === 'light'
-            ? 'bg-gradient-to-r from-white/30 to-transparent'
-            : 'bg-gradient-to-r from-black/40 to-transparent'
-        }`}
-      />
-
-      {/* Sound control */}
-      {showControls && (
-        <motion.button
-          onClick={isPlaying ? toggleSound : handlePlay}
-          className={`absolute bottom-6 left-6 z-10 flex items-center gap-2 px-4 py-2
-                     backdrop-blur-md rounded-full border transition-all duration-200 text-sm font-medium
-                     ${
-                       theme === 'light'
-                         ? 'bg-white/60 border-purple-200/50 text-purple-700 hover:bg-white/80'
-                         : 'bg-white/10 border-white/20 text-white/90 hover:bg-white/20'
-                     }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-        >
-          {!isPlaying ? (
-            <>
-              <Play className="w-4 h-4" />
-              <span>Play video</span>
-            </>
-          ) : isMuted ? (
-            <>
-              <VolumeX className="w-4 h-4" />
-              <span>Enable sound</span>
-            </>
-          ) : (
-            <>
-              <Volume2 className="w-4 h-4" />
-              <span>Sound on</span>
-            </>
-          )}
-        </motion.button>
-      )}
-    </div>
+    <svg className={className} viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+      <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+      <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+      <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+    </svg>
   );
 }
 
 // =============================================================================
-// SOCIAL LOGIN BUTTON COMPONENT
+// GOOGLE ICON COMPONENT
 // =============================================================================
 
-interface SocialButtonProps {
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+// =============================================================================
+// LOGIN BUTTON COMPONENT
+// =============================================================================
+
+interface LoginButtonProps {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'filled' | 'outlined';
+  isLoading?: boolean;
 }
 
-function SocialButton({ icon, label, onClick, variant = 'primary' }: SocialButtonProps) {
+function LoginButton({ icon, label, onClick, variant = 'outlined', isLoading }: LoginButtonProps) {
   const { theme } = useTheme();
+
+  const baseStyles = `
+    w-full flex items-center gap-4 px-5 py-4 rounded-lg
+    font-medium text-base transition-all duration-200
+    focus:outline-none focus:ring-2 focus:ring-offset-2
+  `;
+
+  const variantStyles = {
+    filled: theme === 'light'
+      ? 'bg-[#2F2F2F] text-white hover:bg-[#1F1F1F] focus:ring-gray-500'
+      : 'bg-white text-gray-900 hover:bg-gray-100 focus:ring-white',
+    outlined: theme === 'light'
+      ? 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:ring-indigo-500'
+      : 'bg-transparent text-white border border-gray-600 hover:bg-white/5 hover:border-gray-500 focus:ring-cyan-500',
+  };
 
   return (
     <motion.button
       onClick={onClick}
-      className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl
-                 font-semibold text-base transition-all duration-200
-                 ${
-                   variant === 'primary'
-                     ? theme === 'light'
-                       ? 'bg-white text-gray-800 hover:bg-gray-50 shadow-lg shadow-purple-500/10 border border-purple-100'
-                       : 'bg-white text-gray-900 hover:bg-gray-100'
-                     : theme === 'light'
-                     ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-500/25'
-                     : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-gray-900 hover:from-cyan-400 hover:to-cyan-500'
-                 }`}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className={`${baseStyles} ${variantStyles[variant]}`}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      disabled={isLoading}
     >
-      {icon}
-      <span>{label}</span>
+      {isLoading ? (
+        <Loader2 className="w-5 h-5 animate-spin" />
+      ) : (
+        icon
+      )}
+      <span className="flex-1 text-left">{label}</span>
     </motion.button>
   );
 }
@@ -226,49 +106,102 @@ export default function LoginPage() {
     setMounted(true);
   }, []);
 
+  const handleMicrosoftLogin = async () => {
+    setIsLoading(true);
+    // TODO: Implement Microsoft auth
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement Supabase Google auth
-    // const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+    // TODO: Implement Google auth
     setTimeout(() => setIsLoading(false), 1500);
   };
 
   const handleEmailLogin = async () => {
     setIsLoading(true);
-    // TODO: Navigate to email login flow or show email input
+    // TODO: Navigate to email login flow
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
+  const handleWorkLogin = async () => {
+    setIsLoading(true);
+    // TODO: Implement work/school auth
     setTimeout(() => setIsLoading(false), 1500);
   };
 
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex relative">
+    <div className="min-h-screen flex">
       {/* ===================================================================
-          FULL-SCREEN VIDEO BACKGROUND - Always visible on all screen sizes
+          LEFT PANEL - Marketing/Branding (Hidden on mobile)
           =================================================================== */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          zIndex: 0,
-          opacity: 1,
-          display: 'block',
-          visibility: 'visible',
-        }}
-        src="/scenarios/scenario-01.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
-      {/* ===================================================================
-          LEFT PANEL - Overlay content on video (2/3 width on desktop)
-          =================================================================== */}
-      <div className="hidden lg:flex lg:flex-1 relative z-10">
-        {/* Dark gradient overlay for text readability over video */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
+      <div
+        className={`hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden ${
+          theme === 'light'
+            ? 'bg-gradient-to-br from-[#E8DCFF] via-[#F0E6FF] to-[#E0E8FF]'
+            : 'bg-gradient-to-br from-[#0F0A1A] via-[#1A1025] to-[#0A0F1A]'
+        }`}
+      >
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {theme === 'light' ? (
+            <>
+              <motion.div
+                className="absolute -top-20 -left-20 w-96 h-96 bg-purple-300/40 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  x: [0, 30, 0],
+                  y: [0, -20, 0],
+                }}
+                transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.div
+                className="absolute top-1/3 right-0 w-80 h-80 bg-indigo-300/30 rounded-full blur-3xl"
+                animate={{
+                  scale: [1.2, 1, 1.2],
+                  x: [0, -40, 0],
+                }}
+                transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.div
+                className="absolute bottom-0 left-1/4 w-72 h-72 bg-pink-200/40 rounded-full blur-3xl"
+                animate={{
+                  y: [0, -30, 0],
+                }}
+                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </>
+          ) : (
+            <>
+              <motion.div
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[150px]"
+                animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
+                transition={{ duration: 10, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[120px]"
+                animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.1, 0.15] }}
+                transition={{ duration: 12, repeat: Infinity }}
+              />
+              {/* Grid pattern for dark mode */}
+              <div
+                className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px)
+                  `,
+                  backgroundSize: '60px 60px',
+                }}
+              />
+            </>
+          )}
+        </div>
 
-        {/* Branding overlay */}
-        <div className="absolute inset-0 flex flex-col justify-between p-12 z-10">
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -277,24 +210,17 @@ export default function LoginPage() {
           >
             <Link href="/" className="inline-flex items-center gap-3">
               <div
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center
-                           ${
-                             theme === 'light'
-                               ? 'bg-white/80 backdrop-blur-sm shadow-lg'
-                               : 'bg-white/10 backdrop-blur-sm border border-white/20'
-                           }`}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  theme === 'light'
+                    ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
+                    : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+                }`}
               >
-                <span
-                  className={`text-xl font-bold ${
-                    theme === 'light' ? 'text-purple-600' : 'text-cyan-400'
-                  }`}
-                >
-                  P
-                </span>
+                <Layers className="w-5 h-5 text-white" />
               </div>
               <span
-                className={`text-2xl font-bold font-heading ${
-                  theme === 'light' ? 'text-gray-800' : 'text-white'
+                className={`text-xl font-bold ${
+                  theme === 'light' ? 'text-gray-900' : 'text-white'
                 }`}
               >
                 Praxis
@@ -302,192 +228,297 @@ export default function LoginPage() {
             </Link>
           </motion.div>
 
-          {/* Tagline */}
+          {/* Main content */}
           <motion.div
             className="max-w-lg"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p
-              className={`text-lg font-medium mb-2 ${
-                theme === 'light' ? 'text-gray-700' : 'text-white/80'
+            <h1
+              className={`text-4xl xl:text-5xl font-bold mb-6 leading-tight ${
+                theme === 'light' ? 'text-gray-900' : 'text-white'
               }`}
             >
-              Executive Simulations
-            </p>
+              Master leadership through simulation
+            </h1>
             <p
-              className={`text-sm ${
-                theme === 'light' ? 'text-gray-500' : 'text-white/50'
+              className={`text-lg mb-8 ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
               }`}
             >
-              Where leaders learn by doing. Experience the pressure of real decisions
-              in a safe environment.
+              Experience high-stakes executive decisions in a safe environment.
+              Build the skills you need to lead with confidence.
             </p>
+          </motion.div>
+
+          {/* Feature showcase image area */}
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <div
+              className={`relative rounded-2xl overflow-hidden shadow-2xl ${
+                theme === 'light'
+                  ? 'bg-white/80 backdrop-blur-sm border border-purple-100'
+                  : 'bg-gray-900/80 backdrop-blur-sm border border-gray-700'
+              }`}
+            >
+              {/* Simulated dashboard preview */}
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      theme === 'light' ? 'bg-red-400' : 'bg-red-500'
+                    }`}
+                  />
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      theme === 'light' ? 'bg-yellow-400' : 'bg-yellow-500'
+                    }`}
+                  />
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      theme === 'light' ? 'bg-green-400' : 'bg-green-500'
+                    }`}
+                  />
+                </div>
+                <div
+                  className={`h-40 rounded-lg flex items-center justify-center ${
+                    theme === 'light'
+                      ? 'bg-gradient-to-br from-purple-50 to-indigo-50'
+                      : 'bg-gradient-to-br from-gray-800 to-gray-900'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div
+                      className={`text-2xl font-bold mb-2 ${
+                        theme === 'light'
+                          ? 'text-purple-600'
+                          : 'text-cyan-400'
+                      }`}
+                    >
+                      9 Simulations
+                    </div>
+                    <div
+                      className={`text-sm ${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}
+                    >
+                      Strategy • Finance • Operations • Leadership
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating accent elements */}
+            <motion.div
+              className={`absolute -top-4 -right-4 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg ${
+                theme === 'light'
+                  ? 'bg-gradient-to-br from-pink-400 to-purple-500'
+                  : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+              }`}
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <span className="text-white text-2xl">🎯</span>
+            </motion.div>
           </motion.div>
         </div>
       </div>
 
       {/* ===================================================================
-          RIGHT PANEL - Login Form (1/3 width on desktop, full on mobile)
+          RIGHT PANEL - Login Form
           =================================================================== */}
       <div
-        className={`w-full lg:w-[420px] xl:w-[480px] flex flex-col relative z-10
-                   ${
-                     theme === 'light'
-                       ? 'bg-gray-900/90 backdrop-blur-sm'
-                       : 'bg-[#0a0a12]/90 backdrop-blur-sm'
-                   }`}
+        className={`w-full lg:w-1/2 xl:w-[45%] flex flex-col ${
+          theme === 'light'
+            ? 'bg-white'
+            : 'bg-[#0A0A10]'
+        }`}
       >
-        {/* Theme toggle */}
-        <motion.button
-          onClick={toggleTheme}
-          className={`absolute top-6 right-6 p-3 rounded-xl transition-all duration-200
-                     ${
-                       theme === 'light'
-                         ? 'bg-white/10 hover:bg-white/20 text-white'
-                         : 'bg-white/5 hover:bg-white/10 text-white'
-                     }`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          {theme === 'light' ? (
-            <Moon className="w-5 h-5" />
-          ) : (
-            <Sun className="w-5 h-5 text-amber-400" />
-          )}
-        </motion.button>
+        {/* Top bar with theme toggle and language (simulated) */}
+        <div className="flex items-center justify-end gap-4 p-6">
+          <motion.button
+            onClick={toggleTheme}
+            className={`p-2.5 rounded-lg transition-all duration-200 ${
+              theme === 'light'
+                ? 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {theme === 'light' ? (
+              <Moon className="w-5 h-5" />
+            ) : (
+              <Sun className="w-5 h-5" />
+            )}
+          </motion.button>
+        </div>
 
         {/* Mobile logo */}
-        <div className="lg:hidden p-6 pb-0">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-              <span className="text-lg font-bold text-cyan-400">P</span>
+        <div className="lg:hidden px-8 pb-6">
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                theme === 'light'
+                  ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
+                  : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+              }`}
+            >
+              <Layers className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-white font-heading">Praxis</span>
+            <span
+              className={`text-xl font-bold ${
+                theme === 'light' ? 'text-gray-900' : 'text-white'
+              }`}
+            >
+              Praxis
+            </span>
           </Link>
         </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col justify-center px-8 lg:px-12 py-12">
+        {/* Main login content */}
+        <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="max-w-md mx-auto w-full"
           >
-            {/* Headline */}
-            <h1 className="text-4xl lg:text-5xl font-bold text-white font-heading mb-3 tracking-tight">
-              LEAD WITH
-              <br />
-              <span
-                className={
-                  theme === 'light'
-                    ? 'text-purple-400'
-                    : 'bg-gradient-to-r from-cyan-400 to-fuchsia-400 bg-clip-text text-transparent'
-                }
-              >
-                CONFIDENCE
-              </span>
+            {/* Heading */}
+            <h1
+              className={`text-3xl font-bold mb-2 ${
+                theme === 'light' ? 'text-gray-900' : 'text-white'
+              }`}
+            >
+              Sign in or create an account
             </h1>
-
-            <p className="text-gray-400 mb-10">
-              Sign in to access executive simulations
+            <p
+              className={`mb-10 ${
+                theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+              }`}
+            >
+              Then start running simulations!
             </p>
 
-            {/* Social login buttons */}
-            <div className="space-y-4">
-              <SocialButton
-                icon={<Chrome className="w-5 h-5" />}
-                label="Sign in with Google"
-                onClick={handleGoogleLogin}
+            {/* Login buttons */}
+            <div className="space-y-3">
+              <LoginButton
+                icon={<MicrosoftIcon className="w-5 h-5" />}
+                label="Continue with Microsoft"
+                onClick={handleMicrosoftLogin}
+                variant="filled"
               />
 
               {/* Divider */}
-              <div className="flex items-center gap-4 py-2">
-                <div className="flex-1 h-px bg-gray-700" />
-                <span className="text-gray-500 text-sm">or</span>
-                <div className="flex-1 h-px bg-gray-700" />
+              <div className="flex items-center gap-4 py-3">
+                <div
+                  className={`flex-1 h-px ${
+                    theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+                  }`}
+                />
+                <span
+                  className={`text-sm ${
+                    theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  Or
+                </span>
+                <div
+                  className={`flex-1 h-px ${
+                    theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+                  }`}
+                />
               </div>
 
-              <SocialButton
-                icon={
-                  isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Mail className="w-5 h-5" />
-                  )
-                }
-                label="Sign in with email"
+              <LoginButton
+                icon={<Mail className="w-5 h-5" />}
+                label="Continue with email"
                 onClick={handleEmailLogin}
-                variant="secondary"
+                variant="outlined"
+              />
+
+              <LoginButton
+                icon={<GoogleIcon className="w-5 h-5" />}
+                label="Continue with Google"
+                onClick={handleGoogleLogin}
+                variant="outlined"
+              />
+
+              <LoginButton
+                icon={<Building2 className="w-5 h-5" />}
+                label="Sign in to Praxis for work or school accounts"
+                onClick={handleWorkLogin}
+                variant="outlined"
               />
             </div>
-
-            {/* Terms */}
-            <p className="text-gray-500 text-sm mt-8 leading-relaxed">
-              By signing in, you agree to our{' '}
-              <Link href={'/terms' as Route} className="text-gray-300 hover:text-white underline">
-                Terms of Service
-              </Link>
-              ,{' '}
-              <Link href={'/privacy' as Route} className="text-gray-300 hover:text-white underline">
-                Privacy Policy
-              </Link>
-              , and{' '}
-              <Link href={'/acceptable-use' as Route} className="text-gray-300 hover:text-white underline">
-                Acceptable Use Policy
-              </Link>
-              .
-            </p>
           </motion.div>
         </div>
 
         {/* Footer */}
-        <div className="px-8 lg:px-12 py-6 border-t border-gray-800">
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-            <a
-              href="https://twitter.com"
-              className="text-gray-500 hover:text-white transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
+        <div className="px-8 lg:px-16 xl:px-20 py-8">
+          <div className="max-w-md mx-auto w-full">
+            <div
+              className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm ${
+                theme === 'light' ? 'text-gray-500' : 'text-gray-500'
+              }`}
             >
-              Twitter
-            </a>
-            <a
-              href="https://linkedin.com"
-              className="text-gray-500 hover:text-white transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>
-            <Link
-              href={'/careers' as Route}
-              className="text-gray-500 hover:text-white transition-colors"
-            >
-              Careers
-            </Link>
-            <Link
-              href={'/blog' as Route}
-              className="text-gray-500 hover:text-white transition-colors"
-            >
-              Blog
-            </Link>
-          </div>
+              <Link
+                href={'/terms' as Route}
+                className={`hover:underline ${
+                  theme === 'light'
+                    ? 'text-indigo-600 hover:text-indigo-700'
+                    : 'text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                Terms
+              </Link>
+              <span>|</span>
+              <Link
+                href={'/privacy' as Route}
+                className={`hover:underline ${
+                  theme === 'light'
+                    ? 'text-indigo-600 hover:text-indigo-700'
+                    : 'text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                Privacy Statement
+              </Link>
+              <span>|</span>
+              <Link
+                href={'/data-privacy' as Route}
+                className={`hover:underline ${
+                  theme === 'light'
+                    ? 'text-indigo-600 hover:text-indigo-700'
+                    : 'text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                Data Privacy Policy
+              </Link>
+            </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-4 text-xs text-gray-600">
-            <Link href={'/privacy' as Route} className="hover:text-gray-400 transition-colors">
-              Privacy policy
-            </Link>
-            <Link href={'/terms' as Route} className="hover:text-gray-400 transition-colors">
-              Terms of service
-            </Link>
-            <Link href={'/support' as Route} className="hover:text-gray-400 transition-colors">
-              Support
-            </Link>
+            <div
+              className={`flex items-center justify-center gap-4 mt-4 text-xs ${
+                theme === 'light' ? 'text-gray-400' : 'text-gray-600'
+              }`}
+            >
+              <Link
+                href={'/support' as Route}
+                className={`hover:underline ${
+                  theme === 'light'
+                    ? 'text-indigo-600 hover:text-indigo-700'
+                    : 'text-cyan-400 hover:text-cyan-300'
+                }`}
+              >
+                Account help
+              </Link>
+              <span>&copy; {new Date().getFullYear()} Praxis Simulation</span>
+            </div>
           </div>
         </div>
       </div>
