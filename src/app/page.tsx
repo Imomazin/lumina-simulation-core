@@ -51,6 +51,7 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
   const [isHovering, setIsHovering] = useState(false);
   const [showTagline, setShowTagline] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const taglineTimer = setTimeout(() => setShowTagline(true), 800);
@@ -71,6 +72,26 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
       exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.8, ease: 'easeInOut' }}
     >
+      {/* Video Background */}
+      {!videoError && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/scenarios/scenario-01.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          onError={() => setVideoError(true)}
+        />
+      )}
+      {/* Video Overlay for readability */}
+      <div
+        className={`absolute inset-0 ${
+          theme === 'light'
+            ? 'bg-gradient-to-br from-white/70 via-white/50 to-white/70'
+            : 'bg-gradient-to-br from-black/60 via-black/40 to-black/60'
+        }`}
+      />
       {/* Theme Toggle on Cover */}
       <motion.button
         onClick={toggleTheme}
