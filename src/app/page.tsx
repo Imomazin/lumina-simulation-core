@@ -92,26 +92,43 @@ function CoverPage({ onEnter }: { onEnter: () => void }) {
             : 'bg-gradient-to-br from-black/60 via-black/40 to-black/60'
         }`}
       />
-      {/* Theme Toggle on Cover */}
-      <motion.button
-        onClick={toggleTheme}
-        className={`absolute top-8 right-8 p-4 rounded-2xl transition-all duration-300 ${
-          theme === 'light'
-            ? 'bg-white/70 backdrop-blur-sm border border-indigo-200/50 hover:bg-white shadow-sm'
-            : 'bg-white/5 backdrop-blur-sm border border-cyan-500/20 hover:bg-white/10'
-        }`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      {/* Top Right Actions - Theme Toggle + Sign In */}
+      <motion.div
+        className="absolute top-8 right-8 flex items-center gap-3"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        {theme === 'light' ? (
-          <Sun className="w-6 h-6 text-amber-500" />
-        ) : (
-          <Moon className="w-6 h-6 text-cyan-400" />
-        )}
-      </motion.button>
+        <motion.button
+          onClick={toggleTheme}
+          className={`p-4 rounded-2xl transition-all duration-300 ${
+            theme === 'light'
+              ? 'bg-white/70 backdrop-blur-sm border border-indigo-200/50 hover:bg-white shadow-sm'
+              : 'bg-white/5 backdrop-blur-sm border border-cyan-500/20 hover:bg-white/10'
+          }`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {theme === 'light' ? (
+            <Sun className="w-6 h-6 text-amber-500" />
+          ) : (
+            <Moon className="w-6 h-6 text-cyan-400" />
+          )}
+        </motion.button>
+        <Link href="/login">
+          <motion.div
+            className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${
+              theme === 'light'
+                ? 'bg-white/80 backdrop-blur-sm border border-indigo-200/50 text-indigo-700 hover:bg-white shadow-sm'
+                : 'bg-white/10 backdrop-blur-sm border border-cyan-500/30 text-cyan-300 hover:bg-white/15'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Sign In
+          </motion.div>
+        </Link>
+      </motion.div>
 
       {/* Light Theme Background - Clipchamp style */}
       {theme === 'light' && (
@@ -689,44 +706,94 @@ const TESTIMONIALS = [
 ];
 
 // =============================================================================
-// THEME TOGGLE COMPONENT
+// HEADER WITH THEME TOGGLE AND SIGN IN
 // =============================================================================
 
-function ThemeToggle() {
+function Header() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <motion.button
-      onClick={toggleTheme}
-      className="fixed top-6 right-6 z-50 p-4 rounded-2xl glass transition-all duration-300"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      aria-label="Toggle theme"
+    <motion.header
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
     >
-      <AnimatePresence mode="wait">
-        {theme === 'light' ? (
-          <motion.div
-            key="sun"
-            initial={{ rotate: -90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 90, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+      <div className={`max-w-[1400px] mx-auto flex items-center justify-between px-6 py-3 rounded-2xl ${
+        theme === 'light'
+          ? 'bg-white/80 backdrop-blur-md border border-indigo-100 shadow-sm'
+          : 'bg-slate-900/80 backdrop-blur-md border border-slate-800'
+      }`}>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+            theme === 'light'
+              ? 'bg-gradient-to-br from-indigo-600 to-purple-600'
+              : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+          }`}>
+            <Layers className="w-5 h-5 text-white" />
+          </div>
+          <span className={`text-xl font-bold ${
+            theme === 'light' ? 'text-slate-800' : 'text-white'
+          }`}>
+            Praxis
+          </span>
+        </Link>
+
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
+          <motion.button
+            onClick={toggleTheme}
+            className={`p-3 rounded-xl transition-all duration-300 ${
+              theme === 'light'
+                ? 'bg-indigo-50 hover:bg-indigo-100 text-amber-500'
+                : 'bg-slate-800 hover:bg-slate-700 text-cyan-400'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Toggle theme"
           >
-            <Sun className="w-7 h-7 text-amber-500" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="moon"
-            initial={{ rotate: 90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: -90, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Moon className="w-7 h-7 text-cyan-400" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.button>
+            <AnimatePresence mode="wait">
+              {theme === 'light' ? (
+                <motion.div
+                  key="sun"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Sun className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="moon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Moon className="w-5 h-5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          <Link href="/login">
+            <motion.div
+              className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 ${
+                theme === 'light'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-500/25'
+                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-900 hover:shadow-lg hover:shadow-cyan-500/25'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Sign In
+            </motion.div>
+          </Link>
+        </div>
+      </div>
+    </motion.header>
   );
 }
 
@@ -1737,7 +1804,7 @@ export default function HomePage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <ThemeToggle />
+          <Header />
           <CinematicHero />
           <PhilosophySection />
           <SimulationsSection />
