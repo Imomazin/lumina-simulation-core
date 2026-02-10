@@ -1329,13 +1329,29 @@ You gave everything. The market decided it wasn't enough.`,
 
 function IntroScreen({ onStart }: { onStart: () => void }) {
   const [step, setStep] = useState(0);
+  const [videoError, setVideoError] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Video Background */}
+      {!videoError && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/scenarios/scenario-02.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          onError={() => setVideoError(true)}
+        />
+      )}
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-violet-950/60 to-slate-950/80" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl w-full"
+        className="max-w-3xl w-full relative z-10"
       >
         {step === 0 && (
           <div className="text-center space-y-8">

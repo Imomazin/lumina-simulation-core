@@ -737,12 +737,29 @@ const INITIAL_STATE: GameState = {
 // =============================================================================
 
 function IntroScreen({ onStart }: { onStart: () => void }) {
+  const [videoError, setVideoError] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Video Background */}
+      {!videoError && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/scenarios/scenario-05.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          onError={() => setVideoError(true)}
+        />
+      )}
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-orange-950/80" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl"
+        className="max-w-4xl relative z-10"
       >
         <div className="text-center mb-12">
           <motion.div

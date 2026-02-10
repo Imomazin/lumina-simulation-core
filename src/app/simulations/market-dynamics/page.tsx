@@ -543,10 +543,26 @@ You fought. You just didn't win.`,
 
 function IntroScreen({ onStart }: { onStart: () => void }) {
   const [step, setStep] = useState(0);
+  const [videoError, setVideoError] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/20 to-slate-950 flex items-center justify-center p-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl w-full">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/20 to-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Video Background */}
+      {!videoError && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/scenarios/scenario-03.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          onError={() => setVideoError(true)}
+        />
+      )}
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-blue-950/60 to-slate-950/80" />
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl w-full relative z-10">
         {step === 0 && (
           <div className="text-center space-y-8">
             <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6 }}>
